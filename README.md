@@ -129,17 +129,17 @@
 
 ## Project Status
 
-🚧 Currently under development.
+Currently under development.
 
 ---
 
-## 📄 License
+## License
 
 This project is intended for educational and academic purposes.
 
 ---
 
-## 🤝 Contributors
+## Contributors
 
 - Group Members : Talha Osman Morshed
 - ID : 20230204002
