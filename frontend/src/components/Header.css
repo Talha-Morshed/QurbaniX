@@ -35,7 +35,7 @@
   color: #9b1455;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
   .header {
     flex-direction: column;
     align-items: stretch;
@@ -45,5 +45,20 @@
   .header__nav {
     justify-content: center;
     flex-wrap: wrap;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .header {
+    padding: 0.85rem 1rem;
+  }
+
+  .header__brand {
+    font-size: 0.95rem;
+  }
+
+  .header__nav a {
+    font-size: 0.92rem;
   }
 }

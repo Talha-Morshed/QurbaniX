@@ -36,6 +36,11 @@
 @media (max-width: 600px) {
   .footer__inner {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+  }
+
+  .footer__links {
+    justify-content: center;
+    width: auto;
   }
 }
