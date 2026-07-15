@@ -1,25 +1,22 @@
+@import "tailwindcss";
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   color: #0f172a;
   background-color: #eef2ff;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 * {
   box-sizing: border-box;
 }
 
-html,
-body,
-#root {
-  min-height: 100%;
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   margin: 0;
+  min-height: 100%;
   background: #eef2ff;
   color: #0f172a;
 }
@@ -31,4 +28,9 @@ a {
 
 button {
   cursor: pointer;
+}
+
+::selection {
+  background: #fbcfe8;
+  color: #831843;
 }
