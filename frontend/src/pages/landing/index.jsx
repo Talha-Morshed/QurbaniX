@@ -1,9 +1,11 @@
+import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import './styles.css';
 
 function LandingPage() {
   return (
-    <div className="landing">
+    <div className="landing" id="home">
+      <Header />
       <main className="landing__hero">
         <div className="landing__content">
           <span className="landing__badge">Verified Butchers</span>
