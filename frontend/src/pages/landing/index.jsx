@@ -1,3 +1,4 @@
+import Footer from '../../components/Footer';
 import './styles.css';
 
 function LandingPage() {
@@ -5,16 +6,17 @@ function LandingPage() {
     <div className="landing">
       <main className="landing__hero">
         <div className="landing__content">
-          <span className="landing__badge">Verified butcher</span>
-          <h1 className="landing__title">Book fast.</h1>
+          <span className="landing__badge">Verified Butchers</span>
+          <h1 className="landing__title">QurbaniX</h1>
           <p className="landing__text">
-            One tap to a trusted Qurbani service.
+            One tap away from a trusted Qurbani service.
           </p>
           <button className="landing__button" type="button">
-            Start
+            Get Started
           </button>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }
