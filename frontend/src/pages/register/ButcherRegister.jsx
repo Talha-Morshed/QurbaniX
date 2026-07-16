@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import PageShell from '../../components/form/PageShell';
 import FormField from '../../components/form/FormField';
 import { validateEmail, validatePhone } from '../../utils/validation';
@@ -100,6 +101,13 @@ function ButcherRegister() {
           <button type="submit" className="inline-flex w-full items-center justify-center rounded-3xl bg-pink-600 px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-pink-500/20 transition duration-200 hover:bg-pink-700">
             Register
           </button>
+
+          <p className="text-center text-sm text-slate-600">
+            Already have an account?{' '}
+            <Link to="/login/butcher" className="font-semibold text-pink-600 hover:text-pink-800">
+              Log In
+            </Link>
+          </p>
         </form>
       )}
     </PageShell>

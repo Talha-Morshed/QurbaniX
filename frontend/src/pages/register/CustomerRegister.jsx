@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import PageShell from '../../components/form/PageShell';
 import FormField from '../../components/form/FormField';
 import { validateEmail, validatePhone } from '../../utils/validation';
@@ -87,7 +88,10 @@ function CustomerRegister() {
           </button>
 
           <p className="text-center text-sm text-slate-600">
-            Already have an account? <a href="#" className="font-semibold text-pink-600 hover:text-pink-800">Login</a>
+            Already have an account?{' '}
+            <Link to="/login/customer" className="font-semibold text-pink-600 hover:text-pink-800">
+              Log In
+            </Link>
           </p>
         </form>
       )}
