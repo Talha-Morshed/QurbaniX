@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import PageShell from '../../components/form/PageShell';
 import FormField from '../../components/form/FormField';
+import { validateEmail, validatePhone } from '../../utils/validation';
+import { BANGLADESH_DISTRICTS } from '../../constants/locations';
 
 const initialState = {
   fullName: '',
@@ -24,8 +26,16 @@ function ButcherRegister() {
     const nextErrors = {};
     if (!form.fullName.trim()) nextErrors.fullName = 'Full name is required.';
     if (!form.nationalId.trim()) nextErrors.nationalId = 'National ID is required.';
-    if (!form.phone.trim()) nextErrors.phone = 'Phone number is required.';
-    if (!form.email.trim()) nextErrors.email = 'Email address is required.';
+    if (!form.phone.trim()) {
+      nextErrors.phone = 'Phone number is required.';
+    } else if (!validatePhone(form.phone)) {
+      nextErrors.phone = 'Please enter a valid phone number.';
+    }
+    if (!form.email.trim()) {
+      nextErrors.email = 'Email address is required.';
+    } else if (!validateEmail(form.email)) {
+      nextErrors.email = 'Please enter a valid email address.';
+    }
     if (!form.address.trim()) nextErrors.address = 'Address is required.';
     if (!form.experience.trim()) nextErrors.experience = 'Years of experience is required.';
     if (!form.serviceArea.trim()) nextErrors.serviceArea = 'Service area is required.';
@@ -69,9 +79,9 @@ function ButcherRegister() {
             <FormField label="National ID Number" icon="🪪" name="nationalId" value={form.nationalId} onChange={handleChange} error={errors.nationalId} placeholder="Enter your national ID" required />
             <FormField label="Phone Number" icon="📞" name="phone" value={form.phone} onChange={handleChange} error={errors.phone} placeholder="01XXXXXXXXX" required />
             <FormField label="Email Address" icon="📧" type="email" name="email" value={form.email} onChange={handleChange} error={errors.email} placeholder="name@example.com" required />
-            <FormField label="Address" icon="📍" name="address" value={form.address} onChange={handleChange} error={errors.address} placeholder="Enter your address" required />
+            <FormField label="Address" icon="📍" name="address" value={form.address} onChange={handleChange} error={errors.address} placeholder="Enter your address" required suggestions={BANGLADESH_DISTRICTS} />
             <FormField label="Years of Experience" icon="⏳" name="experience" value={form.experience} onChange={handleChange} error={errors.experience} placeholder="e.g. 5" required />
-            <FormField label="Service Area" icon="🌍" name="serviceArea" value={form.serviceArea} onChange={handleChange} error={errors.serviceArea} placeholder="Enter your service area" required />
+            <FormField label="Service Area" icon="🌍" name="serviceArea" value={form.serviceArea} onChange={handleChange} error={errors.serviceArea} placeholder="Enter your service area" required suggestions={BANGLADESH_DISTRICTS} />
             <FormField label="Password" icon="🔒" type="password" name="password" value={form.password} onChange={handleChange} error={errors.password} placeholder="Create a password" required />
             <FormField label="Confirm Password" icon="🔒" type="password" name="confirmPassword" value={form.confirmPassword} onChange={handleChange} error={errors.confirmPassword} placeholder="Confirm your password" required />
           </div>

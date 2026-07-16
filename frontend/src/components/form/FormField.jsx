@@ -1,4 +1,5 @@
-function FormField({ label, icon, type = 'text', name, value, onChange, error, required = false, placeholder }) {
+function FormField({ label, icon, type = 'text', name, value, onChange, error, required = false, placeholder, suggestions }) {
+  const listId = suggestions ? `${name}-suggestions` : undefined;
   return (
     <label className="space-y-2 text-sm font-medium text-slate-700">
       <span className="flex items-center gap-2">
@@ -15,9 +16,17 @@ function FormField({ label, icon, type = 'text', name, value, onChange, error, r
         placeholder={placeholder}
         value={value}
         onChange={onChange}
+        list={listId}
         aria-invalid={!!error}
         aria-describedby={error ? `${name}-error` : undefined}
       />
+      {suggestions && (
+        <datalist id={listId}>
+          {suggestions.map((option, index) => (
+            <option key={index} value={option} />
+          ))}
+        </datalist>
+      )}
       {error && (
         <p id={`${name}-error`} className="text-xs text-rose-600">
           {error}

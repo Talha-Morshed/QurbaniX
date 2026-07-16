@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import PageShell from '../../components/form/PageShell';
 import FormField from '../../components/form/FormField';
+import { validateEmail, validatePhone } from '../../utils/validation';
 
 const initialState = {
   fullName: '',
@@ -20,8 +21,16 @@ function AdminRegister() {
     const nextErrors = {};
     if (!form.fullName.trim()) nextErrors.fullName = 'Full name is required.';
     if (!form.orgName.trim()) nextErrors.orgName = 'Organization/Admin name is required.';
-    if (!form.email.trim()) nextErrors.email = 'Official email is required.';
-    if (!form.phone.trim()) nextErrors.phone = 'Phone number is required.';
+    if (!form.email.trim()) {
+      nextErrors.email = 'Official email is required.';
+    } else if (!validateEmail(form.email)) {
+      nextErrors.email = 'Please enter a valid email address.';
+    }
+    if (!form.phone.trim()) {
+      nextErrors.phone = 'Phone number is required.';
+    } else if (!validatePhone(form.phone)) {
+      nextErrors.phone = 'Please enter a valid phone number.';
+    }
     if (!form.password.trim()) nextErrors.password = 'Password is required.';
     if (!form.confirmPassword.trim()) nextErrors.confirmPassword = 'Confirm password is required.';
     if (form.password && form.confirmPassword && form.password !== form.confirmPassword) {
