@@ -12,6 +12,7 @@ import CustomerResetPassword from './pages/login/CustomerResetPassword.jsx';
 import ButcherResetPassword from './pages/login/ButcherResetPassword.jsx';
 import CustomerDashboard from './pages/dashboard/CustomerDashboard.jsx';
 import ButcherDashboard from './pages/dashboard/ButcherDashboard.jsx';
+import TermsAndConditions from './pages/Terms/TermsAndConditions.jsx';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
         <Route path="/reset-password/butcher" element={<ButcherResetPassword />} />
         <Route path="/dashboard/customer" element={<CustomerDashboard />} />
         <Route path="/dashboard/butcher" element={<ButcherDashboard />} />
+        <Route path="/terms" element={<TermsAndConditions />} />
         <Route path="*" element={<LandingPage />} />
       </Routes>
     </BrowserRouter>

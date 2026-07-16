@@ -23,8 +23,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: radial-gradient(circle at top, rgba(225, 28, 128, 0.14), transparent 30%),
-    #ffffff;
+  background: #ffffff;
 }
 
 .landing__hero {
@@ -41,8 +40,8 @@ body {
   border-radius: 28px;
   padding: 3rem;
   background: #ffffff;
-  border: 1px solid rgba(155, 20, 85, 0.08);
-  box-shadow: 0 30px 60px rgba(155, 20, 85, 0.08);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 30px 60px rgba(15, 23, 42, 0.06);
 }
 
 .landing__badge {

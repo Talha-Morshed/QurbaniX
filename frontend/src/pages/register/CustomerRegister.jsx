@@ -78,7 +78,7 @@ function CustomerRegister() {
           <label className="flex items-start gap-3 text-sm text-slate-700">
             <input type="checkbox" name="agree" checked={form.agree} onChange={handleChange} className="mt-1 h-5 w-5 rounded border-slate-300 text-[#9b1455] focus:ring-[#9b1455]" />
             <span>
-              I agree to the <a href="#" className="font-semibold text-[#9b1455] hover:text-[#7a0f40]">Terms & Conditions</a>.
+              I agree to the <Link to="/terms" className="font-semibold text-[#9b1455] hover:text-[#7a0f40]">Terms & Conditions</Link>.
               {errors.agree && <span className="block text-rose-600">{errors.agree}</span>}
             </span>
           </label>
