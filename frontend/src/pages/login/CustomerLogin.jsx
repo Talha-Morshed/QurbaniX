@@ -108,9 +108,9 @@ function CustomerLogin() {
             <input type="checkbox" name="remember" checked={form.remember} onChange={handleChange} className="h-4 w-4 rounded border-slate-300 text-[#9b1455] focus:ring-[#9b1455]" />
             Remember Me
           </label>
-          <a href="#" className="text-sm font-semibold text-[#9b1455] transition hover:text-[#7a0f40]">
+          <Link to="/forgot-password/customer" className="text-sm font-semibold text-[#9b1455] transition hover:text-[#7a0f40]">
             Forgot Password?
-          </a>
+          </Link>
         </div>
 
         <button
