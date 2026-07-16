@@ -68,23 +68,23 @@ function ButcherRegister() {
       notice="Registration is subject to administrator verification before the account becomes active."
     >
       {submitted ? (
-        <div className="rounded-3xl border border-pink-100 bg-pink-50 p-8 text-pink-900">
+        <div className="rounded-3xl border border-[#f4d4e2] bg-[#fff4f8] p-8 text-[#9b1455]">
           <h2 className="text-2xl font-semibold">Registration submitted</h2>
           <p className="mt-3 text-slate-700">Your butcher application has been received. It will be reviewed before activation.</p>
         </div>
       ) : (
         <form className="space-y-6" onSubmit={handleSubmit} noValidate>
           <div className="grid gap-6 lg:grid-cols-2">
-            <FormField label="Full Name" icon="👤" name="fullName" value={form.fullName} onChange={handleChange} error={errors.fullName} placeholder="Enter your full name" required />
-            <FormField label="Business/Shop Name" icon="🏪" name="shopName" value={form.shopName} onChange={handleChange} placeholder="Optional" />
-            <FormField label="National ID Number" icon="🪪" name="nationalId" value={form.nationalId} onChange={handleChange} error={errors.nationalId} placeholder="Enter your national ID" required />
-            <FormField label="Phone Number" icon="📞" name="phone" value={form.phone} onChange={handleChange} error={errors.phone} placeholder="01XXXXXXXXX" required />
-            <FormField label="Email Address" icon="📧" type="email" name="email" value={form.email} onChange={handleChange} error={errors.email} placeholder="name@example.com" required />
-            <FormField label="Address" icon="📍" name="address" value={form.address} onChange={handleChange} error={errors.address} placeholder="Enter your address" required suggestions={BANGLADESH_DISTRICTS} />
-            <FormField label="Years of Experience" icon="⏳" name="experience" value={form.experience} onChange={handleChange} error={errors.experience} placeholder="e.g. 5" required />
-            <FormField label="Service Area" icon="🌍" name="serviceArea" value={form.serviceArea} onChange={handleChange} error={errors.serviceArea} placeholder="Enter your service area" required suggestions={BANGLADESH_DISTRICTS} />
-            <FormField label="Password" icon="🔒" type="password" name="password" value={form.password} onChange={handleChange} error={errors.password} placeholder="Create a password" required />
-            <FormField label="Confirm Password" icon="🔒" type="password" name="confirmPassword" value={form.confirmPassword} onChange={handleChange} error={errors.confirmPassword} placeholder="Confirm your password" required />
+            <FormField label="Full Name" name="fullName" value={form.fullName} onChange={handleChange} error={errors.fullName} placeholder="Enter your full name" required />
+            <FormField label="Business/Shop Name" name="shopName" value={form.shopName} onChange={handleChange} placeholder="Optional" />
+            <FormField label="National ID Number" name="nationalId" value={form.nationalId} onChange={handleChange} error={errors.nationalId} placeholder="Enter your national ID" required />
+            <FormField label="Phone Number" name="phone" value={form.phone} onChange={handleChange} error={errors.phone} placeholder="01XXXXXXXXX" required />
+            <FormField label="Email Address" type="email" name="email" value={form.email} onChange={handleChange} error={errors.email} placeholder="name@example.com" required />
+            <FormField label="Address" name="address" value={form.address} onChange={handleChange} error={errors.address} placeholder="Enter your address" required suggestions={BANGLADESH_DISTRICTS} />
+            <FormField label="Years of Experience" name="experience" value={form.experience} onChange={handleChange} error={errors.experience} placeholder="e.g. 5" required />
+            <FormField label="Service Area" name="serviceArea" value={form.serviceArea} onChange={handleChange} error={errors.serviceArea} placeholder="Enter your service area" required suggestions={BANGLADESH_DISTRICTS} />
+            <FormField label="Password" type="password" name="password" value={form.password} onChange={handleChange} error={errors.password} placeholder="Create a password" required />
+            <FormField label="Confirm Password" type="password" name="confirmPassword" value={form.confirmPassword} onChange={handleChange} error={errors.confirmPassword} placeholder="Confirm your password" required />
           </div>
 
           <div className="grid gap-4 lg:grid-cols-2">
@@ -98,13 +98,13 @@ function ButcherRegister() {
             </div>
           </div>
 
-          <button type="submit" className="inline-flex w-full items-center justify-center rounded-3xl bg-pink-600 px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-pink-500/20 transition duration-200 hover:bg-pink-700">
+          <button type="submit" className="inline-flex w-full items-center justify-center rounded-3xl bg-[#9b1455] px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-[#9b1455]/20 transition duration-200 hover:-translate-y-0.5 hover:bg-[#7a0f40] active:translate-y-1">
             Register
           </button>
 
           <p className="text-center text-sm text-slate-600">
             Already have an account?{' '}
-            <Link to="/login/butcher" className="font-semibold text-pink-600 hover:text-pink-800">
+            <Link to="/login/butcher" className="font-semibold text-[#9b1455] hover:text-[#7a0f40]">
               Log In
             </Link>
           </p>

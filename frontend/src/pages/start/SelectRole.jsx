@@ -57,7 +57,7 @@ function SelectRole() {
               }}
               className={`inline-flex w-full max-w-xs items-center justify-center rounded-3xl px-6 py-4 text-sm font-semibold text-white transition duration-200 ${
                 selectedRole
-                  ? 'bg-[#9b1455] hover:bg-[#7a0f40]'
+                  ? 'bg-[#9b1455] hover:-translate-y-0.5 hover:bg-[#7a0f40] active:translate-y-1'
                   : 'cursor-not-allowed bg-slate-300 text-slate-500'
               }`}
             >

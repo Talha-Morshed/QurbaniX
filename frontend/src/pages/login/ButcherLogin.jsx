@@ -63,11 +63,10 @@ function ButcherLogin() {
         <div className="space-y-5">
           <label className="block space-y-2 text-sm font-medium text-slate-700">
             <span className="flex items-center gap-2">
-              <span className="text-pink-600">📧</span>
               Email Address or Phone Number
             </span>
             <input
-              className={`w-full rounded-3xl border px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition duration-200 focus:border-pink-500 focus:ring-2 focus:ring-pink-100 ${errors.identifier ? 'border-rose-500' : 'border-slate-200'}`}
+              className={`w-full rounded-3xl border px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition duration-200 focus:border-[#9b1455] focus:ring-2 focus:ring-[#f8dbe7] ${errors.identifier ? 'border-rose-500' : 'border-slate-200'}`}
               type="text"
               name="identifier"
               value={form.identifier}
@@ -80,12 +79,11 @@ function ButcherLogin() {
 
           <label className="block space-y-2 text-sm font-medium text-slate-700">
             <span className="flex items-center gap-2">
-              <span className="text-pink-600">🔒</span>
               Password
             </span>
             <div className="relative">
               <input
-                className={`w-full rounded-3xl border px-4 py-3 pr-24 text-sm text-slate-900 shadow-sm outline-none transition duration-200 focus:border-pink-500 focus:ring-2 focus:ring-pink-100 ${errors.password ? 'border-rose-500' : 'border-slate-200'}`}
+                className={`w-full rounded-3xl border px-4 py-3 pr-24 text-sm text-slate-900 shadow-sm outline-none transition duration-200 focus:border-[#9b1455] focus:ring-2 focus:ring-[#f8dbe7] ${errors.password ? 'border-rose-500' : 'border-slate-200'}`}
                 type={showPassword ? 'text' : 'password'}
                 name="password"
                 value={form.password}
@@ -96,7 +94,7 @@ function ButcherLogin() {
               <button
                 type="button"
                 onClick={() => setShowPassword((current) => !current)}
-                className="absolute inset-y-0 right-4 flex items-center text-sm font-semibold text-pink-600 transition hover:text-pink-800"
+                className="absolute inset-y-0 right-4 flex items-center text-sm font-semibold text-[#9b1455] transition hover:text-[#7a0f40]"
               >
                 {showPassword ? 'Hide' : 'Show'}
               </button>
@@ -107,10 +105,10 @@ function ButcherLogin() {
 
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <label className="flex items-center gap-3 text-sm text-slate-700">
-            <input type="checkbox" name="remember" checked={form.remember} onChange={handleChange} className="h-4 w-4 rounded border-slate-300 text-pink-600 focus:ring-pink-500" />
+            <input type="checkbox" name="remember" checked={form.remember} onChange={handleChange} className="h-4 w-4 rounded border-slate-300 text-[#9b1455] focus:ring-[#9b1455]" />
             Remember Me
           </label>
-          <a href="#" className="text-sm font-semibold text-pink-600 transition hover:text-pink-800">
+          <a href="#" className="text-sm font-semibold text-[#9b1455] transition hover:text-[#7a0f40]">
             Forgot Password?
           </a>
         </div>
@@ -118,14 +116,14 @@ function ButcherLogin() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="inline-flex w-full items-center justify-center rounded-3xl bg-pink-600 px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-pink-500/20 transition duration-200 hover:bg-pink-700 disabled:cursor-not-allowed disabled:bg-pink-400"
+          className="inline-flex w-full items-center justify-center rounded-3xl bg-[#9b1455] px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-[#9b1455]/20 transition duration-200 hover:-translate-y-0.5 hover:bg-[#7a0f40] active:translate-y-1 disabled:cursor-not-allowed disabled:bg-[#d79bb3]"
         >
           {isSubmitting ? 'Signing In...' : 'Login'}
         </button>
 
         <p className="text-center text-sm text-slate-600">
           Don&apos;t have an account?{' '}
-          <Link to="/register/butcher" className="font-semibold text-pink-600 transition hover:text-pink-800">
+          <Link to="/register/butcher" className="font-semibold text-[#9b1455] transition hover:text-[#7a0f40]">
             Register
           </Link>
         </p>

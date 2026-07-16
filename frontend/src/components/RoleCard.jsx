@@ -3,7 +3,7 @@ function RoleCard({ icon, title, description, isSelected, onSelect }) {
     <button
       type="button"
       onClick={onSelect}
-      className={`group flex h-full flex-col justify-between rounded-[2rem] border bg-white p-8 text-left shadow-[0_24px_80px_rgba(15,23,42,0.06)] transition duration-300 hover:-translate-y-1 hover:border-[#9b1455] hover:shadow-[#9b1455]/20 ${
+      className={`group flex h-full flex-col justify-between rounded-[2rem] border bg-white p-8 text-left shadow-[0_24px_80px_rgba(15,23,42,0.06)] transition duration-300 hover:-translate-y-1 hover:border-[#9b1455] hover:shadow-[#9b1455]/20 active:translate-y-1 ${
         isSelected ? 'border-[#9b1455] ring-2 ring-[#fde8f0]' : 'border-slate-200'
       }`}
     >
