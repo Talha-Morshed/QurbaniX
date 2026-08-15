@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import PageShell from '../../components/form/PageShell';
+import LoginShell from '../../components/form/LoginShell';
 import { validatePhone } from '../../utils/validation';
 
 function CustomerLogin() {
@@ -96,7 +96,15 @@ function CustomerLogin() {
   };
 
   return (
-    <PageShell title="Customer Login" description="Welcome back to QurbaniX." notice="Secure sign-in for a smooth shopping and delivery experience.">
+    <LoginShell
+      pageTitle="Customer Login"
+      pageDescription="Welcome back to QurbaniX."
+      notice="Secure sign-in for a smooth shopping and delivery experience."
+      leftTitle="Welcome back to QurbaniX"
+      leftDescription="Sign in securely to book trusted Qurbani services, track orders, and manage your bookings — all in one place."
+      formTitle="Customer Sign In"
+      formSubtitle="Sign in with your phone number to continue."
+    >
       {stage === 'request' && (
         <form className="space-y-6" onSubmit={sendPin} noValidate>
           <div className="space-y-5">
@@ -162,7 +170,7 @@ function CustomerLogin() {
           </div>
         </form>
       )}
-    </PageShell>
+    </LoginShell>
   );
 }
 

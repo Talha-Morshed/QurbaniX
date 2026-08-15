@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import PageShell from '../../components/form/PageShell';
+import LoginShell from '../../components/form/LoginShell';
 import { validatePhone } from '../../utils/validation';
 
 function ButcherForgotPassword() {
@@ -37,7 +37,15 @@ function ButcherForgotPassword() {
   };
 
   return (
-    <PageShell title="Butcher Forgot Password" description="Recover your butcher account." notice="We will guide you through the secure reset process for your account.">
+    <LoginShell
+      pageTitle="Butcher Forgot Password"
+      pageDescription="Recover your butcher account."
+      notice="We will guide you through the secure reset process for your account."
+      leftTitle="Recover your account"
+      leftDescription="Enter your registered phone number and we will send you a code to reset your butcher password securely."
+      formTitle="Forgot Password"
+      formSubtitle="Enter your phone to receive a reset code."
+    >
       <form className="space-y-6" onSubmit={handleSubmit} noValidate>
         <label className="block space-y-2 text-sm font-medium text-slate-700">
           <span className="flex items-center gap-2">Phone Number</span>
@@ -66,7 +74,7 @@ function ButcherForgotPassword() {
           </Link>
         </p>
       </form>
-    </PageShell>
+    </LoginShell>
   );
 }
 

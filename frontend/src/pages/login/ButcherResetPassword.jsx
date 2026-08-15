@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import PageShell from '../../components/form/PageShell';
+import LoginShell from '../../components/form/LoginShell';
 import PasswordField from '../../components/form/PasswordField';
 
 function ButcherResetPassword() {
@@ -56,7 +56,15 @@ function ButcherResetPassword() {
   };
 
   return (
-    <PageShell title="Butcher Reset Password" description="Set a new password." notice="Choose a strong password to keep your account safe.">
+    <LoginShell
+      pageTitle="Butcher Reset Password"
+      pageDescription="Set a new password."
+      notice="Choose a strong password to keep your account safe."
+      leftTitle="Set a new password"
+      leftDescription="Create a strong, unique password for your butcher account so it stays protected and ready for your next order."
+      formTitle="Reset Password"
+      formSubtitle="Enter and confirm your new password."
+    >
       {isSuccess ? (
         <div className="rounded-[2rem] border border-warm-cream bg-warm-cream p-8 text-center text-primary shadow-sm">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary text-3xl text-white">✓</div>
@@ -114,7 +122,7 @@ function ButcherResetPassword() {
           </button>
         </form>
       )}
-    </PageShell>
+    </LoginShell>
   );
 }
 

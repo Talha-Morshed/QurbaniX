@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import PageShell from '../../components/form/PageShell';
+import LoginShell from '../../components/form/LoginShell';
 import { validatePhone } from '../../utils/validation';
 
 function ButcherLogin() {
@@ -97,7 +97,15 @@ function ButcherLogin() {
   };
 
   return (
-    <PageShell title="Butcher Login" description="Access your butcher account." notice="Manage your order requests and business profile from one secure hub.">
+    <LoginShell
+      pageTitle="Butcher Login"
+      pageDescription="Access your butcher account."
+      notice="Manage your order requests and business profile from one secure hub."
+      leftTitle="Welcome back, butcher"
+      leftDescription="Sign in to manage your availability, accept bookings, and keep your Qurbani business running smoothly."
+      formTitle="Butcher Sign In"
+      formSubtitle="Sign in with your phone number to continue."
+    >
       {stage === 'request' && (
         <form className="space-y-6" onSubmit={sendPin} noValidate>
           <div className="space-y-5">
@@ -163,7 +171,7 @@ function ButcherLogin() {
           </div>
         </form>
       )}
-    </PageShell>
+    </LoginShell>
   );
 }
 
