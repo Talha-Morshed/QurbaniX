@@ -16,6 +16,15 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   text-decoration: none;
+  display: flex;
+  align-items: center;
+  margin-right: auto;
+}
+
+.header__logo {
+  height: 65px;
+  width: auto;
+  object-fit: contain;
 }
 
 .header__nav {
