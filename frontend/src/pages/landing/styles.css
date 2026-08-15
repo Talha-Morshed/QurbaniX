@@ -12,7 +12,7 @@
 
 body, html, #root { margin: 0; min-height: 100%; }
 
-.landing { height: 100vh; display:flex; flex-direction:column; background:var(--bg); overflow: hidden; }
+.landing { min-height: 100vh; display:flex; flex-direction:column; background:var(--bg); overflow-x: hidden; }
 
 /* keep some spacing handled by Tailwind utilities in components; this file provides minimal overrides */
 

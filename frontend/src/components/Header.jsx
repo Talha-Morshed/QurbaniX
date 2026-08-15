@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import './Header.css';
 import images from '../assets/images';
 
@@ -11,6 +12,9 @@ function Header() {
         <a href="#home">Home</a>
         <a href="#services">Services</a>
         <a href="#how-it-works">How it works</a>
+        <Link to="/login/customer" className="header__cta">
+          Sign in
+        </Link>
       </nav>
     </header>
   );

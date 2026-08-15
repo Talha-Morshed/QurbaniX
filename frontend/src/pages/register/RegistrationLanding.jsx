@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import PageShell from '../../components/form/PageShell';
 import CustomerRegisterForm from './CustomerRegisterForm';
 import ButcherRegisterForm from './ButcherRegisterForm';
@@ -110,7 +111,7 @@ export default function RegistrationLanding() {
 
                 <div className="flex items-center gap-3">
                   <span className="text-xs text-slate-500">Already have an account?</span>
-                  <a href="/login" className="text-sm font-semibold text-primary">Sign in</a>
+                  <Link to="/login/customer" className="text-sm font-semibold text-primary">Sign in</Link>
                 </div>
               </div>
             </div>

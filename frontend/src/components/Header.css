@@ -44,6 +44,20 @@
   color: var(--color-primary);
 }
 
+.header__nav .header__cta {
+  color: #ffffff;
+  background: var(--color-primary);
+  padding: 0.5rem 1.25rem;
+  border-radius: 999px;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.header__nav .header__cta:hover {
+  background: var(--color-primary-dark);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
 @media (max-width: 900px) {
   .header {
     flex-direction: column;

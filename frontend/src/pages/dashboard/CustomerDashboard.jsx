@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import images from '../../assets/images';
 
 const packageOptions = [
   {
@@ -37,6 +38,10 @@ function CustomerDashboard() {
       <div className="mx-auto flex max-w-6xl flex-col rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_24px_80px_rgba(15,23,42,0.08)] sm:p-12 lg:p-14">
         <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-2xl">
+            <div className="mb-4 flex items-center gap-3">
+              <img src={images.logo} alt="QurbaniX" className="h-10 w-10 object-contain rounded-lg" />
+              <span className="text-sm font-bold uppercase tracking-[0.2em] text-primary">QurbaniX</span>
+            </div>
             <p className="text-sm uppercase tracking-[0.3em] text-primary">Customer Dashboard</p>
             <h1 className="mt-4 text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">Welcome back to your Qurbani planning hub.</h1>
             <p className="mt-5 text-lg text-slate-600">
