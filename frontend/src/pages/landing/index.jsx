@@ -2,7 +2,6 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import Hero from '../../components/landing/Hero';
-import StatsSection from '../../components/landing/StatsSection';
 import './styles.css';
 
 function LandingPage() {
@@ -10,7 +9,6 @@ function LandingPage() {
     <div className="landing" id="home">
       <Header />
       <Hero />
-      <StatsSection />
       <Footer />
     </div>
   );
