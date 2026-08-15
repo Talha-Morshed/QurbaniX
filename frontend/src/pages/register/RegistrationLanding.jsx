@@ -17,7 +17,7 @@ export default function RegistrationLanding() {
         <div className="flex flex-col justify-between gap-6 px-6 py-8 lg:py-10 lg:px-12 h-full">
           <div>
             <span className="inline-flex items-center px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 font-semibold text-sm">Verified Butchers</span>
-            <h1 className="mt-4 md:mt-6 text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-tight text-emerald-900">Create your QurbaniX account</h1>
+            <h1 className="mt-4 md:mt-6 text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-tight text-emerald-900">Welcome to QurbaniX</h1>
             <p className="mt-3 text-base text-slate-700 max-w-lg">Join verified butchers and customers on QurbaniX — book trusted services, manage orders, and connect with local providers.</p>
           </div>
 
@@ -52,18 +52,17 @@ export default function RegistrationLanding() {
                   <img src={images.logo} alt="QurbaniX" className="h-10 w-10 object-contain rounded-lg" />
                   <div className="flex items-baseline gap-6">
                     <h3 className="text-xl md:text-2xl font-semibold text-slate-900">
-                      {role === 'customer' ? 'Customer Registration' : role === 'butcher' ? 'Butcher Registration' : 'Create your account'}
+                      {role === 'customer' ? 'Customer Registration' : role === 'butcher' ? 'Butcher Registration' : 'Select your role'}
                     </h3>
                     <p className="hidden md:block text-sm text-slate-600">
-                      {role ? 'Complete the form and verify your phone number.' : 'Choose your role and complete the registration form.'}
+                      {role ? 'Complete the form and verify your phone number.' : 'Pick an account type to continue.'}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <span className="text-xs text-slate-500">Already have an account?</span>
-                  <Link to="/login/customer" className="text-sm font-semibold text-primary">Sign in</Link>
-                </div>
+                <Link to="/login/customer" className="shrink-0 text-sm font-semibold text-primary transition hover:text-primary-dark">
+                  Sign in
+                </Link>
               </div>
             </div>
 
@@ -112,8 +111,8 @@ export default function RegistrationLanding() {
             </div>
 
             <div>
-              {role === 'customer' && <CustomerRegisterForm onComplete={() => setCompleted(true)} />}
-              {role === 'butcher' && <ButcherRegisterForm onComplete={() => setCompleted(true)} />}
+              {role === 'customer' && <CustomerRegisterForm onComplete={() => setCompleted(true)} showLogin={false} />}
+              {role === 'butcher' && <ButcherRegisterForm onComplete={() => setCompleted(true)} showLogin={false} />}
               {!role && (
                 <div className="rounded-2xl border border-slate-100 bg-slate-50 p-6 text-sm text-slate-600">Select a role above to begin registration.</div>
               )}

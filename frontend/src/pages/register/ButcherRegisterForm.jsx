@@ -9,7 +9,7 @@ const initialState = {
   agree: false,
 };
 
-export default function ButcherRegisterForm({ onComplete }) {
+export default function ButcherRegisterForm({ onComplete, showLogin = true }) {
   const [form, setForm] = useState(initialState);
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
@@ -127,12 +127,14 @@ export default function ButcherRegisterForm({ onComplete }) {
             {isSubmitting ? 'Sending...' : 'Register & Send PIN'}
           </button>
 
-          <p className="text-center text-sm text-slate-600">
-            Already have an account?{' '}
-            <Link to="/login/butcher" className="font-semibold text-primary hover:text-primary-dark">
-              Log In
-            </Link>
-          </p>
+          {showLogin && (
+            <p className="text-center text-sm text-slate-600">
+              Already have an account?{' '}
+              <Link to="/login/butcher" className="font-semibold text-primary hover:text-primary-dark">
+                Log In
+              </Link>
+            </p>
+          )}
         </form>
       ) : stage === 'verify' ? (
         <form className="space-y-6" onSubmit={verifyPin} noValidate>
