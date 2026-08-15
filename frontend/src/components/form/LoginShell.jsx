@@ -53,13 +53,13 @@ function LoginShell({
           <div className="mt-6 grid gap-6 lg:grid-cols-2 items-stretch">
             {/* Left: Branding / Welcome */}
             <div className="flex flex-col justify-between gap-6 px-6 py-8 lg:py-10 lg:px-12 h-full">
-              <div className="relative">
+              <div className="relative isolate">
                 <span className="inline-flex items-center px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 font-semibold text-sm">Verified Butchers</span>
                 <h2 className="mt-4 md:mt-6 text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight text-emerald-900">{leftTitle}</h2>
                 <p className="mt-3 text-base text-slate-700 max-w-lg">{leftDescription}</p>
 
                 {/* Decorative subtle shape */}
-                <div className="pointer-events-none absolute right-2 bottom-2 hidden md:block opacity-60">
+                <div className="pointer-events-none absolute right-2 bottom-2 hidden md:block opacity-60 -z-10">
                   <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <defs>
                       <linearGradient id="g1" x1="0" x2="1">

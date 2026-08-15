@@ -98,7 +98,7 @@ function CustomerLogin() {
   return (
     <LoginShell
       pageTitle="Customer Login"
-      pageDescription="Welcome back to QurbaniX."
+      pageDescription="Sign in to your account."
       notice="Secure sign-in for a smooth shopping and delivery experience."
       leftTitle="Welcome back to QurbaniX"
       leftDescription="Sign in securely to book trusted Qurbani services, track orders, and manage your bookings — all in one place."
