@@ -9,7 +9,7 @@ const initialState = {
   agree: false,
 };
 
-export default function CustomerRegisterForm() {
+export default function CustomerRegisterForm({ onComplete }) {
   const [form, setForm] = useState(initialState);
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
@@ -77,6 +77,7 @@ export default function CustomerRegisterForm() {
     if (pinInput.trim() === devPin) {
       setSubmitted(true);
       setStage('done');
+      if (onComplete) onComplete();
       if (isDev) {
         // eslint-disable-next-line no-console
         console.log('Customer registration data (dev):', form);
@@ -123,7 +124,7 @@ export default function CustomerRegisterForm() {
             </span>
           </label>
 
-          <button type="submit" className="inline-flex w-full items-center justify-center rounded-3xl bg-primary px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-primary transition duration-200 hover:-translate-y-0.5 hover:bg-primary-dark active:translate-y-1">
+          <button type="submit" disabled={isSubmitting} className="inline-flex w-full items-center justify-center rounded-3xl bg-primary px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-primary transition duration-200 hover:-translate-y-0.5 hover:bg-primary-dark active:translate-y-1 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-600">
             {isSubmitting ? 'Sending...' : 'Register & Send PIN'}
           </button>
 

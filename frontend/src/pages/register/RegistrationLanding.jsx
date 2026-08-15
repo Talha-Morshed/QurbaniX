@@ -4,24 +4,24 @@ import PageShell from '../../components/form/PageShell';
 import CustomerRegisterForm from './CustomerRegisterForm';
 import ButcherRegisterForm from './ButcherRegisterForm';
 import images from '../../assets/images';
-import HeroAnimalCard from '../../components/landing/HeroAnimalCard';
 
 export default function RegistrationLanding() {
   const [role, setRole] = useState(null); // 'customer' | 'butcher'
-  const activeStep = role ? 2 : 1;
+  const [completed, setCompleted] = useState(false);
+  const activeStep = !role ? 1 : completed ? 3 : 2;
 
   return (
     <PageShell title="Register" description="Create your account.">
       <div className="mt-6 grid gap-6 lg:grid-cols-2 items-stretch">
         {/* Left: Branding / Welcome */}
         <div className="flex flex-col justify-between gap-6 px-6 py-8 lg:py-10 lg:px-12 h-full">
-            <div className="relative">
+            <div className="relative isolate">
                 <span className="inline-flex items-center px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 font-semibold text-sm">Verified Butchers</span>
                 <h1 className="mt-4 md:mt-6 text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight text-emerald-900">Create your QurbaniX account</h1>
                 <p className="mt-3 text-base text-slate-700 max-w-lg">Join verified butchers and customers on QurbaniX — book trusted services, manage orders, and connect with local providers.</p>
 
                 {/* Decorative subtle shape (reduced, placed safely) */}
-                <div className="pointer-events-none absolute right-2 bottom-2 hidden md:block opacity-60">
+                <div className="pointer-events-none absolute right-2 bottom-2 hidden md:block opacity-60 -z-10">
                   <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <defs>
                       <linearGradient id="g1" x1="0" x2="1">
@@ -104,8 +104,12 @@ export default function RegistrationLanding() {
                 <div className="flex items-center gap-3">
                   <img src={images.logo} alt="QurbaniX" className="h-10 w-10 object-contain rounded-lg" />
                   <div className="flex items-baseline gap-6">
-                    <h3 className="text-xl md:text-2xl font-semibold text-slate-900">Create your account</h3>
-                    <p className="hidden md:block text-sm text-slate-600">Choose your role and complete the registration form.</p>
+                    <h3 className="text-xl md:text-2xl font-semibold text-slate-900">
+                      {role === 'customer' ? 'Customer Registration' : role === 'butcher' ? 'Butcher Registration' : 'Create your account'}
+                    </h3>
+                    <p className="hidden md:block text-sm text-slate-600">
+                      {role ? 'Complete the form and verify your phone number.' : 'Choose your role and complete the registration form.'}
+                    </p>
                   </div>
                 </div>
 
@@ -139,7 +143,7 @@ export default function RegistrationLanding() {
             <div className="mb-4 grid grid-cols-2 gap-3">
               <button
                 type="button"
-                onClick={() => setRole('customer')}
+                onClick={() => { setRole('customer'); setCompleted(false); }}
                 className={`flex items-center justify-center gap-2 rounded-3xl px-4 py-3 text-sm font-semibold transition transform ${
                   role === 'customer' ? 'bg-emerald-700 text-white shadow-md' : 'bg-slate-50 text-slate-700 border border-slate-100'
                 } hover:scale-[1.02] active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-emerald-200`}
@@ -150,7 +154,7 @@ export default function RegistrationLanding() {
 
               <button
                 type="button"
-                onClick={() => setRole('butcher')}
+                onClick={() => { setRole('butcher'); setCompleted(false); }}
                 className={`flex items-center justify-center gap-2 rounded-3xl px-4 py-3 text-sm font-semibold transition transform ${
                   role === 'butcher' ? 'bg-emerald-700 text-white shadow-md' : 'bg-slate-50 text-slate-700 border border-slate-100'
                 } hover:scale-[1.02] active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-emerald-200`}
@@ -161,8 +165,8 @@ export default function RegistrationLanding() {
             </div>
 
             <div>
-              {role === 'customer' && <CustomerRegisterForm />}
-              {role === 'butcher' && <ButcherRegisterForm />}
+              {role === 'customer' && <CustomerRegisterForm onComplete={() => setCompleted(true)} />}
+              {role === 'butcher' && <ButcherRegisterForm onComplete={() => setCompleted(true)} />}
               {!role && (
                 <div className="rounded-2xl border border-slate-100 bg-slate-50 p-6 text-sm text-slate-600">Select a role above to begin registration.</div>
               )}
