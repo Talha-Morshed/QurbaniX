@@ -15,80 +15,27 @@ export default function RegistrationLanding() {
       <div className="mt-6 grid gap-6 lg:grid-cols-2 items-stretch">
         {/* Left: Branding / Welcome */}
         <div className="flex flex-col justify-between gap-6 px-6 py-8 lg:py-10 lg:px-12 h-full">
-            <div className="relative isolate">
-                <span className="inline-flex items-center px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 font-semibold text-sm">Verified Butchers</span>
-                <h1 className="mt-4 md:mt-6 text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight text-emerald-900">Create your QurbaniX account</h1>
-                <p className="mt-3 text-base text-slate-700 max-w-lg">Join verified butchers and customers on QurbaniX — book trusted services, manage orders, and connect with local providers.</p>
-
-                {/* Decorative subtle shape (reduced, placed safely) */}
-                <div className="pointer-events-none absolute right-2 bottom-2 hidden md:block opacity-60 -z-10">
-                  <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                      <linearGradient id="g1" x1="0" x2="1">
-                        <stop offset="0%" stopColor="#ECFDF5" />
-                        <stop offset="100%" stopColor="#EEF2FF" />
-                      </linearGradient>
-                    </defs>
-                    <rect x="0" y="0" width="120" height="120" rx="24" fill="url(#g1)" />
-                  </svg>
-                </div>
-              </div>
+          <div>
+            <span className="inline-flex items-center px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 font-semibold text-sm">Verified Butchers</span>
+            <h1 className="mt-4 md:mt-6 text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-tight text-emerald-900">Create your QurbaniX account</h1>
+            <p className="mt-3 text-base text-slate-700 max-w-lg">Join verified butchers and customers on QurbaniX — book trusted services, manage orders, and connect with local providers.</p>
+          </div>
 
           <div className="hidden md:block">
             <div className="rounded-2xl bg-gradient-to-br from-primary/5 to-warm-cream p-4 shadow-md overflow-hidden">
-
-              <div className="mt-4 flex flex-col gap-4">
-                <p className="text-sm text-slate-600">Trusted local providers — ethical, verified, and halal.</p>
-
-                <div className="mt-3 flex flex-wrap items-start gap-6">
-                  <div className="flex-1 min-w-[260px]">
-                    <div className="w-full h-72 md:h-96 rounded-3xl overflow-hidden bg-white p-2 shadow-2xl flex items-center justify-center">
-                      <img src={images.cow} alt="Cow" className="w-full h-full object-contain block" />
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-4">
-                    <div className="w-48 h-48 md:w-56 md:h-56 rounded-2xl overflow-hidden bg-white p-2 shadow-lg flex items-center justify-center">
-                      <img src={images.goat} alt="Goat" className="w-full h-full object-contain block" />
-                    </div>
-                    <div className="w-48 h-48 md:w-56 md:h-56 rounded-2xl overflow-hidden bg-white p-2 shadow-lg flex items-center justify-center">
-                      <img src={images.sheep} alt="Sheep" className="w-full h-full object-contain block" />
-                    </div>
+              <div className="flex flex-wrap items-start gap-6">
+                <div className="flex-1 min-w-[260px]">
+                  <div className="w-full h-72 md:h-96 rounded-3xl overflow-hidden bg-white p-2 shadow-2xl flex items-center justify-center">
+                    <img src={images.cow} alt="Cow" className="w-full h-full object-contain block" />
                   </div>
                 </div>
 
-                {/* How it works */}
-                <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div className="rounded-2xl border border-slate-100 bg-white p-4 text-sm shadow-sm">
-                    <div className="font-semibold text-slate-800">1. Choose role</div>
-                    <div className="text-slate-600 mt-1 text-xs">Customer or Butcher — pick one to begin.</div>
+                <div className="flex flex-col gap-4">
+                  <div className="w-48 h-48 md:w-56 md:h-56 rounded-2xl overflow-hidden bg-white p-2 shadow-lg flex items-center justify-center">
+                    <img src={images.goat} alt="Goat" className="w-full h-full object-contain block" />
                   </div>
-                  <div className="rounded-2xl border border-slate-100 bg-white p-4 text-sm shadow-sm">
-                    <div className="font-semibold text-slate-800">2. Verify phone</div>
-                    <div className="text-slate-600 mt-1 text-xs">We send a 4-digit PIN to confirm your number.</div>
-                  </div>
-                  <div className="rounded-2xl border border-slate-100 bg-white p-4 text-sm shadow-sm">
-                    <div className="font-semibold text-slate-800">3. Get started</div>
-                    <div className="text-slate-600 mt-1 text-xs">Start booking and managing your Qurbani services.</div>
-                  </div>
-                </div>
-
-                {/* Why QurbaniX */}
-                <div className="mt-5">
-                  <h4 className="text-sm font-semibold text-slate-800">Why QurbaniX</h4>
-                  <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100">
-                      <div className="font-medium text-slate-800">Verified Butchers</div>
-                      <div className="text-xs text-slate-500 mt-1">We screen and verify all service providers for your peace of mind.</div>
-                    </div>
-                    <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100">
-                      <div className="font-medium text-slate-800">Secure Payments</div>
-                      <div className="text-xs text-slate-500 mt-1">Encrypted transactions and clear receipts for every booking.</div>
-                    </div>
-                    <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100">
-                      <div className="font-medium text-slate-800">Easy Booking</div>
-                      <div className="text-xs text-slate-500 mt-1">Fast scheduling and order tracking from your dashboard.</div>
-                    </div>
+                  <div className="w-48 h-48 md:w-56 md:h-56 rounded-2xl overflow-hidden bg-white p-2 shadow-lg flex items-center justify-center">
+                    <img src={images.sheep} alt="Sheep" className="w-full h-full object-contain block" />
                   </div>
                 </div>
               </div>
