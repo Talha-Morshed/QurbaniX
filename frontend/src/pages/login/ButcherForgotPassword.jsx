@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import PageShell from '../../components/form/PageShell';
-import { validateEmail, validatePhone } from '../../utils/validation';
+import { validatePhone } from '../../utils/validation';
 
 function ButcherForgotPassword() {
   const [value, setValue] = useState('');
@@ -12,16 +12,11 @@ function ButcherForgotPassword() {
   const validate = () => {
     const trimmedValue = value.trim();
     if (!trimmedValue) {
-      setError('Email address or phone number is required.');
+      setError('Phone number is required.');
       return false;
     }
 
-    if (trimmedValue.includes('@')) {
-      if (!validateEmail(trimmedValue)) {
-        setError('Please enter a valid email address.');
-        return false;
-      }
-    } else if (!validatePhone(trimmedValue)) {
+    if (!validatePhone(trimmedValue)) {
       setError('Please enter a valid phone number.');
       return false;
     }
@@ -45,13 +40,13 @@ function ButcherForgotPassword() {
     <PageShell title="Butcher Forgot Password" description="Recover your butcher account." notice="We will guide you through the secure reset process for your account.">
       <form className="space-y-6" onSubmit={handleSubmit} noValidate>
         <label className="block space-y-2 text-sm font-medium text-slate-700">
-          <span className="flex items-center gap-2">Email Address or Phone Number</span>
+          <span className="flex items-center gap-2">Phone Number</span>
           <input
             className={`w-full rounded-3xl border px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition duration-200 focus:border-[#9b1455] focus:ring-2 focus:ring-[#f8dbe7] ${error ? 'border-rose-500' : 'border-slate-200'}`}
             type="text"
             value={value}
             onChange={(event) => setValue(event.target.value)}
-            placeholder="name@example.com or 01XXXXXXXXX"
+            placeholder="01XXXXXXXXX"
             aria-invalid={!!error}
           />
           {error && <p className="text-xs text-rose-600">{error}</p>}
@@ -62,7 +57,7 @@ function ButcherForgotPassword() {
           disabled={isSubmitting}
           className="inline-flex w-full items-center justify-center rounded-3xl bg-[#9b1455] px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-[#9b1455]/20 transition duration-200 hover:-translate-y-0.5 hover:bg-[#7a0f40] active:translate-y-1 disabled:cursor-not-allowed disabled:bg-[#d79bb3]"
         >
-          {isSubmitting ? 'Sending...' : 'Send Reset Link'}
+          {isSubmitting ? 'Sending...' : 'Send Reset Code'}
         </button>
 
         <p className="text-center text-sm text-slate-600">
