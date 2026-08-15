@@ -22,45 +22,42 @@ export default function RegistrationLanding() {
           </div>
 
           <div className="hidden md:block">
-            <div className="rounded-2xl bg-gradient-to-br from-primary/5 to-warm-cream p-4 shadow-md overflow-hidden">
-              <div className="flex flex-wrap items-start gap-6">
-                <div className="flex-1 min-w-[260px]">
-                  <div className="w-full h-72 md:h-96 rounded-3xl overflow-hidden bg-white p-2 shadow-2xl flex items-center justify-center">
-                    <img src={images.cow} alt="Cow" className="w-full h-full object-contain block" />
+            <div className="rounded-2xl bg-gradient-to-br from-primary/5 to-warm-cream p-4 shadow-md overflow-hidden max-h-[760px] relative z-0">
+                <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+                  <div className="col-span-1 md:col-span-2">
+                    <div className="w-full h-40 md:h-64 rounded-3xl overflow-hidden bg-white p-2 shadow-2xl flex items-center justify-center">
+                      <img src={images.cow} alt="Cow" className="w-auto max-w-full max-h-full object-contain block" />
+                    </div>
                   </div>
-                </div>
 
-                <div className="flex flex-col gap-4">
-                  <div className="w-48 h-48 md:w-56 md:h-56 rounded-2xl overflow-hidden bg-white p-2 shadow-lg flex items-center justify-center">
-                    <img src={images.goat} alt="Goat" className="w-full h-full object-contain block" />
-                  </div>
-                  <div className="w-48 h-48 md:w-56 md:h-56 rounded-2xl overflow-hidden bg-white p-2 shadow-lg flex items-center justify-center">
-                    <img src={images.sheep} alt="Sheep" className="w-full h-full object-contain block" />
+                  <div className="col-span-1 flex flex-col gap-4">
+                    <div className="w-full h-28 md:h-32 rounded-2xl overflow-hidden bg-white p-2 shadow-lg flex items-center justify-center">
+                      <img src={images.goat} alt="Goat" className="w-auto max-w-full max-h-full object-contain block" />
+                    </div>
+                    <div className="w-full h-28 md:h-32 rounded-2xl overflow-hidden bg-white p-2 shadow-lg flex items-center justify-center">
+                      <img src={images.sheep} alt="Sheep" className="w-auto max-w-full max-h-full object-contain block" />
+                    </div>
                   </div>
                 </div>
-              </div>
             </div>
           </div>
         </div>
 
         {/* Right: Form card */}
         <div className="flex items-center justify-center px-4 py-6 sm:px-6 lg:pr-12">
-          <div className="w-full max-w-2xl rounded-[1.5rem] border border-slate-100 bg-white p-10 shadow-lg">
+          <div className="w-full max-w-3xl rounded-[1.5rem] border border-slate-100 bg-white p-10 shadow-lg relative z-10">
             <div className="mb-3">
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <img src={images.logo} alt="QurbaniX" className="h-10 w-10 object-contain rounded-lg" />
-                  <div className="flex items-baseline gap-6">
-                    <h3 className="text-xl md:text-2xl font-semibold text-slate-900">
-                      {role === 'customer' ? 'Customer Registration' : role === 'butcher' ? 'Butcher Registration' : 'Select your role'}
-                    </h3>
-                    <p className="hidden md:block text-sm text-slate-600">
-                      {role ? 'Complete the form and verify your phone number.' : 'Pick an account type to continue.'}
-                    </p>
-                  </div>
+              <div className="w-full rounded-lg border border-slate-100 bg-transparent px-4 py-4 relative pb-12">
+                <div className="flex flex-col">
+                  <h3 className="text-lg md:text-2xl font-semibold text-slate-900">
+                    {role === 'customer' ? 'Customer Registration' : role === 'butcher' ? 'Butcher Registration' : 'Select role'}
+                  </h3>
+                  <p className="text-sm text-slate-600 mt-1">
+                    {role ? 'Complete the form and verify your phone number.' : 'Pick an account type to continue.'}
+                  </p>
                 </div>
 
-                <Link to="/login/customer" className="shrink-0 text-sm font-semibold text-primary transition hover:text-primary-dark">
+                <Link to="/login/customer" className="absolute right-4 bottom-3 text-sm font-semibold text-primary transition hover:text-primary-dark">
                   Sign in
                 </Link>
               </div>
