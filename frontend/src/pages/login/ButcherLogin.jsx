@@ -126,7 +126,7 @@ function ButcherLogin() {
 
           <p className="text-center text-sm text-slate-600">
             Don&apos;t have an account?{' '}
-            <Link to="/register/butcher" className="font-semibold text-[#9b1455] transition hover:text-[#7a0f40]">
+            <Link to="/register" className="font-semibold text-[#9b1455] transition hover:text-[#7a0f40]">
               Register
             </Link>
           </p>
