@@ -81,6 +81,10 @@
     font-size: 0.95rem;
   }
 
+  .header__logo {
+    height: 52px;
+  }
+
   .header__nav a {
     font-size: 0.92rem;
   }

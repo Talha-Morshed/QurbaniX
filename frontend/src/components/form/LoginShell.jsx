@@ -126,7 +126,7 @@ function LoginShell({
 
             {/* Right: Form card */}
             <div className="flex items-center justify-center px-4 py-6 sm:px-6 lg:pr-12">
-              <div className="w-full max-w-2xl rounded-[1.5rem] border border-slate-100 bg-white p-10 shadow-lg">
+              <div className="w-full max-w-2xl rounded-[1.5rem] border border-slate-100 bg-white p-5 shadow-lg sm:p-8 lg:p-10">
                 <div className="mb-6">
                   <div className="flex items-center gap-3">
                     <img src={images.logo} alt="QurbaniX" className="h-10 w-10 object-contain rounded-lg" />
