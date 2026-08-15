@@ -2,16 +2,11 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import FormField from '../../components/form/FormField';
 import { validatePhone } from '../../utils/validation';
-import { BANGLADESH_DISTRICTS } from '../../constants/locations';
 
 const initialState = {
   fullName: '',
-  shopName: '',
-  nationalId: '',
   phone: '',
-  address: '',
-  experience: '',
-  serviceArea: '',
+  agree: false,
 };
 
 export default function ButcherRegisterForm() {
@@ -30,23 +25,23 @@ export default function ButcherRegisterForm() {
   const validate = () => {
     const nextErrors = {};
     if (!form.fullName.trim()) nextErrors.fullName = 'Full name is required.';
-    if (!form.nationalId.trim()) nextErrors.nationalId = 'National ID is required.';
     if (!form.phone.trim()) {
       nextErrors.phone = 'Phone number is required.';
     } else if (!validatePhone(form.phone)) {
       nextErrors.phone = 'Please enter a valid phone number.';
     }
-    if (!form.address.trim()) nextErrors.address = 'Address is required.';
-    if (!form.experience.trim()) nextErrors.experience = 'Years of experience is required.';
-    if (!form.serviceArea.trim()) nextErrors.serviceArea = 'Service area is required.';
+    if (!form.agree) nextErrors.agree = 'You must agree to the terms and conditions.';
 
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
   };
 
   const handleChange = (event) => {
-    const { name, value } = event.target;
-    setForm((current) => ({ ...current, [name]: value }));
+    const { name, value, type, checked } = event.target;
+    setForm((current) => ({
+      ...current,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
   };
 
   const handleSubmit = (event) => {
@@ -116,24 +111,16 @@ export default function ButcherRegisterForm() {
         <form className="space-y-6" onSubmit={handleSubmit} noValidate>
           <div className="grid gap-6 lg:grid-cols-2">
             <FormField label="Full Name" name="fullName" value={form.fullName} onChange={handleChange} error={errors.fullName} placeholder="Enter your full name" required />
-            <FormField label="Business/Shop Name" name="shopName" value={form.shopName} onChange={handleChange} placeholder="Optional" />
-            <FormField label="National ID Number" name="nationalId" value={form.nationalId} onChange={handleChange} error={errors.nationalId} placeholder="Enter your national ID" required />
             <FormField label="Phone Number" name="phone" value={form.phone} onChange={handleChange} error={errors.phone} placeholder="01XXXXXXXXX" required />
-            <FormField label="Address" name="address" value={form.address} onChange={handleChange} error={errors.address} placeholder="Enter your address" required suggestions={BANGLADESH_DISTRICTS} />
-            <FormField label="Years of Experience" name="experience" value={form.experience} onChange={handleChange} error={errors.experience} placeholder="e.g. 5" required />
-            <FormField label="Service Area" name="serviceArea" value={form.serviceArea} onChange={handleChange} error={errors.serviceArea} placeholder="Enter your service area" required suggestions={BANGLADESH_DISTRICTS} />
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-2">
-            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-700">
-              <p className="font-semibold text-slate-900">Upload placeholders</p>
-              <p className="mt-3">Upload National ID and Profile Photo when the backend is ready. These are placeholders for now.</p>
-            </div>
-            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-700">
-              <p className="font-semibold text-slate-900">Verification notice</p>
-              <p className="mt-3">Your registration will be reviewed by administrators before your butcher account becomes active.</p>
-            </div>
-          </div>
+          <label className="flex items-start gap-3 text-sm text-slate-700">
+            <input type="checkbox" name="agree" checked={form.agree} onChange={handleChange} className="mt-1 h-5 w-5 rounded border-slate-300 text-primary focus:ring-warm-cream" />
+            <span>
+              I agree to the <Link to="/terms" className="font-semibold text-primary hover:text-primary-dark">Terms & Conditions</Link>.
+              {errors.agree && <span className="block text-rose-600">{errors.agree}</span>}
+            </span>
+          </label>
 
           <button type="submit" className="inline-flex w-full items-center justify-center rounded-3xl bg-primary px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-primary transition duration-200 hover:-translate-y-0.5 hover:bg-primary-dark active:translate-y-1">
             {isSubmitting ? 'Sending...' : 'Register & Send PIN'}
