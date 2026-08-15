@@ -1,13 +1,16 @@
 import { useNavigate } from 'react-router-dom';
 import TermsSection from '../../components/terms/TermsSection';
 import TableOfContents from '../../components/terms/TableOfContents';
+import Navbar from '../../components/Navbar';
 
 function TermsAndConditions() {
   const navigate = useNavigate();
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-warm-cream px-4 py-8 text-slate-900 sm:px-6 lg:px-8">
-      <div className="w-full max-w-6xl rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_24px_80px_rgba(15,23,42,0.08)] sm:p-8 lg:p-10">
+    <div className="min-h-screen bg-warm-cream">
+      <Navbar />
+      <div className="flex items-center justify-center px-4 py-8 text-slate-900 sm:px-6 lg:px-8">
+        <div className="w-full max-w-6xl rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_24px_80px_rgba(15,23,42,0.08)] sm:p-8 lg:p-10">
         <div className="flex flex-col gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <p className="text-sm uppercase tracking-[0.3em] text-primary">QurbaniX</p>
@@ -91,6 +94,7 @@ function TermsAndConditions() {
               <p>If you have questions, please contact the QurbaniX support team through the official contact channels.</p>
             </TermsSection>
           </div>
+        </div>
         </div>
       </div>
     </div>

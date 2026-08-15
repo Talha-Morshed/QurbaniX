@@ -1,4 +1,5 @@
 import images from '../../assets/images';
+import Navbar from '../Navbar';
 
 const defaultSteps = [
   { title: '1. Enter phone', description: 'Sign in with your registered mobile number.' },
@@ -25,8 +26,10 @@ function LoginShell({
   children,
 }) {
   return (
-    <div className="min-h-screen bg-warm-cream text-slate-900 py-8 sm:py-10 lg:py-12">
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-warm-cream">
+      <Navbar />
+      <div className="py-8 text-slate-900 sm:py-10 lg:py-12">
+        <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_24px_80px_rgba(15,23,42,0.08)] sm:p-8 lg:p-10">
           <div className="relative mb-8 overflow-hidden rounded-[1.75rem] bg-primary p-6 text-white shadow-primary-soft sm:p-8">
             <div className="relative flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
@@ -137,6 +140,7 @@ function LoginShell({
                 {children}
               </div>
             </div>
+          </div>
           </div>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RoleCard from '../../components/RoleCard';
+import Navbar from '../../components/Navbar';
 import './styles.css';
 
 const roles = [
@@ -44,6 +45,7 @@ function SelectRole() {
 
   return (
     <div className="role-selection">
+      <Navbar />
       <main className="role-selection__container">
         <div className="role-selection__panel">
           <div className="role-selection__header">
