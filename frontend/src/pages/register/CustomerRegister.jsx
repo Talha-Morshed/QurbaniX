@@ -78,8 +78,10 @@ function CustomerRegister() {
     if (pinInput.trim() === devPin) {
       setSubmitted(true);
       setStage('done');
-      // eslint-disable-next-line no-console
-      console.log('Customer registration data (dev):', form);
+      if (isDev) {
+        // eslint-disable-next-line no-console
+        console.log('Customer registration data (dev):', form);
+      }
       return;
     }
     setAttempts((a) => a + 1);

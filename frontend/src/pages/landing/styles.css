@@ -1,142 +1,21 @@
+/* Landing page base styles — revised palette (white/cream, deep emerald, subtle gold) */
 :root {
-  color: #2a0f28;
-  background: #ffffff;
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --bg: #ffffff;
+  --cream: #fbf9f6;
+  --deep-green: #064e3b;
+  --green: #047857;
+  --muted: #6b7280;
+  --accent: #b45309;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
-body,
-html,
-#root {
-  margin: 0;
-  min-height: 100%;
-}
+body, html, #root { margin: 0; min-height: 100%; }
 
-body {
-  background: #ffffff;
-}
+.landing { min-height: 100vh; display:flex; flex-direction:column; background:var(--bg); }
 
-.landing {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background: #ffffff;
-}
-
-.landing__hero {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 2rem 1.5rem 3rem;
-}
-
-.landing__content {
-  width: min(760px, 100%);
-  text-align: center;
-  border-radius: 28px;
-  padding: 3rem;
-  background: #ffffff;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  box-shadow: 0 30px 60px rgba(15, 23, 42, 0.06);
-}
-
-.landing__badge {
-  display: inline-flex;
-  padding: 0.9rem 1.3rem;
-  border-radius: 999px;
-  background: rgba(225, 28, 128, 0.12);
-  color: #9b1455;
-  font-weight: 700;
-  font-size: 0.9rem;
-}
-
-.landing__title {
-  margin: 1.5rem auto 1rem;
-  font-size: clamp(2.4rem, 4vw, 3.8rem);
-  line-height: 1.03;
-  color: #9b1455;
-}
-
-.landing__text {
-  margin: 0 auto 2rem;
-  max-width: 620px;
-  color: #4a1d3c;
-  font-size: 1.05rem;
-  line-height: 1.8;
-}
-
-.landing__button {
-  border: none;
-  border-radius: 999px;
-  padding: 1rem 2rem;
-  background: #9b1455;
-  color: #ffffff;
-  font-size: 1rem;
-  font-weight: 700;
-  box-shadow: 0 18px 40px rgba(155, 20, 85, 0.18);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-}
-
-.landing__button:hover {
-  transform: translateY(-2px);
-  background: #7a0f40;
-}
-
-.landing__button:active {
-  transform: translateY(4px);
-  box-shadow: 0 8px 18px rgba(155, 20, 85, 0.16);
-}
-
-@media (max-width: 900px) {
-  .landing__hero {
-    padding: 2.5rem 1.5rem 2.5rem;
-  }
-
-  .landing__content {
-    padding: 2.4rem;
-  }
-}
+/* keep some spacing handled by Tailwind utilities in components; this file provides minimal overrides */
 
 @media (max-width: 680px) {
-  .landing__hero {
-    padding: 2rem 1.25rem 2rem;
-  }
-
-  .landing__content {
-    padding: 2rem;
-  }
-
-  .landing__text {
-    font-size: 1rem;
-    line-height: 1.7;
-  }
-
-  .landing__button {
-    width: 100%;
-    padding: 1rem 1.25rem;
-  }
-}
-
-@media (max-width: 520px) {
-  .landing__content {
-    border-radius: 24px;
-    padding: 1.75rem;
-  }
-
-  .landing__badge {
-    padding: 0.75rem 1rem;
-    font-size: 0.85rem;
-  }
-
-  .landing__title {
-    font-size: 2.1rem;
-  }
-
-  .landing__text {
-    max-width: 100%;
-  }
+  .landing { padding-bottom: 2rem; }
 }

@@ -40,16 +40,7 @@ function ButcherRegister() {
     if (!form.address.trim()) nextErrors.address = 'Address is required.';
     if (!form.experience.trim()) nextErrors.experience = 'Years of experience is required.';
     if (!form.serviceArea.trim()) nextErrors.serviceArea = 'Service area is required.';
-    if (!form.fullName.trim()) nextErrors.fullName = 'Full name is required.';
-    if (!form.nationalId.trim()) nextErrors.nationalId = 'National ID is required.';
-    if (!form.phone.trim()) {
-      nextErrors.phone = 'Phone number is required.';
-    } else if (!validatePhone(form.phone)) {
-      nextErrors.phone = 'Please enter a valid phone number.';
-    }
-    if (!form.address.trim()) nextErrors.address = 'Address is required.';
-    if (!form.experience.trim()) nextErrors.experience = 'Years of experience is required.';
-    if (!form.serviceArea.trim()) nextErrors.serviceArea = 'Service area is required.';
+
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
   };
@@ -92,8 +83,10 @@ function ButcherRegister() {
       setSubmitted(true);
       setStage('done');
       // Here you would send `form` to the backend to create the account
-      // eslint-disable-next-line no-console
-      console.log('Butcher registration data (dev):', form);
+      if (isDev) {
+        // eslint-disable-next-line no-console
+        console.log('Butcher registration data (dev):', form);
+      }
       return;
     }
     setAttempts((a) => a + 1);

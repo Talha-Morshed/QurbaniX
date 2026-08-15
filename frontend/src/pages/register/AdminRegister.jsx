@@ -16,6 +16,7 @@ function AdminRegister() {
   const [form, setForm] = useState(initialState);
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
+  const isDev = typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.MODE !== 'production';
 
   const validate = () => {
     const nextErrors = {};
@@ -49,7 +50,10 @@ function AdminRegister() {
     event.preventDefault();
     if (!validate()) return;
     setSubmitted(true);
-    console.log('Administrator registration data:', form);
+    if (isDev) {
+      // eslint-disable-next-line no-console
+      console.log('Administrator registration data:', form);
+    }
   };
 
   return (

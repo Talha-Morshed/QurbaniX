@@ -22,15 +22,15 @@
 }
 
 .footer__links a {
-  color: #6e2a56;
+  color: #374151;
   text-decoration: none;
   font-size: 0.92rem;
   font-weight: 600;
-  transition: color 0.2s ease;
+  transition: color 0.15s ease;
 }
 
 .footer__links a:hover {
-  color: #9b1455;
+  color: #047857;
 }
 
 @media (max-width: 600px) {
