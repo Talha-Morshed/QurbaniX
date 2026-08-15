@@ -3,12 +3,12 @@ function FormField({ label, icon, type = 'text', name, value, onChange, error, r
   return (
     <label className="space-y-2 text-sm font-medium text-slate-700">
       <span className="flex items-center gap-2">
-        {icon ? <span className="text-[#9b1455]">{icon}</span> : null}
+        {icon ? <span className="text-primary">{icon}</span> : null}
         {label}
-        {required && <span className="text-[#9b1455]">*</span>}
+        {required && <span className="text-primary">*</span>}
       </span>
       <input
-        className={`w-full rounded-3xl border px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition duration-200 focus:border-[#9b1455] focus:ring-2 focus:ring-[#f8dbe7] ${
+        className={`w-full rounded-3xl border px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition duration-200 focus:border-primary focus:ring-2 focus:ring-warm-cream ${
           error ? 'border-rose-500' : 'border-slate-200'
         }`}
         type={type}

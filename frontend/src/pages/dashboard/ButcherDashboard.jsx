@@ -20,20 +20,20 @@ const incomingRequests = [
 
 function ButcherDashboard() {
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-8 text-slate-900 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-warm-cream px-4 py-8 text-slate-900 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <header className="mb-8 flex flex-col gap-4 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_24px_80px_rgba(15,23,42,0.06)] md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#9b1455]">Butcher Dashboard</p>
+            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-primary">Butcher Dashboard</p>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">Welcome back, Qurbani partner.</h1>
             <p className="mt-2 text-slate-600">Manage package availability, confirm delivery requests, and monitor daily business performance.</p>
           </div>
 
           <div className="flex gap-3">
-            <Link to="/" className="rounded-2xl border border-slate-300 px-4 py-2.5 font-medium text-slate-700 transition hover:border-[#9b1455] hover:text-[#9b1455]">
+            <Link to="/" className="rounded-2xl border border-slate-300 px-4 py-2.5 font-medium text-slate-700 transition hover:border-primary hover:text-primary">
               Home
             </Link>
-            <Link to="/login/butcher" className="rounded-2xl bg-[#9b1455] px-4 py-2.5 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#7a0f40] active:translate-y-1">
+            <Link to="/login/butcher" className="rounded-2xl bg-primary px-4 py-2.5 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-primary-dark active:translate-y-1">
               Logout
             </Link>
           </div>
@@ -56,7 +56,7 @@ function ButcherDashboard() {
                 <h2 className="text-xl font-semibold text-slate-900">Package management</h2>
                 <p className="text-sm text-slate-500">Keep your Qurbani packages accurate and ready for customers.</p>
               </div>
-              <span className="rounded-full bg-[#fff4f8] px-3 py-1 text-xs font-semibold text-[#9b1455]">Live</span>
+              <span className="rounded-full bg-warm-cream px-3 py-1 text-xs font-semibold text-primary">Live</span>
             </div>
 
             <div className="mt-6 space-y-4">
@@ -85,13 +85,13 @@ function ButcherDashboard() {
 
             <div className="mt-5 space-y-3">
               {incomingRequests.map((request) => (
-                <div key={`${request.customer}-${request.package}`} className="rounded-[1.1rem] border border-[#f4d4e2] bg-[#fff4f8] p-4">
+                <div key={`${request.customer}-${request.package}`} className="rounded-[1.1rem] border border-warm-cream bg-warm-cream p-4">
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <p className="font-semibold text-slate-900">{request.customer}</p>
                       <p className="text-sm text-slate-600">{request.package}</p>
                     </div>
-                    <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-[#9b1455]">{request.priority}</span>
+                    <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-primary">{request.priority}</span>
                   </div>
                   <p className="mt-2 text-xs text-slate-500">{request.location}</p>
                 </div>

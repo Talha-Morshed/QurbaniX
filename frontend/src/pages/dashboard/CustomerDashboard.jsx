@@ -33,25 +33,25 @@ function CustomerDashboard() {
   const selectedPackage = packageOptions.find((item) => item.id === selectedPackageId) ?? packageOptions[0];
 
   return (
-    <div className="min-h-screen bg-slate-50 px-6 py-16 sm:px-8 lg:px-10">
+    <div className="min-h-screen bg-warm-cream px-6 py-16 sm:px-8 lg:px-10">
       <div className="mx-auto flex max-w-6xl flex-col rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_24px_80px_rgba(15,23,42,0.08)] sm:p-12 lg:p-14">
         <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-2xl">
-            <p className="text-sm uppercase tracking-[0.3em] text-[#9b1455]">Customer Dashboard</p>
+            <p className="text-sm uppercase tracking-[0.3em] text-primary">Customer Dashboard</p>
             <h1 className="mt-4 text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">Welcome back to your Qurbani planning hub.</h1>
             <p className="mt-5 text-lg text-slate-600">
               Review your upcoming plans, compare available packages, and move closer to a trusted booking experience.
             </p>
           </div>
 
-          <div className="rounded-[1.5rem] border border-[#f4d4e2] bg-[#fff4f8] p-6 text-sm text-[#9b1455] lg:min-w-[280px]">
+          <div className="rounded-[1.5rem] border border-warm-cream bg-warm-cream p-6 text-sm text-primary lg:min-w-[280px]">
             <p className="font-semibold">What is next?</p>
-            <ul className="mt-4 space-y-3 text-[#9b1455]">
+            <ul className="mt-4 space-y-3 text-primary">
               <li>• Review your recent purchases</li>
               <li>• Manage your delivery preferences</li>
               <li>• Explore available Qurbani packages</li>
             </ul>
-            <Link to="/login/customer" className="mt-6 inline-flex rounded-2xl bg-[#9b1455] px-4 py-3 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#7a0f40] active:translate-y-1">
+            <Link to="/login/customer" className="mt-6 inline-flex rounded-2xl bg-primary px-4 py-3 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-primary-dark active:translate-y-1">
               Back to login
             </Link>
           </div>
@@ -61,10 +61,10 @@ function CustomerDashboard() {
           <section className="rounded-[2rem] border border-slate-200 bg-slate-50 p-6 sm:p-8">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-sm uppercase tracking-[0.25em] text-[#9b1455]">Recommended packages</p>
+                <p className="text-sm uppercase tracking-[0.25em] text-primary">Recommended packages</p>
                 <h2 className="mt-2 text-2xl font-semibold text-slate-900">Pick a plan that fits your family</h2>
               </div>
-              <span className="inline-flex w-fit rounded-full border border-[#f4d4e2] bg-white px-3 py-2 text-sm font-medium text-[#9b1455]">
+              <span className="inline-flex w-fit rounded-full border border-warm-cream bg-white px-3 py-2 text-sm font-medium text-primary">
                 Updated today
               </span>
             </div>
@@ -79,9 +79,9 @@ function CustomerDashboard() {
                     type="button"
                     onClick={() => setSelectedPackageId(item.id)}
                     className={`rounded-[1.5rem] border p-5 text-left transition duration-200 ${
-                      isActive
-                        ? 'border-[#9b1455] bg-[#fff4f8] shadow-[0_16px_40px_rgba(155,20,85,0.08)]'
-                        : 'border-slate-200 bg-white hover:border-[#9b1455] hover:shadow-sm'
+                              isActive
+                                ? 'border-primary bg-warm-cream shadow-primary'
+                                : 'border-slate-200 bg-white hover:border-primary hover:shadow-sm'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
@@ -89,7 +89,7 @@ function CustomerDashboard() {
                         <p className="text-sm font-semibold text-slate-900">{item.name}</p>
                         <p className="mt-2 text-sm text-slate-600">{item.description}</p>
                       </div>
-                      <span className="rounded-full bg-[#fce7f0] px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[#9b1455]">
+                      <span className="rounded-full accent-badge px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em]">
                         {item.badge}
                       </span>
                     </div>
@@ -100,17 +100,17 @@ function CustomerDashboard() {
             </div>
           </section>
 
-          <aside className="rounded-[2rem] border border-[#f4d4e2] bg-[#fff4f8] p-6 sm:p-8">
-            <p className="text-sm uppercase tracking-[0.25em] text-[#9b1455]">Selected package</p>
+          <aside className="rounded-[2rem] border border-warm-cream bg-warm-cream p-6 sm:p-8">
+            <p className="text-sm uppercase tracking-[0.25em] text-primary">Selected package</p>
             <h3 className="mt-3 text-2xl font-semibold text-slate-900">{selectedPackage.name}</h3>
             <p className="mt-3 text-sm leading-7 text-slate-700">{selectedPackage.description}</p>
 
-            <div className="mt-6 rounded-[1.5rem] border border-[#f4d4e2] bg-white p-5">
+            <div className="mt-6 rounded-[1.5rem] border border-warm-cream bg-white p-5">
               <p className="text-sm font-semibold text-slate-900">What is included</p>
               <ul className="mt-4 space-y-3 text-sm text-slate-700">
                 {selectedPackage.features.map((feature) => (
                   <li key={feature} className="flex items-start gap-2">
-                    <span className="mt-1 text-[#9b1455]">•</span>
+                    <span className="mt-1 text-primary">•</span>
                     <span>{feature}</span>
                   </li>
                 ))}
@@ -119,7 +119,7 @@ function CustomerDashboard() {
 
             <button
               type="button"
-              className="mt-6 inline-flex w-full items-center justify-center rounded-3xl bg-[#9b1455] px-6 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#7a0f40] active:translate-y-1"
+              className="mt-6 inline-flex w-full items-center justify-center rounded-3xl bg-primary px-6 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-primary-dark active:translate-y-1"
             >
               Book this package
             </button>

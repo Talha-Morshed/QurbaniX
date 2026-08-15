@@ -4,7 +4,7 @@ function PasswordField({ label, name, value, onChange, error, placeholder, showP
       <span className="flex items-center gap-2">{label}</span>
       <div className="relative">
         <input
-          className={`w-full rounded-3xl border px-4 py-3 pr-24 text-sm text-slate-900 shadow-sm outline-none transition duration-200 focus:border-[#9b1455] focus:ring-2 focus:ring-[#f8dbe7] ${error ? 'border-rose-500' : 'border-slate-200'}`}
+          className={`w-full rounded-3xl border px-4 py-3 pr-24 text-sm text-slate-900 shadow-sm outline-none transition duration-200 focus:border-primary focus:ring-2 focus:ring-warm-cream ${error ? 'border-rose-500' : 'border-slate-200'}`}
           type={showPassword ? 'text' : 'password'}
           name={name}
           value={value}
@@ -15,7 +15,7 @@ function PasswordField({ label, name, value, onChange, error, placeholder, showP
         <button
           type="button"
           onClick={onToggleShowPassword}
-          className="absolute inset-y-0 right-4 flex items-center text-sm font-semibold text-[#9b1455] transition hover:text-[#7a0f40]"
+          className="absolute inset-y-0 right-4 flex items-center text-sm font-semibold text-primary transition hover:text-primary-dark"
         >
           {showPassword ? 'Hide' : 'Show'}
         </button>

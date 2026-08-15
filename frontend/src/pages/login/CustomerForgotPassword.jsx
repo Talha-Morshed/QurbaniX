@@ -42,7 +42,7 @@ function CustomerForgotPassword() {
         <label className="block space-y-2 text-sm font-medium text-slate-700">
           <span className="flex items-center gap-2">Phone Number</span>
           <input
-            className={`w-full rounded-3xl border px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition duration-200 focus:border-[#9b1455] focus:ring-2 focus:ring-[#f8dbe7] ${error ? 'border-rose-500' : 'border-slate-200'}`}
+            className={`w-full rounded-3xl border px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition duration-200 focus:border-primary focus:ring-2 focus:ring-warm-cream ${error ? 'border-rose-500' : 'border-slate-200'}`}
             type="text"
             value={value}
             onChange={(event) => setValue(event.target.value)}
@@ -55,13 +55,13 @@ function CustomerForgotPassword() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="inline-flex w-full items-center justify-center rounded-3xl bg-[#9b1455] px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-[#9b1455]/20 transition duration-200 hover:-translate-y-0.5 hover:bg-[#7a0f40] active:translate-y-1 disabled:cursor-not-allowed disabled:bg-[#d79bb3]"
+          className="inline-flex w-full items-center justify-center rounded-3xl bg-primary px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-primary transition duration-200 hover:-translate-y-0.5 hover:bg-primary-dark active:translate-y-1 disabled:cursor-not-allowed disabled:bg-warm-cream"
         >
           {isSubmitting ? 'Sending...' : 'Send Reset Code'}
         </button>
 
         <p className="text-center text-sm text-slate-600">
-          <Link to="/login/customer" className="font-semibold text-[#9b1455] transition hover:text-[#7a0f40]">
+          <Link to="/login/customer" className="font-semibold text-primary transition hover:text-primary-dark">
             Back to Login
           </Link>
         </p>

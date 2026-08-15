@@ -108,7 +108,7 @@ export default function ButcherRegisterForm() {
   return (
     <>
       {submitted ? (
-        <div className="rounded-3xl border border-[#f4d4e2] bg-[#fff4f8] p-8 text-[#9b1455]">
+        <div className="rounded-3xl border border-warm-cream bg-warm-cream p-8 text-primary">
           <h2 className="text-2xl font-semibold">Registration submitted</h2>
           <p className="mt-3 text-slate-700">Your butcher application has been received. It will be reviewed before activation.</p>
         </div>
@@ -135,13 +135,13 @@ export default function ButcherRegisterForm() {
             </div>
           </div>
 
-          <button type="submit" className="inline-flex w-full items-center justify-center rounded-3xl bg-[#9b1455] px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-[#9b1455]/20 transition duration-200 hover:-translate-y-0.5 hover:bg-[#7a0f40] active:translate-y-1">
+          <button type="submit" className="inline-flex w-full items-center justify-center rounded-3xl bg-primary px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-primary transition duration-200 hover:-translate-y-0.5 hover:bg-primary-dark active:translate-y-1">
             {isSubmitting ? 'Sending...' : 'Register & Send PIN'}
           </button>
 
           <p className="text-center text-sm text-slate-600">
             Already have an account?{' '}
-            <Link to="/login/butcher" className="font-semibold text-[#9b1455] hover:text-[#7a0f40]">
+            <Link to="/login/butcher" className="font-semibold text-primary hover:text-primary-dark">
               Log In
             </Link>
           </p>
@@ -153,7 +153,7 @@ export default function ButcherRegisterForm() {
             <label className="block space-y-2 text-sm font-medium text-slate-700">
               <span>Enter PIN</span>
               <input
-                className={`w-full rounded-3xl border px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition duration-200 focus:border-[#9b1455] focus:ring-2 focus:ring-[#f8dbe7] ${errorMsg ? 'border-rose-500' : 'border-slate-200'}`}
+                className={`w-full rounded-3xl border px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition duration-200 focus:border-primary focus:ring-2 focus:ring-warm-cream ${errorMsg ? 'border-rose-500' : 'border-slate-200'}`}
                 type="text"
                 name="pin"
                 value={pinInput}
@@ -165,8 +165,8 @@ export default function ButcherRegisterForm() {
             </label>
 
             <div className="flex items-center justify-between gap-4">
-              <button type="submit" className="inline-flex items-center justify-center rounded-3xl bg-[#9b1455] px-6 py-3 text-sm font-semibold text-white">Verify PIN</button>
-              <button type="button" onClick={resendPin} className="text-sm font-semibold text-[#9b1455]">Resend PIN</button>
+              <button type="submit" className="inline-flex items-center justify-center rounded-3xl bg-primary px-6 py-3 text-sm font-semibold text-white">Verify PIN</button>
+              <button type="button" onClick={resendPin} className="text-sm font-semibold text-primary">Resend PIN</button>
             </div>
 
             <p className="text-xs text-slate-500">Attempts: {attempts} / 3</p>

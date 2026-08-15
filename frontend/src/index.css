@@ -2,8 +2,16 @@
 
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  color: #0f172a;
-  background-color: #ffffff;
+  --color-primary: #14532D; /* Deep Forest Green */
+  --color-primary-dark: #0f3f22;
+  --color-background: #F7F3E8; /* Warm Cream */
+  --color-accent: #D4A72C; /* Warm Gold */
+  --color-white: #FFFFFF;
+  --color-text: #1F2937;
+  --color-muted: #6B7280;
+  --color-border: #E5E7EB;
+  color: var(--color-text);
+  background-color: var(--color-white);
 }
 
 * {
@@ -18,8 +26,8 @@ html {
 body {
   margin: 0;
   min-height: 100%;
-  background: #ffffff;
-  color: #0f172a;
+  background: var(--color-background);
+  color: var(--color-text);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
@@ -46,6 +54,24 @@ img {
 }
 
 ::selection {
-  background: #fbcfe8;
-  color: #831843;
+  background: var(--color-accent);
+  color: var(--color-white);
 }
+
+/* Utility classes for brand colors (used to replace hardcoded Tailwind hex classes) */
+.bg-primary { background-color: var(--color-primary) !important; }
+.bg-primary-dark { background-color: var(--color-primary-dark) !important; }
+.bg-warm-cream { background-color: var(--color-background) !important; }
+.text-primary { color: var(--color-primary) !important; }
+.text-muted { color: var(--color-muted) !important; }
+.border-primary { border-color: var(--color-primary) !important; }
+.border-warm-cream { border-color: rgba(212,167,44,0.08) !important; }
+.shadow-primary-soft { box-shadow: 0 24px 80px rgba(20,83,45,0.08) !important; }
+.shadow-primary { box-shadow: 0 20px 40px rgba(20,83,45,0.12) !important; }
+.focus\:ring-warm-cream:focus { box-shadow: 0 0 0 4px rgba(247,243,232,0.8) !important; }
+.ring-warm-cream { box-shadow: 0 0 0 6px rgba(247,243,232,0.8) !important; }
+.hover\:bg-primary-dark:hover { background-color: var(--color-primary-dark) !important; }
+.hover\:text-primary:hover { color: var(--color-primary) !important; }
+
+/* Small accent badge */
+.accent-badge { color: var(--color-white); background: var(--color-accent); border-radius: 9999px; padding: 0.125rem 0.5rem; font-weight: 600; }

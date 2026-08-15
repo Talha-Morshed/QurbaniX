@@ -18,12 +18,12 @@ export default function RegistrationLanding() {
             onClick={() => setRole('customer')}
             onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setRole('customer')}
             className={`relative cursor-pointer overflow-hidden rounded-2xl border bg-white p-6 text-left shadow-lg transition transform hover:-translate-y-1 ${
-              role === 'customer' ? 'border-[#9b1455] ring-2 ring-[#f8dbe7]' : 'border-slate-200'
+              role === 'customer' ? 'border-primary ring-2 ring-warm-cream' : 'border-slate-200'
             }`}
           >
             <div className="flex items-center gap-3">
               <div className="flex items-center">
-                <div className={`h-3 w-3 rounded-full mr-3 ${role === 'customer' ? 'bg-[#9b1455]' : 'border border-slate-300 bg-white'}`} />
+                <div className={`h-3 w-3 rounded-full mr-3 ${role === 'customer' ? 'bg-primary' : 'border border-slate-300 bg-white'}`} />
               </div>
               <div>
                 <div className="text-sm font-semibold text-slate-900">Customer</div>
@@ -38,12 +38,12 @@ export default function RegistrationLanding() {
             onClick={() => setRole('butcher')}
             onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setRole('butcher')}
             className={`relative cursor-pointer overflow-hidden rounded-2xl border bg-white p-6 text-left shadow-lg transition transform hover:-translate-y-1 ${
-              role === 'butcher' ? 'border-[#9b1455] ring-2 ring-[#f8dbe7]' : 'border-slate-200'
+              role === 'butcher' ? 'border-primary ring-2 ring-warm-cream' : 'border-slate-200'
             }`}
           >
             <div className="flex items-center gap-3">
               <div className="flex items-center">
-                <div className={`h-3 w-3 rounded-full mr-3 ${role === 'butcher' ? 'bg-[#9b1455]' : 'border border-slate-300 bg-white'}`} />
+                <div className={`h-3 w-3 rounded-full mr-3 ${role === 'butcher' ? 'bg-primary' : 'border border-slate-300 bg-white'}`} />
               </div>
               <div>
                 <div className="text-sm font-semibold text-slate-900">Butcher</div>

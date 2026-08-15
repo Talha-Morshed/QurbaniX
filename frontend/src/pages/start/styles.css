@@ -2,7 +2,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #f8fafc;
+  background: var(--color-background);
 }
 
 .role-selection__container {
@@ -13,9 +13,9 @@
 
 .role-selection__panel {
   background: #ffffff;
-  border: 1px solid rgba(155, 20, 85, 0.08);
+  border: 1px solid rgba(20,83,45,0.06);
   border-radius: 32px;
-  box-shadow: 0 30px 80px rgba(155, 20, 85, 0.1);
+  box-shadow: 0 30px 80px rgba(20,83,45,0.06);
   padding: 3rem;
 }
 
@@ -28,8 +28,8 @@
 .role-selection__badge {
   display: inline-flex;
   border-radius: 999px;
-  background: rgba(155, 20, 85, 0.12);
-  color: #9b1455;
+  background: rgba(212,167,44,0.08);
+  color: var(--color-primary);
   font-weight: 700;
   font-size: 0.85rem;
   padding: 0.8rem 1.2rem;
@@ -38,7 +38,7 @@
 .role-selection__title {
   margin: 1rem 0 1rem;
   font-size: clamp(2.2rem, 3.5vw, 3.8rem);
-  color: #2a0f28;
+  color: var(--color-text);
   line-height: 1.05;
 }
 
@@ -46,7 +46,7 @@
   margin: 0;
   font-size: 1rem;
   line-height: 1.9;
-  color: #4a1d3c;
+  color: var(--color-muted);
 }
 
 .role-selection__grid {

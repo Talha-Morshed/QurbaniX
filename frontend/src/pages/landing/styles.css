@@ -1,11 +1,11 @@
 /* Landing page base styles — revised palette (white/cream, deep emerald, subtle gold) */
 :root {
-  --bg: #ffffff;
-  --cream: #fbf9f6;
-  --deep-green: #064e3b;
-  --green: #047857;
-  --muted: #6b7280;
-  --accent: #b45309;
+  --bg: #F7F3E8;
+  --cream: #F7F3E8;
+  --deep-green: #14532D;
+  --green: #14532D;
+  --muted: #6B7280;
+  --accent: #D4A72C;
 }
 
 * { box-sizing: border-box; }

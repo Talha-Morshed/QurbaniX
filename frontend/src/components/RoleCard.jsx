@@ -3,12 +3,12 @@ function RoleCard({ icon, title, description, isSelected, onSelect }) {
     <button
       type="button"
       onClick={onSelect}
-      className={`group flex h-full flex-col justify-between rounded-[2rem] border bg-white p-8 text-left shadow-[0_24px_80px_rgba(15,23,42,0.06)] transition duration-300 hover:-translate-y-1 hover:border-[#9b1455] hover:shadow-[#9b1455]/20 active:translate-y-1 ${
-        isSelected ? 'border-[#9b1455] ring-2 ring-[#fde8f0]' : 'border-slate-200'
+      className={`group flex h-full flex-col justify-between rounded-[2rem] border bg-white p-8 text-left shadow-[0_24px_80px_rgba(15,23,42,0.06)] transition duration-300 hover:-translate-y-1 hover:border-primary hover:shadow-primary active:translate-y-1 ${
+        isSelected ? 'border-primary ring-2 ring-warm-cream' : 'border-slate-200'
       }`}
     >
       <div>
-        <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-3xl bg-[#ffe1ed] text-4xl transition duration-300 group-hover:bg-[#f4c5db]">
+        <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-3xl bg-warm-cream text-4xl transition duration-300 group-hover:bg-warm-cream">
           <span aria-hidden="true">{icon}</span>
         </div>
         <h3 className="text-2xl font-semibold text-slate-900">{title}</h3>

@@ -22,7 +22,7 @@ function TableOfContents() {
       <ul className="mt-4 grid gap-2 text-sm text-slate-700 sm:grid-cols-2">
         {links.map((link) => (
           <li key={link.id}>
-            <a href={`#${link.id}`} className="transition hover:text-[#9b1455]">
+            <a href={`#${link.id}`} className="transition hover:text-primary">
               {link.label}
             </a>
           </li>

@@ -10,7 +10,7 @@ function TermsAndConditions() {
       <div className="w-full max-w-6xl rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_24px_80px_rgba(15,23,42,0.08)] sm:p-8 lg:p-10">
         <div className="flex flex-col gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="text-sm uppercase tracking-[0.3em] text-[#9b1455]">QurbaniX</p>
+            <p className="text-sm uppercase tracking-[0.3em] text-primary">QurbaniX</p>
             <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Terms & Conditions</h1>
             <p className="mt-3 max-w-3xl text-base leading-7 text-slate-600">
               These are the basic rules for using QurbaniX. They are written in simple language so everyone can understand them.
@@ -19,7 +19,7 @@ function TermsAndConditions() {
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 text-xl text-slate-600 transition hover:border-[#9b1455] hover:text-[#9b1455]"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 text-xl text-slate-600 transition hover:border-primary hover:text-primary"
             aria-label="Close terms and conditions"
           >
             ×

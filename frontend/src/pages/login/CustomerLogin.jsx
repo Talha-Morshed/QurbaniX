@@ -103,7 +103,7 @@ function CustomerLogin() {
             <label className="block space-y-2 text-sm font-medium text-slate-700">
               <span className="flex items-center gap-2">Phone Number</span>
               <input
-                className={`w-full rounded-3xl border px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition duration-200 focus:border-[#9b1455] focus:ring-2 focus:ring-[#f8dbe7] ${errors.phone ? 'border-rose-500' : 'border-slate-200'}`}
+                className={`w-full rounded-3xl border px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition duration-200 focus:border-primary focus:ring-2 focus:ring-warm-cream ${errors.phone ? 'border-rose-500' : 'border-slate-200'}`}
                 type="text"
                 name="phone"
                 value={form.phone}
@@ -118,14 +118,14 @@ function CustomerLogin() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="inline-flex w-full items-center justify-center rounded-3xl bg-[#9b1455] px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-[#9b1455]/20 transition duration-200 hover:-translate-y-0.5 hover:bg-[#7a0f40] active:translate-y-1 disabled:cursor-not-allowed disabled:bg-[#d79bb3]"
+            className="inline-flex w-full items-center justify-center rounded-3xl bg-primary px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-primary transition duration-200 hover:-translate-y-0.5 hover:bg-primary-dark active:translate-y-1 disabled:cursor-not-allowed disabled:bg-warm-cream"
           >
             {isSubmitting ? 'Sending...' : 'Send PIN'}
           </button>
 
           <p className="text-center text-sm text-slate-600">
             Don&apos;t have an account?{' '}
-            <Link to="/register" className="font-semibold text-[#9b1455] transition hover:text-[#7a0f40]">
+            <Link to="/register" className="font-semibold text-primary transition hover:text-primary-dark">
               Register
             </Link>
           </p>
@@ -139,7 +139,7 @@ function CustomerLogin() {
             <label className="block space-y-2 text-sm font-medium text-slate-700">
               <span>Enter PIN</span>
               <input
-                className={`w-full rounded-3xl border px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition duration-200 focus:border-[#9b1455] focus:ring-2 focus:ring-[#f8dbe7] ${errorMsg ? 'border-rose-500' : 'border-slate-200'}`}
+                className={`w-full rounded-3xl border px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition duration-200 focus:border-primary focus:ring-2 focus:ring-warm-cream ${errorMsg ? 'border-rose-500' : 'border-slate-200'}`}
                 type="text"
                 name="pin"
                 value={pinInput}
@@ -153,8 +153,8 @@ function CustomerLogin() {
             {/* Dev PIN is logged to console in dev mode; not shown on-screen */}
 
             <div className="flex items-center justify-between gap-4">
-              <button type="submit" className="inline-flex items-center justify-center rounded-3xl bg-[#9b1455] px-6 py-3 text-sm font-semibold text-white">Verify PIN</button>
-              <button type="button" onClick={resendPin} className="text-sm font-semibold text-[#9b1455]">Resend PIN</button>
+              <button type="submit" className="inline-flex items-center justify-center rounded-3xl bg-primary px-6 py-3 text-sm font-semibold text-white">Verify PIN</button>
+              <button type="button" onClick={resendPin} className="text-sm font-semibold text-primary">Resend PIN</button>
             </div>
 
             <p className="text-xs text-slate-500">Attempts: {attempts} / 3</p>

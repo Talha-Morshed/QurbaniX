@@ -10,7 +10,7 @@
 }
 
 .header__brand {
-  color: #064e3b;
+  color: var(--color-primary);
   font-weight: 800;
   font-size: 1.05rem;
   letter-spacing: 0.06em;
@@ -24,7 +24,7 @@
 }
 
 .header__nav a {
-  color: #374151;
+  color: var(--color-text);
   text-decoration: none;
   font-size: 0.95rem;
   font-weight: 600;
@@ -32,7 +32,7 @@
 }
 
 .header__nav a:hover {
-  color: #047857;
+  color: var(--color-primary);
 }
 
 @media (max-width: 900px) {

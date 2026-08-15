@@ -58,11 +58,11 @@ function ButcherResetPassword() {
   return (
     <PageShell title="Butcher Reset Password" description="Set a new password." notice="Choose a strong password to keep your account safe.">
       {isSuccess ? (
-        <div className="rounded-[2rem] border border-[#f4d4e2] bg-[#fff4f8] p-8 text-center text-[#9b1455] shadow-sm">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#9b1455] text-3xl text-white">✓</div>
+        <div className="rounded-[2rem] border border-warm-cream bg-warm-cream p-8 text-center text-primary shadow-sm">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary text-3xl text-white">✓</div>
           <h2 className="mt-6 text-2xl font-semibold">Password reset successful</h2>
           <p className="mt-3 text-sm text-slate-700">Your butcher password has been updated. You can now sign in with your new credentials.</p>
-          <Link to="/login/butcher" className="mt-6 inline-flex rounded-3xl bg-[#9b1455] px-6 py-3 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#7a0f40] active:translate-y-1">
+          <Link to="/login/butcher" className="mt-6 inline-flex rounded-3xl bg-primary px-6 py-3 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-primary-dark active:translate-y-1">
             Back to Login
           </Link>
         </div>
@@ -108,7 +108,7 @@ function ButcherResetPassword() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="inline-flex w-full items-center justify-center rounded-3xl bg-[#9b1455] px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-[#9b1455]/20 transition duration-200 hover:-translate-y-0.5 hover:bg-[#7a0f40] active:translate-y-1 disabled:cursor-not-allowed disabled:bg-[#d79bb3]"
+            className="inline-flex w-full items-center justify-center rounded-3xl bg-primary px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-primary transition duration-200 hover:-translate-y-0.5 hover:bg-primary-dark active:translate-y-1 disabled:cursor-not-allowed disabled:bg-warm-cream"
           >
             {isSubmitting ? 'Resetting...' : 'Reset Password'}
           </button>
