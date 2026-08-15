@@ -65,20 +65,20 @@ export default function RegistrationLanding() {
 
             {/* Step indicator */}
             <div className="mb-4">
-              <div className="flex items-center gap-4 text-xs text-slate-500">
+              <div className="flex items-center gap-3 text-xs text-slate-500 sm:gap-4">
                 <div className={`flex items-center gap-2 ${activeStep===1? 'text-emerald-700 font-semibold':''}`}>
                   <div className={`w-7 h-7 rounded-full flex items-center justify-center ${activeStep===1? 'bg-emerald-700 text-white':'bg-slate-100 text-slate-600'}`}>1</div>
-                  <div>Choose role</div>
+                  <div className="hidden sm:inline">Choose role</div>
                 </div>
                 <div className="h-px flex-1 bg-slate-100" />
                 <div className={`flex items-center gap-2 ${activeStep===2? 'text-emerald-700 font-semibold':''}`}>
                   <div className={`w-7 h-7 rounded-full flex items-center justify-center ${activeStep===2? 'bg-emerald-700 text-white':'bg-slate-100 text-slate-600'}`}>2</div>
-                  <div>Account details</div>
+                  <div className="hidden sm:inline">Account details</div>
                 </div>
                 <div className="h-px flex-1 bg-slate-100" />
                 <div className={`flex items-center gap-2 ${activeStep===3? 'text-emerald-700 font-semibold':''}`}>
                   <div className={`w-7 h-7 rounded-full flex items-center justify-center ${activeStep===3? 'bg-emerald-700 text-white':'bg-slate-100 text-slate-600'}`}>3</div>
-                  <div>Complete</div>
+                  <div className="hidden sm:inline">Complete</div>
                 </div>
               </div>
             </div>

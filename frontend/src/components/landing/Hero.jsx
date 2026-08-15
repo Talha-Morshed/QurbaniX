@@ -17,8 +17,14 @@ export default function Hero() {
             </div>
           </div>
 
-          <div className="lg:col-span-6 relative">
-            <div className="relative w-full h-96 lg:h-[520px]">
+          <div className="lg:col-span-6">
+            {/* Mobile: single clean image */}
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl md:hidden">
+              <img src={images.cow} alt="Cow" className="w-full h-72 object-cover" />
+            </div>
+
+            {/* md+: layered animal collage */}
+            <div className="relative hidden md:block w-full h-96 lg:h-[520px]">
               {/* Top Left - Goat */}
               <div className="absolute -left-8 -top-12 w-44 h-44 md:w-56 md:h-56 transform rotate-3 z-10">
                 <HeroAnimalCard src={images.goat} alt="Goat" />

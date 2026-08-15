@@ -34,7 +34,7 @@ function CustomerDashboard() {
   const selectedPackage = packageOptions.find((item) => item.id === selectedPackageId) ?? packageOptions[0];
 
   return (
-    <div className="min-h-screen bg-warm-cream px-6 py-16 sm:px-8 lg:px-10">
+    <div className="min-h-screen bg-warm-cream px-4 py-10 sm:px-8 lg:px-10">
       <div className="mx-auto flex max-w-6xl flex-col rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_24px_80px_rgba(15,23,42,0.08)] sm:p-12 lg:p-14">
         <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-2xl">

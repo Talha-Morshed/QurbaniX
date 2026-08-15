@@ -75,3 +75,12 @@ img {
 
 /* Small accent badge */
 .accent-badge { color: var(--color-white); background: var(--color-accent); border-radius: 9999px; padding: 0.125rem 0.5rem; font-weight: 600; }
+
+/* Prevent iOS Safari from auto-zooming into small input fields */
+@media (max-width: 768px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
