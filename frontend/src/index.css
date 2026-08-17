@@ -48,6 +48,20 @@ button {
   cursor: pointer;
 }
 
+/*
+ * QurbaniX uses a crisp rectangular component language. This centralized rule
+ * applies to Tailwind rounded utilities without requiring each screen to
+ * duplicate an override. Use .keep-circular only for controls or decoration
+ * whose purpose is inherently circular.
+ */
+[class*="rounded-"] {
+  border-radius: 0 !important;
+}
+
+.keep-circular {
+  border-radius: 9999px !important;
+}
+
 img {
   max-width: 100%;
   display: block;
@@ -74,7 +88,7 @@ img {
 .hover\:text-primary:hover { color: var(--color-primary) !important; }
 
 /* Small accent badge */
-.accent-badge { color: var(--color-white); background: var(--color-accent); border-radius: 9999px; padding: 0.125rem 0.5rem; font-weight: 600; }
+.accent-badge { color: var(--color-white); background: var(--color-accent); border-radius: 0; padding: 0.125rem 0.5rem; font-weight: 600; }
 
 /* Prevent iOS Safari from auto-zooming into small input fields */
 @media (max-width: 768px) {

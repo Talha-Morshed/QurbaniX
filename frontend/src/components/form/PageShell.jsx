@@ -20,8 +20,8 @@ function PageShell({ title, description, children, notice }) {
                 className="h-16 w-16 shrink-0 rounded-2xl bg-white/10 object-contain p-2 ring-1 ring-white/20 sm:h-20 sm:w-20"
               />
             </div>
-            <div className="pointer-events-none absolute -right-10 -top-16 h-48 w-48 rounded-full bg-white/5" aria-hidden="true" />
-            <div className="pointer-events-none absolute -bottom-20 right-28 h-44 w-44 rounded-full bg-[rgba(212,167,44,0.15)]" aria-hidden="true" />
+            <div className="keep-circular pointer-events-none absolute -right-10 -top-16 h-48 w-48 rounded-full bg-white/5" aria-hidden="true" />
+            <div className="keep-circular pointer-events-none absolute -bottom-20 right-28 h-44 w-44 rounded-full bg-[rgba(212,167,44,0.15)]" aria-hidden="true" />
           </div>
 
           {notice && (

@@ -67,7 +67,7 @@ function CustomerResetPassword() {
     >
       {isSuccess ? (
         <div className="rounded-[2rem] border border-warm-cream bg-warm-cream p-8 text-center text-primary shadow-sm">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary text-3xl text-white">✓</div>
+          <div className="keep-circular mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary text-3xl text-white">✓</div>
           <h2 className="mt-6 text-2xl font-semibold">Password reset successful</h2>
           <p className="mt-3 text-sm text-slate-700">Your customer password has been updated. You can now sign in with your new credentials.</p>
           <Link to="/login/customer" className="mt-6 inline-flex rounded-3xl bg-primary px-6 py-3 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-primary-dark active:translate-y-1">

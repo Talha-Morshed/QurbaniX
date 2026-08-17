@@ -57,7 +57,7 @@ export default function LoginShell({
                   <div className="mt-3 grid gap-3 sm:grid-cols-3">
                     {steps.map((s, i) => (
                       <div key={i} className="flex flex-col items-start gap-1 rounded-md border border-slate-100 bg-white p-3 text-xs shadow-sm">
-                        <div className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-primary text-white">{i + 1}</div>
+                        <div className="keep-circular inline-flex h-7 w-7 items-center justify-center rounded-full bg-primary text-white">{i + 1}</div>
                         <div className="mt-1 font-semibold text-slate-800">{s.title}</div>
                         <div className="text-slate-600">{s.description}</div>
                       </div>

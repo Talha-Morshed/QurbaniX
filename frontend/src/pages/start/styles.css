@@ -14,7 +14,7 @@
 .role-selection__panel {
   background: #ffffff;
   border: 1px solid rgba(20,83,45,0.06);
-  border-radius: 32px;
+  border-radius: 0;
   box-shadow: 0 30px 80px rgba(20,83,45,0.06);
   padding: 3rem;
 }
@@ -27,7 +27,7 @@
 
 .role-selection__badge {
   display: inline-flex;
-  border-radius: 999px;
+  border-radius: 0;
   background: rgba(212,167,44,0.08);
   color: var(--color-primary);
   font-weight: 700;
