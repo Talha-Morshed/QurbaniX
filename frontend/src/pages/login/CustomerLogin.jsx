@@ -97,13 +97,15 @@ function CustomerLogin() {
 
   return (
     <LoginShell
-      pageTitle="Customer Login"
+      pageTitle="Secure Sign In"
       pageDescription="Sign in to your account."
-      notice="Secure sign-in for a smooth shopping and delivery experience."
+      notice="Secure sign-in for trusted and verified Qurbani services."
       leftTitle="Welcome back to QurbaniX"
-      leftDescription="Sign in securely to book trusted Qurbani services, track orders, and manage your bookings — all in one place."
-      formTitle="Customer Sign In"
-      formSubtitle="Sign in with your phone number to continue."
+      leftDescription="Sign in securely to manage your Qurbani bookings and services in one place."
+      formTitle="Sign in to your account"
+      formSubtitle="Continue with your registered phone number."
+      splitLayout
+      compact
     >
       {stage === 'request' && (
         <form className="space-y-6" onSubmit={sendPin} noValidate>
@@ -141,8 +143,8 @@ function CustomerLogin() {
       )}
 
       {stage === 'verify' && (
-        <form className="space-y-6" onSubmit={verifyPin} noValidate>
-          <div className="space-y-5">
+        <form className="space-y-4" onSubmit={verifyPin} noValidate>
+          <div className="space-y-3">
             <p className="text-sm text-slate-700">A 4-digit PIN was sent to <strong className="text-slate-900">{form.phone}</strong>.</p>
             <label className="block space-y-2 text-sm font-medium text-slate-700">
               <span>Enter PIN</span>
@@ -155,18 +157,15 @@ function CustomerLogin() {
                 placeholder="1234"
                 aria-invalid={!!errorMsg}
               />
-              {errorMsg && <p className="text-xs text-rose-600">{errorMsg}</p>}
+              <p className="min-h-5 text-xs text-rose-600">{errorMsg}</p>
             </label>
 
             {/* Dev PIN is logged to console in dev mode; not shown on-screen */}
 
             <div className="flex items-center justify-between gap-4">
               <button type="submit" className="inline-flex items-center justify-center rounded-3xl bg-primary px-6 py-3 text-sm font-semibold text-white">Verify PIN</button>
-              <button type="button" onClick={resendPin} className="text-sm font-semibold text-primary">Resend PIN</button>
+              <button type="button" onClick={resendPin} className="text-xs font-semibold text-primary">Resend PIN</button>
             </div>
-
-            <p className="text-xs text-slate-500">Attempts: {attempts} / 3</p>
-            {pinExpiresAt && <p className="text-xs text-slate-500">Expires: {new Date(pinExpiresAt).toLocaleTimeString()}</p>}
           </div>
         </form>
       )}
