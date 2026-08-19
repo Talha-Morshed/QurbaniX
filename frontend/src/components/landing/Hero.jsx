@@ -1,4 +1,3 @@
-import React from 'react';
 import HeroAnimalCard from './HeroAnimalCard';
 import CTAButton from './CTAButton';
 import images from '../../assets/images';
