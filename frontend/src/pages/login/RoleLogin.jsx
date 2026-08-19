@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import LoginShell from '../../components/form/LoginShell';
-import { validatePhone } from '../../utils/validation';
+import { maskPhone, validatePhone } from '../../utils/validation';
 
 function RoleLogin({ role, dashboardPath }) {
   const [form, setForm] = useState({ phone: '' });
@@ -98,7 +98,7 @@ function RoleLogin({ role, dashboardPath }) {
             {errors.phone && <p className="text-xs text-rose-600">{errors.phone}</p>}
           </label>
 
-          <button type="submit" disabled={isSubmitting} className="inline-flex w-full items-center justify-center rounded-3xl bg-primary px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-primary transition duration-200 hover:-translate-y-0.5 hover:bg-primary-dark active:translate-y-1 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-600">
+          <button type="submit" disabled={isSubmitting} className="premium-action inline-flex w-full items-center justify-center rounded-3xl bg-primary px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-primary hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-600">
             {isSubmitting ? 'Sending...' : 'Send PIN'}
           </button>
 
@@ -110,7 +110,7 @@ function RoleLogin({ role, dashboardPath }) {
       ) : (
         <form className="space-y-4" onSubmit={verifyPin} noValidate>
           <div className="space-y-3">
-            <p className="text-sm text-slate-700">A 4-digit PIN was sent to <strong className="text-slate-900">{form.phone}</strong>.</p>
+            <p className="text-sm text-slate-700">A 4-digit PIN was sent to <strong className="text-slate-900">{maskPhone(form.phone)}</strong>.</p>
             <label className="block space-y-2 text-sm font-medium text-slate-700">
               <span>Enter PIN</span>
               <input
@@ -126,8 +126,8 @@ function RoleLogin({ role, dashboardPath }) {
             </label>
 
             <div className="flex items-center justify-between gap-4">
-              <button type="submit" className="inline-flex items-center justify-center rounded-3xl bg-primary px-6 py-3 text-sm font-semibold text-white">Verify PIN</button>
-              <button type="button" onClick={() => issuePin(true)} className="text-xs font-semibold text-primary">Resend PIN</button>
+              <button type="submit" className="premium-action inline-flex items-center justify-center rounded-3xl bg-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary hover:bg-primary-dark">Enter</button>
+              <button type="button" onClick={() => issuePin(true)} className="premium-action text-[0.35rem] font-semibold text-primary">Resend PIN</button>
             </div>
           </div>
         </form>

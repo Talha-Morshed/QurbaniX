@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import FormField from '../../components/form/FormField';
-import { validatePhone } from '../../utils/validation';
+import { maskPhone, validatePhone } from '../../utils/validation';
 
 const initialState = { fullName: '', phone: '', agree: false };
 
@@ -87,15 +87,15 @@ function RoleRegistrationForm({ role, loginPath, onComplete, showLogin = true, s
     return (
       <form className="space-y-6" onSubmit={verifyPin} noValidate>
         <div className="space-y-5">
-          <p className="text-sm text-slate-700">A 4-digit PIN was sent to <strong className="text-slate-900">{form.phone}</strong>.</p>
+          <p className="text-sm text-slate-700">A 4-digit PIN was sent to <strong className="text-slate-900">{maskPhone(form.phone)}</strong>.</p>
           <label className="block space-y-2 text-sm font-medium text-slate-700">
             <span>Enter PIN</span>
             <input className={`w-full rounded-3xl border px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition duration-200 focus:border-primary focus:ring-2 focus:ring-warm-cream ${errorMsg ? 'border-rose-500' : 'border-slate-200'}`} type="text" name="pin" value={pinInput} onChange={(event) => setPinInput(event.target.value)} placeholder="1234" aria-invalid={!!errorMsg} />
             {errorMsg && <p className="text-xs text-rose-600">{errorMsg}</p>}
           </label>
           <div className="flex items-center justify-between gap-4">
-            <button type="submit" className="inline-flex items-center justify-center rounded-3xl bg-primary px-6 py-3 text-sm font-semibold text-white">Verify PIN</button>
-            <button type="button" onClick={() => issuePin(true)} className="text-sm font-semibold text-primary">Resend PIN</button>
+            <button type="submit" className="premium-action inline-flex items-center justify-center rounded-3xl bg-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary hover:bg-primary-dark">Enter</button>
+            <button type="button" onClick={() => issuePin(true)} className="premium-action text-[0.35rem] font-semibold text-primary">Resend PIN</button>
           </div>
           <p className="text-xs text-slate-500">Attempts: {attempts} / 3</p>
           {pinExpiresAt && <p className="text-xs text-slate-500">Expires: {new Date(pinExpiresAt).toLocaleTimeString()}</p>}
@@ -114,7 +114,7 @@ function RoleRegistrationForm({ role, loginPath, onComplete, showLogin = true, s
         <input type="checkbox" name="agree" checked={form.agree} onChange={handleChange} className="mt-1 h-5 w-5 rounded border-slate-300 text-primary focus:ring-warm-cream" />
         <span>I agree to the <Link to="/terms" className="font-semibold text-primary hover:text-primary-dark">Terms & Conditions</Link>.{errors.agree && <span className="block text-rose-600">{errors.agree}</span>}</span>
       </label>
-      <button type="submit" disabled={isSubmitting} className="inline-flex w-full items-center justify-center rounded-3xl bg-primary px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-primary transition duration-200 hover:-translate-y-0.5 hover:bg-primary-dark active:translate-y-1 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-600">{isSubmitting ? 'Sending...' : 'Register & Send PIN'}</button>
+      <button type="submit" disabled={isSubmitting} className="premium-action inline-flex w-full items-center justify-center rounded-3xl bg-primary px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-primary hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-600">{isSubmitting ? 'Sending...' : 'Register & Send PIN'}</button>
       {showLogin && <p className="text-center text-sm text-slate-600">Already have an account?{' '}<Link to={loginPath} className="font-semibold text-primary hover:text-primary-dark">Log In</Link></p>}
     </form>
   );

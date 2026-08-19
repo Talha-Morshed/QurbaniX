@@ -87,9 +87,9 @@ export default function RegistrationLanding() {
               <button
                 type="button"
                 onClick={() => { setRole('customer'); setCompleted(false); }}
-                className={`flex items-center justify-center gap-2 rounded-3xl px-4 py-3 text-sm font-semibold transition transform ${
+                className={`premium-action flex items-center justify-center gap-2 rounded-3xl px-4 py-3 text-sm font-semibold ${
                   role === 'customer' ? 'bg-emerald-700 text-white shadow-md' : 'bg-slate-50 text-slate-700 border border-slate-100'
-                } hover:scale-[1.02] active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-emerald-200`}
+                } focus:outline-none focus:ring-2 focus:ring-emerald-200`}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 12a5 5 0 100-10 5 5 0 000 10zM3 21a9 9 0 1118 0H3z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 Customer
@@ -98,9 +98,9 @@ export default function RegistrationLanding() {
               <button
                 type="button"
                 onClick={() => { setRole('butcher'); setCompleted(false); }}
-                className={`flex items-center justify-center gap-2 rounded-3xl px-4 py-3 text-sm font-semibold transition transform ${
+                className={`premium-action flex items-center justify-center gap-2 rounded-3xl px-4 py-3 text-sm font-semibold ${
                   role === 'butcher' ? 'bg-emerald-700 text-white shadow-md' : 'bg-slate-50 text-slate-700 border border-slate-100'
-                } hover:scale-[1.02] active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-emerald-200`}
+                } focus:outline-none focus:ring-2 focus:ring-emerald-200`}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 7h18M7 21h10M12 3v18" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 Butcher

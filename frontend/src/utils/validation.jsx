@@ -21,3 +21,8 @@ export function validatePhone(phone) {
   const phoneRegex = /^01\d{9}$/;
   return phoneRegex.test(cleanPhone);
 }
+
+export function maskPhone(phone) {
+  const cleanPhone = phone.trim();
+  return `${cleanPhone.slice(0, 3)}${'*'.repeat(Math.max(0, cleanPhone.length - 5))}${cleanPhone.slice(-2)}`;
+}

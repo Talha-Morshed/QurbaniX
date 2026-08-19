@@ -22,7 +22,7 @@ function TermsAndConditions() {
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="keep-circular inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 text-xl text-slate-600 transition hover:border-primary hover:text-primary"
+            className="premium-action keep-circular inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 text-xl text-slate-600 hover:border-primary hover:text-primary"
             aria-label="Close terms and conditions"
           >
             ×

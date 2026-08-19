@@ -56,7 +56,7 @@ function CustomerDashboard() {
               <li>• Manage your delivery preferences</li>
               <li>• Explore available Qurbani packages</li>
             </ul>
-            <Link to="/login/customer" className="mt-6 inline-flex rounded-2xl bg-primary px-4 py-3 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-primary-dark active:translate-y-1">
+            <Link to="/login/customer" className="premium-action mt-6 inline-flex rounded-2xl bg-primary px-4 py-3 font-semibold text-white hover:bg-primary-dark">
               Back to login
             </Link>
           </div>
@@ -83,7 +83,7 @@ function CustomerDashboard() {
                     key={item.id}
                     type="button"
                     onClick={() => setSelectedPackageId(item.id)}
-                    className={`rounded-[1.5rem] border p-5 text-left transition duration-200 ${
+                    className={`premium-action rounded-[1.5rem] border p-5 text-left ${
                               isActive
                                 ? 'border-primary bg-warm-cream shadow-primary'
                                 : 'border-slate-200 bg-white hover:border-primary hover:shadow-sm'
@@ -124,7 +124,7 @@ function CustomerDashboard() {
 
             <button
               type="button"
-              className="mt-6 inline-flex w-full items-center justify-center rounded-3xl bg-primary px-6 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-primary-dark active:translate-y-1"
+              className="premium-action mt-6 inline-flex w-full items-center justify-center rounded-3xl bg-primary px-6 py-3 text-sm font-semibold text-white hover:bg-primary-dark"
             >
               Book this package
             </button>

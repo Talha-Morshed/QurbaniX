@@ -38,7 +38,7 @@ function ButcherDashboard() {
             <Link to="/" className="rounded-2xl border border-slate-300 px-4 py-2.5 font-medium text-slate-700 transition hover:border-primary hover:text-primary">
               Home
             </Link>
-            <Link to="/login/butcher" className="rounded-2xl bg-primary px-4 py-2.5 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-primary-dark active:translate-y-1">
+            <Link to="/login/butcher" className="premium-action rounded-2xl bg-primary px-4 py-2.5 font-semibold text-white hover:bg-primary-dark">
               Logout
             </Link>
           </div>

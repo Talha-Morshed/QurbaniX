@@ -58,7 +58,7 @@ function RoleResetPassword({ role, loginPath, accountPurpose }) {
           <div className="keep-circular mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary text-3xl text-white">âœ“</div>
           <h2 className="mt-6 text-2xl font-semibold">Password reset successful</h2>
           <p className="mt-3 text-sm text-slate-700">Your {role.toLowerCase()} password has been updated. You can now sign in with your new credentials.</p>
-          <Link to={loginPath} className="mt-6 inline-flex rounded-3xl bg-primary px-6 py-3 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-primary-dark active:translate-y-1">Back to Login</Link>
+          <Link to={loginPath} className="premium-action mt-6 inline-flex rounded-3xl bg-primary px-6 py-3 font-semibold text-white hover:bg-primary-dark">Back to Login</Link>
         </div>
       ) : (
         <form className="space-y-6" onSubmit={handleSubmit} noValidate>
@@ -75,7 +75,7 @@ function RoleResetPassword({ role, loginPath, accountPurpose }) {
             </ul>
           </div>
 
-          <button type="submit" disabled={isSubmitting} className="inline-flex w-full items-center justify-center rounded-3xl bg-primary px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-primary transition duration-200 hover:-translate-y-0.5 hover:bg-primary-dark active:translate-y-1 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-600">
+          <button type="submit" disabled={isSubmitting} className="premium-action inline-flex w-full items-center justify-center rounded-3xl bg-primary px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-primary hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-600">
             {isSubmitting ? 'Resetting...' : 'Reset Password'}
           </button>
         </form>

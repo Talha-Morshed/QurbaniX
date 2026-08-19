@@ -71,7 +71,7 @@ function SelectRole() {
                   navigate(roles.find((role) => role.title === selectedRole).action);
                 }
               }}
-              className={`inline-flex w-full max-w-xs items-center justify-center rounded-3xl px-6 py-4 text-sm font-semibold text-white transition duration-200 ${
+              className={`premium-action inline-flex w-full max-w-xs items-center justify-center rounded-3xl px-6 py-4 text-sm font-semibold text-white ${
                 selectedRole
                   ? 'bg-primary hover:-translate-y-0.5 hover:bg-primary-dark active:translate-y-1'
                   : 'cursor-not-allowed bg-slate-300 text-slate-500'

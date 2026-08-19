@@ -48,6 +48,24 @@ button {
   cursor: pointer;
 }
 
+.premium-action {
+  transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease, border-color 180ms ease;
+  will-change: transform;
+}
+
+.premium-action:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.premium-action:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.premium-action:focus-visible {
+  outline: 3px solid rgba(212, 167, 44, 0.45);
+  outline-offset: 3px;
+}
+
 /*
  * QurbaniX uses a crisp rectangular component language. This centralized rule
  * applies to Tailwind rounded utilities without requiring each screen to
