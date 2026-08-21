@@ -40,7 +40,7 @@ function CustomerDashboard() {
           <div className="max-w-2xl">
             <div className="mb-4 flex items-center gap-3">
               <img src={images.logo} alt="QurbaniX" className="h-10 w-10 object-contain rounded-lg" />
-              <span className="text-sm font-bold uppercase tracking-[0.2em] text-primary">QurbaniX</span>
+              <span className="text-sm font-bold tracking-[0.2em] text-primary">QurbaniX</span>
             </div>
             <p className="text-sm uppercase tracking-[0.3em] text-primary">Customer Dashboard</p>
             <h1 className="mt-4 text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">Welcome back to your Qurbani planning hub.</h1>

@@ -27,7 +27,7 @@ function ButcherDashboard() {
           <div>
             <div className="mb-4 flex items-center gap-3">
               <img src={images.logo} alt="QurbaniX" className="h-10 w-10 object-contain rounded-lg" />
-              <span className="text-sm font-bold uppercase tracking-[0.2em] text-primary">QurbaniX</span>
+              <span className="text-sm font-bold tracking-[0.2em] text-primary">QurbaniX</span>
             </div>
             <p className="text-sm font-semibold uppercase tracking-[0.3em] text-primary">Butcher Dashboard</p>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">Welcome back, Qurbani partner.</h1>

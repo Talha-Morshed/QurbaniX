@@ -7,7 +7,7 @@ function Navbar() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
         <Link to="/" className="flex items-center gap-3">
           <img src={images.logo} alt="QurbaniX" className="h-10 w-10 rounded-lg object-contain" />
-          <span className="text-sm font-bold uppercase tracking-[0.2em] text-primary">QurbaniX</span>
+          <span className="text-sm font-bold tracking-[0.2em] text-primary">QurbaniX</span>
         </Link>
 
         <Link

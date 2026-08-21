@@ -30,6 +30,7 @@ const features = [
     icon: <TagIcon />,
     title: 'Transparent Pricing',
     desc: 'Clear, upfront rates with zero hidden charges. Compare butchers side by side and choose with confidence.',
+    highlight: true,
   },
   {
     icon: <TruckIcon />,
@@ -40,10 +41,10 @@ const features = [
 
 export default function AboutSection() {
   return (
-    <section id="about" className="bg-white border-t border-slate-100">
+    <section id="about" className="bg-gray-50 border-t border-slate-100">
       <div className="max-w-7xl mx-auto px-6 py-16 lg:py-24">
         <div className="max-w-2xl mx-auto text-center">
-          <span className="inline-flex items-center px-3 py-1 bg-emerald-100 text-emerald-700 font-semibold text-sm uppercase tracking-widest">About QurbaniX</span>
+          <span className="inline-flex items-center px-3 py-1 bg-emerald-100 text-emerald-700 font-semibold text-sm tracking-widest">About QurbaniX</span>
           <h2 className="mt-6 text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight text-emerald-900">Qurbani, Done The Right Way</h2>
           <p className="mt-4 text-lg text-slate-600">
             We connect families with trusted, verified butchers—so your sacred obligation is fulfilled with dignity,
@@ -55,13 +56,15 @@ export default function AboutSection() {
           {features.map((feature) => (
             <div
               key={feature.title}
-              className="premium-action group bg-white ring-1 ring-slate-200 shadow-sm hover:shadow-xl p-8 flex flex-col items-start gap-5"
+              className={`premium-action group p-8 flex flex-col items-start gap-5 shadow-sm hover:shadow-xl ${
+                feature.highlight ? 'bg-emerald-900 ring-1 ring-emerald-900' : 'bg-white ring-1 ring-slate-200'
+              }`}
             >
-              <div className="inline-flex items-center justify-center w-14 h-14 bg-emerald-900 text-[#D4A72C]">
+              <div className={`inline-flex items-center justify-center w-14 h-14 ${feature.highlight ? 'bg-emerald-800 text-white' : 'bg-emerald-900 text-[#D4A72C]'}`}>
                 {feature.icon}
               </div>
-              <h3 className="text-xl font-bold text-emerald-900">{feature.title}</h3>
-              <p className="text-slate-600 leading-relaxed">{feature.desc}</p>
+              <h3 className={`text-xl font-bold ${feature.highlight ? 'text-white' : 'text-emerald-900'}`}>{feature.title}</h3>
+              <p className={`leading-relaxed ${feature.highlight ? 'text-white' : 'text-slate-600'}`}>{feature.desc}</p>
             </div>
           ))}
         </div>
