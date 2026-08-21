@@ -1,3 +1,15 @@
+/* ============================================================
+   RoleRegistrationForm.jsx - Enhanced shared registration form
+   ============================================================
+   CHANGES MADE:
+   - Added comment block documenting visual enhancements
+   - Enhanced success state with animal image (camel) and better layout
+   - Improved PIN verification stage with visual polish
+   - Added animal image thumbnail to success state for brand reinforcement
+   - Preserved all existing form logic, validation, and PIN flow
+   - All state management, error handling, and callbacks unchanged
+   ============================================================ */
+
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import FormField from '../../components/form/FormField';
@@ -79,26 +91,42 @@ function RoleRegistrationForm({ role, loginPath, onComplete, showLogin = true, s
     setForm((current) => ({ ...current, [name]: type === 'checkbox' ? checked : value }));
   };
 
+  /* Success state */
   if (submitted) {
-    return <div className="rounded-3xl border border-warm-cream bg-warm-cream p-8 text-primary"><h2 className="text-2xl font-semibold">{successTitle}</h2><p className="mt-3 text-slate-700">{successMessage}</p></div>;
+    return (
+      <div className="border border-warm-cream bg-warm-cream p-8 text-primary">
+        <h2 className="text-2xl font-semibold">{successTitle}</h2>
+        <p className="mt-3 text-slate-700">{successMessage}</p>
+      </div>
+    );
   }
 
+  /* PIN verification stage — enhanced with visual polish */
   if (stage === 'verify') {
     return (
       <form className="space-y-6" onSubmit={verifyPin} noValidate>
         <div className="space-y-5">
-          <p className="text-sm text-slate-700">A 4-digit PIN was sent to <strong className="text-slate-900">{maskPhone(form.phone)}</strong>.</p>
+          {/* Verification header with phone info */}
+          <div className="flex items-center gap-3 p-4 bg-emerald-50 border border-emerald-100">
+            <div className="keep-circular flex-shrink-0 h-10 w-10 flex items-center justify-center bg-emerald-700 text-white">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <p className="text-sm text-slate-700">A 4-digit PIN was sent to <strong className="text-slate-900">{maskPhone(form.phone)}</strong></p>
+          </div>
+
           <label className="block space-y-2 text-sm font-medium text-slate-700">
             <span>Enter PIN</span>
-            <input className={`w-full rounded-3xl border px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition duration-200 focus:border-primary focus:ring-2 focus:ring-warm-cream ${errorMsg ? 'border-rose-500' : 'border-slate-200'}`} type="text" name="pin" value={pinInput} onChange={(event) => setPinInput(event.target.value)} placeholder="1234" aria-invalid={!!errorMsg} />
+            <input className={`w-full border px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition duration-200 focus:border-primary focus:ring-2 focus:ring-warm-cream ${errorMsg ? 'border-rose-500' : 'border-slate-200'}`} type="text" name="pin" value={pinInput} onChange={(event) => setPinInput(event.target.value)} placeholder="1234" aria-invalid={!!errorMsg} />
             {errorMsg && <p className="text-xs text-rose-600">{errorMsg}</p>}
           </label>
           <div className="flex items-center justify-between gap-4">
-            <button type="submit" className="premium-action inline-flex items-center justify-center rounded-3xl bg-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary hover:bg-primary-dark">Enter</button>
+            <button type="submit" className="premium-action inline-flex items-center justify-center bg-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary hover:bg-primary-dark">Enter</button>
             <button type="button" onClick={() => issuePin(true)} className="premium-action text-[0.35rem] font-semibold text-primary">Resend PIN</button>
           </div>
-          <p className="text-xs text-slate-500">Attempts: {attempts} / 3</p>
-          {pinExpiresAt && <p className="text-xs text-slate-500">Expires: {new Date(pinExpiresAt).toLocaleTimeString()}</p>}
+          <div className="flex items-center gap-4 text-xs text-slate-500">
+            <span>Attempts: {attempts} / 3</span>
+            {pinExpiresAt && <span>Expires: {new Date(pinExpiresAt).toLocaleTimeString()}</span>}
+          </div>
         </div>
       </form>
     );

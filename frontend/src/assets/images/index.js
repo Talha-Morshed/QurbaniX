@@ -8,6 +8,9 @@ import login from './login.png';
 import RA from './RA.png';
 import KS from './KS.png';
 import IH from './IH.png';
+// Registration page icons
+import customerIcon from './customer-icon.svg';
+import butcherIcon from './butcher-icon.svg';
 
 const images = {
   cow,
@@ -19,6 +22,8 @@ const images = {
   RA,
   KS,
   IH,
+  customerIcon,
+  butcherIcon,
 };
 
 export default images;

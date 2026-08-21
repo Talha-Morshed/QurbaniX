@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- Customer icon: person silhouette with suit and tie -->
+  <circle cx="100" cy="65" r="40" fill="#1a1a1a"/>
+  <path d="M30 195 C30 145 60 120 100 120 C140 120 170 145 170 195 Z" fill="#1a1a1a"/>
+  <path d="M85 120 L100 155 L115 120" fill="none" stroke="#ffffff" stroke-width="4"/>
+  <path d="M96 120 L100 160 L104 120" fill="#1a1a1a" stroke="#1a1a1a" stroke-width="2"/>
+  <path d="M88 118 L100 130 L112 118" fill="none" stroke="#ffffff" stroke-width="3"/>
+</svg>
