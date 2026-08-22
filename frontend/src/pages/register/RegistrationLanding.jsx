@@ -66,9 +66,9 @@ export default function RegistrationLanding() {
         <button
           type="button"
           onClick={() => { setRole('customer'); setCompleted(false); }}
-          className={`premium-action flex items-center justify-center gap-3 px-4 py-3 text-sm font-semibold ${
+          className={`flex items-center justify-center gap-3 px-4 py-3 text-sm font-semibold ${
             role === 'customer' ? 'bg-emerald-700 text-white shadow-md' : 'bg-slate-50 text-slate-700 border border-slate-100 hover:bg-slate-100'
-          } focus:outline-none focus:ring-2 focus:ring-emerald-200 transition-all duration-200`}
+          } focus:outline-none focus:ring-2 focus:ring-emerald-200 transition-colors duration-200`}
         >
           <div className="h-8 w-8 flex-shrink-0 flex items-center justify-center">
             <img src={images.customerIcon} alt="" className="h-full w-full object-contain" />
@@ -80,9 +80,9 @@ export default function RegistrationLanding() {
         <button
           type="button"
           onClick={() => { setRole('butcher'); setCompleted(false); }}
-          className={`premium-action flex items-center justify-center gap-3 px-4 py-3 text-sm font-semibold ${
+          className={`flex items-center justify-center gap-3 px-4 py-3 text-sm font-semibold ${
             role === 'butcher' ? 'bg-emerald-700 text-white shadow-md' : 'bg-slate-50 text-slate-700 border border-slate-100 hover:bg-slate-100'
-          } focus:outline-none focus:ring-2 focus:ring-emerald-200 transition-all duration-200`}
+          } focus:outline-none focus:ring-2 focus:ring-emerald-200 transition-colors duration-200`}
         >
           <div className="h-8 w-8 flex-shrink-0 flex items-center justify-center">
             <img src={images.butcherIcon} alt="" className="h-full w-full object-contain" />
