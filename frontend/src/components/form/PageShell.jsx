@@ -16,11 +16,11 @@
 import images from '../../assets/images';
 import Navbar from '../Navbar';
 
-function PageShell({ title, description, children, notice }) {
+function PageShell({ title, description, children, notice, hideHomeButton = false, hideLogo = false }) {
   return (
     /* Main wrapper: full-screen warm cream background */
     <div className="min-h-screen bg-warm-cream">
-      <Navbar />
+      <Navbar hideHomeButton={hideHomeButton} hideLogo={hideLogo} />
 
       {/* Centered content area with split layout */}
       <div className="py-6 text-slate-900 sm:py-8 lg:py-10">

@@ -83,7 +83,7 @@ function AdminRegister() {
   if (submitted) {
     return (
       <div className="min-h-screen bg-warm-cream">
-        <Navbar />
+        <Navbar hideHomeButton hideLogo />
         <div className="flex items-center justify-center px-4 py-16">
           <div className="border border-warm-cream bg-warm-cream p-8 text-primary shadow-[0_20px_50px_rgba(15,23,42,0.08)]">
             <h2 className="text-2xl font-semibold">Registration submitted</h2>
@@ -100,7 +100,7 @@ function AdminRegister() {
   /* ── main render – split layout ─────────────────────────────────── */
   return (
     <div className="min-h-screen bg-warm-cream">
-      <Navbar />
+      <Navbar hideHomeButton hideLogo />
 
       <div className="py-6 text-slate-900 sm:py-8 lg:py-10">
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">

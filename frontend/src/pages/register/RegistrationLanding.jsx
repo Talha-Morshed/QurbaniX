@@ -25,7 +25,7 @@ export default function RegistrationLanding() {
   const activeStep = !role ? 1 : completed ? 3 : 2;
 
   return (
-    <PageShell title="Register" description="Create your account.">
+    <PageShell title="Register" description="Create your account." hideHomeButton hideLogo>
       {/* Form header card with role context */}
       <div className="mb-3">
         <div className="w-full border border-slate-100 bg-transparent px-4 py-4 relative pb-12">

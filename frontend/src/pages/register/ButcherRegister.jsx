@@ -7,6 +7,8 @@ function ButcherRegister() {
       title="Butcher Registration"
       description="Apply as a verified butcher."
       notice="Registration is subject to administrator verification before the account becomes active."
+      hideHomeButton
+      hideLogo
     >
       <ButcherRegisterForm />
     </PageShell>
