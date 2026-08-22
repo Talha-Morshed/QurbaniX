@@ -1,20 +1,17 @@
 import { useNavigate } from 'react-router-dom';
 import TermsSection from '../../components/terms/TermsSection';
 import TableOfContents from '../../components/terms/TableOfContents';
-import Navbar from '../../components/Navbar';
 
 function TermsAndConditions() {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-warm-cream">
-      <Navbar />
       <div className="flex items-center justify-center px-4 py-8 text-slate-900 sm:px-6 lg:px-8">
         <div className="w-full max-w-6xl rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_24px_80px_rgba(15,23,42,0.08)] sm:p-8 lg:p-10">
         <div className="flex flex-col gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="text-sm tracking-[0.3em] text-primary">QurbaniX</p>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Terms & Conditions</h1>
+            <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Terms & Conditions</h1>
             <p className="mt-3 max-w-3xl text-base leading-7 text-slate-600">
               These are the basic rules for using QurbaniX. They are written in simple language so everyone can understand them.
             </p>
