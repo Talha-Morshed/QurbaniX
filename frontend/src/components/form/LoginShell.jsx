@@ -22,12 +22,12 @@ export default function LoginShell({
 }) {
   if (splitLayout) {
     return (
-      <main className="flex min-h-screen w-full items-center justify-center bg-warm-cream p-2 text-slate-900 sm:p-4 lg:h-screen lg:min-h-0 lg:overflow-hidden lg:p-8 xl:p-10">
+      <main className="flex min-h-screen w-full items-center justify-center bg-warm-cream p-4 text-slate-900 sm:p-6 lg:h-screen lg:min-h-0 lg:overflow-hidden lg:p-8 xl:p-10">
         <div className="grid w-full border border-white bg-white shadow-[0_28px_80px_rgba(15,23,42,0.14)] lg:h-[calc(100vh-4rem)] lg:w-[min(90vw,1440px)] lg:grid-cols-[45fr_55fr] xl:h-[calc(100vh-5rem)]">
-          <section className={`flex items-center bg-warm-cream px-4 py-6 sm:px-6 sm:py-8 lg:px-16 xl:px-24 ${compact ? 'lg:py-3' : 'lg:py-6'}`}>
+          <section className={`flex items-center bg-warm-cream px-5 py-8 sm:px-10 lg:px-16 xl:px-24 ${compact ? 'lg:py-3' : 'lg:py-6'}`}>
             <div className="mx-auto w-full max-w-md">
-              <div className={`${compact ? 'mb-4' : 'mb-6 sm:mb-8'} flex items-center`}>
-                <img src={images.logo} alt="QurbaniX" className="h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 object-contain" />
+              <div className={`${compact ? 'mb-4' : 'mb-8'} flex items-center`}>
+                <img src={images.logo} alt="QurbaniX" className="h-24 w-24 object-contain" />
               </div>
 
               <p className="text-xs font-bold uppercase tracking-[0.24em] text-primary">{pageTitle}</p>
@@ -40,7 +40,7 @@ export default function LoginShell({
                 </p>
               )}
 
-              <div className={`${compact ? 'mt-4 p-4 sm:p-5' : 'mt-5 sm:mt-7 p-4 sm:p-6'} border border-slate-200 bg-white shadow-[0_20px_50px_rgba(15,23,42,0.08)] lg:h-[340px]`}>
+              <div className={`${compact ? 'mt-4 p-5 sm:p-6' : 'mt-7 p-6 sm:p-8'} border border-slate-200 bg-white shadow-[0_20px_50px_rgba(15,23,42,0.08)] lg:h-[340px]`}>
                 <div className={compact ? 'mb-4' : 'mb-6'}>
                   <h2 className="text-xl font-semibold text-slate-900">{formTitle}</h2>
                   <p className="mt-2 text-sm text-slate-600">{formSubtitle}</p>

@@ -4,18 +4,18 @@ import images from '../assets/images';
 function Navbar({ hideHomeButton = false, hideLogo = false }) {
   return (
     <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-3 py-2.5 sm:px-4 sm:py-3 md:px-6 lg:px-8">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
         {!hideLogo && (
-          <Link to="/" className="flex items-center gap-2 sm:gap-3">
-            <img src={images.logo} alt="QurbaniX" className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 rounded-lg object-contain" />
-            <span className="text-xs sm:text-sm font-bold tracking-[0.2em] text-primary">QurbaniX</span>
+          <Link to="/" className="flex items-center gap-3">
+            <img src={images.logo} alt="QurbaniX" className="h-10 w-10 rounded-lg object-contain" />
+            <span className="text-sm font-bold tracking-[0.2em] text-primary">QurbaniX</span>
           </Link>
         )}
 
         {!hideHomeButton && (
           <Link
             to="/"
-            className="premium-action inline-flex items-center gap-1.5 sm:gap-2 rounded-full bg-primary px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-white hover:bg-primary-dark"
+            className="premium-action inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark"
           >
             <svg
               viewBox="0 0 24 24"

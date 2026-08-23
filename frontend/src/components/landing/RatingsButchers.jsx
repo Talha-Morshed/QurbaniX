@@ -47,22 +47,22 @@ function Stars({ count = 5 }) {
 export default function RatingsButchers() {
   return (
     <section id="ratings" className="bg-gray-50 border-t border-slate-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16 lg:py-24">
+      <div className="max-w-7xl mx-auto px-6 py-16 lg:py-24">
         <div className="max-w-2xl mx-auto text-center">
-          <span className="inline-flex items-center px-3 py-1 bg-emerald-100 text-emerald-700 font-semibold text-xs sm:text-sm uppercase tracking-widest">Ratings & Reviews</span>
-          <h2 className="mt-4 sm:mt-6 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight text-emerald-900">Trusted By Thousands Of Families</h2>
-          <p className="mt-3 sm:mt-4 text-base sm:text-lg text-slate-600">Real ratings from real customers—and the top-rated professionals making it happen.</p>
+          <span className="inline-flex items-center px-3 py-1 bg-emerald-100 text-emerald-700 font-semibold text-sm uppercase tracking-widest">Ratings & Reviews</span>
+          <h2 className="mt-6 text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight text-emerald-900">Trusted By Thousands Of Families</h2>
+          <p className="mt-4 text-lg text-slate-600">Real ratings from real customers—and the top-rated professionals making it happen.</p>
         </div>
 
-        <div className="mt-8 sm:mt-12 max-w-4xl mx-auto grid grid-cols-1 auto-rows-fr gap-8 sm:gap-10">
+        <div className="mt-12 max-w-4xl mx-auto grid grid-cols-1 auto-rows-fr gap-10">
           <div className="flex flex-col">
             <div className="flex items-center justify-between px-1">
               <h3 className="text-xl font-bold text-emerald-900">Overall Rating</h3>
               <span className="text-sm font-semibold text-[#D4A72C] uppercase tracking-wider">Verified Reviews</span>
             </div>
-            <div className="mt-3 sm:mt-4 flex-1 bg-white ring-1 ring-slate-200 shadow-sm p-5 sm:p-6 md:p-8 flex flex-col gap-5 sm:gap-6">
-              <div className="flex items-end gap-3 sm:gap-4">
-                <span className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-emerald-900 leading-none">4.8</span>
+            <div className="mt-4 flex-1 bg-white ring-1 ring-slate-200 shadow-sm p-8 flex flex-col gap-6">
+              <div className="flex items-end gap-4">
+                <span className="text-6xl font-extrabold text-emerald-900 leading-none">4.8</span>
                 <div className="flex flex-col gap-1 pb-1">
                   <Stars />
                   <span className="text-sm text-slate-500">Based on 3,200+ verified reviews</span>
@@ -99,16 +99,16 @@ export default function RatingsButchers() {
               <h3 className="text-xl font-bold text-emerald-900">Top Rated Butchers</h3>
               <span className="text-sm font-semibold text-[#D4A72C] uppercase tracking-wider">This Season</span>
             </div>
-            <div className="mt-3 sm:mt-4 flex-1 bg-white ring-1 ring-slate-200 shadow-sm p-4 sm:p-5 md:p-6 flex flex-col justify-between gap-3 sm:gap-4">
+            <div className="mt-4 flex-1 bg-white ring-1 ring-slate-200 shadow-sm p-6 flex flex-col justify-between gap-4">
               {topButchers.map((butcher) => (
                 <div
                   key={butcher.name}
-                  className="premium-action bg-white ring-1 ring-slate-200 shadow-sm hover:shadow-lg p-4 sm:p-5 flex items-center gap-3 sm:gap-4"
+                  className="premium-action bg-white ring-1 ring-slate-200 shadow-sm hover:shadow-lg p-5 flex items-center gap-4"
                 >
                   <img
                     src={butcher.image}
                     alt={butcher.name}
-                    className="keep-circular w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 shrink-0 object-cover"
+                    className="keep-circular w-14 h-14 shrink-0 object-cover"
                   />
 
                   <div className="min-w-0 flex-1">

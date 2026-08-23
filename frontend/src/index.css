@@ -116,21 +116,3 @@ img {
     font-size: 16px !important;
   }
 }
-
-/* Responsive adjustments for very small screens (320px-375px) */
-@media (max-width: 375px) {
-  html {
-    font-size: 14px;
-  }
-
-  body {
-    line-height: 1.4;
-  }
-}
-
-/* Ensure smooth scrolling on all devices */
-@supports (scroll-behavior: smooth) {
-  html {
-    scroll-behavior: smooth;
-  }
-}

@@ -28,12 +28,12 @@ export default function RegistrationLanding() {
     <PageShell title="Register" description="Create your account." hideHomeButton hideLogo>
       {/* Form header card with role context */}
         <div className="mb-3">
-        <div className="w-full border border-slate-100 bg-transparent px-3 sm:px-4 py-3 sm:py-4">
+        <div className="w-full border border-slate-100 bg-transparent px-4 py-4">
           <div className="flex flex-col">
             <h3 className="text-lg md:text-2xl font-semibold text-slate-900">
               {role === 'customer' ? 'Customer Registration' : role === 'butcher' ? 'Butcher Registration' : 'Select role'}
             </h3>
-            <p className="text-xs sm:text-sm text-slate-600 mt-1">
+            <p className="text-sm text-slate-600 mt-1">
               {role ? 'Complete the form and verify your phone number.' : 'Pick an account type to continue.'}
             </p>
           </div>
