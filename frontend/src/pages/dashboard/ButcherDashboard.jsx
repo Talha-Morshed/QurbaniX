@@ -21,17 +21,17 @@ const incomingRequests = [
 
 function ButcherDashboard() {
   return (
-    <div className="min-h-screen bg-warm-cream px-4 py-8 text-slate-900 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-warm-cream px-3 py-6 text-slate-900 sm:px-4 sm:py-8 md:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
-        <header className="mb-8 flex flex-col gap-4 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_24px_80px_rgba(15,23,42,0.06)] md:flex-row md:items-center md:justify-between">
+        <header className="mb-6 sm:mb-8 flex flex-col gap-4 rounded-[2rem] border border-slate-200 bg-white p-4 sm:p-5 md:p-6 shadow-[0_24px_80px_rgba(15,23,42,0.06)] md:flex-row md:items-center md:justify-between">
           <div>
-            <div className="mb-4 flex items-center gap-3">
-              <img src={images.logo} alt="QurbaniX" className="h-10 w-10 object-contain rounded-lg" />
-              <span className="text-sm font-bold tracking-[0.2em] text-primary">QurbaniX</span>
+            <div className="mb-3 sm:mb-4 flex items-center gap-3">
+              <img src={images.logo} alt="QurbaniX" className="h-8 w-8 sm:h-10 sm:w-10 object-contain rounded-lg" />
+              <span className="text-xs sm:text-sm font-bold tracking-[0.2em] text-primary">QurbaniX</span>
             </div>
-            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-primary">Butcher Dashboard</p>
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">Welcome back, Qurbani partner.</h1>
-            <p className="mt-2 text-slate-600">Manage package availability, confirm delivery requests, and monitor daily business performance.</p>
+            <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.3em] text-primary">Butcher Dashboard</p>
+            <h1 className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight sm:text-4xl">Welcome back, Qurbani partner.</h1>
+            <p className="mt-2 text-sm sm:text-base text-slate-600">Manage package availability, confirm delivery requests, and monitor daily business performance.</p>
           </div>
 
           <div className="flex gap-3">
@@ -54,8 +54,8 @@ function ButcherDashboard() {
           ))}
         </section>
 
-        <section className="mt-8 grid gap-6 lg:grid-cols-[1.35fr_0.9fr]">
-          <article className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm">
+        <section className="mt-6 sm:mt-8 grid gap-4 sm:gap-5 lg:grid-cols-[1.35fr_0.9fr]">
+          <article className="rounded-[1.75rem] border border-slate-200 bg-white p-4 sm:p-5 md:p-6 shadow-sm">
             <div className="flex items-center justify-between gap-3">
               <div>
                 <h2 className="text-xl font-semibold text-slate-900">Package management</h2>
@@ -84,7 +84,7 @@ function ButcherDashboard() {
             </div>
           </article>
 
-          <aside className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm">
+          <aside className="rounded-[1.75rem] border border-slate-200 bg-white p-4 sm:p-5 md:p-6 shadow-sm">
             <h2 className="text-xl font-semibold text-slate-900">Incoming requests</h2>
             <p className="mt-1 text-sm text-slate-500">Priority queue for customer package requests.</p>
 
@@ -105,9 +105,9 @@ function ButcherDashboard() {
           </aside>
         </section>
 
-        <section className="mt-8 rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold text-slate-900">Operations snapshot</h2>
-          <div className="mt-5 grid gap-4 md:grid-cols-3">
+        <section className="mt-6 sm:mt-8 rounded-[1.75rem] border border-slate-200 bg-white p-4 sm:p-5 md:p-6 shadow-sm">
+          <h2 className="text-lg sm:text-xl font-semibold text-slate-900">Operations snapshot</h2>
+          <div className="mt-4 sm:mt-5 grid gap-3 sm:gap-4 md:grid-cols-3">
             <div className="rounded-[1.25rem] bg-slate-50 p-4">
               <p className="text-sm text-slate-500">Inventory status</p>
               <p className="mt-2 text-lg font-semibold text-slate-900">Healthy</p>

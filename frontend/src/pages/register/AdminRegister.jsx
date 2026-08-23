@@ -102,29 +102,29 @@ function AdminRegister() {
     <div className="min-h-screen bg-warm-cream">
       <Navbar hideHomeButton hideLogo />
 
-      <div className="py-6 text-slate-900 sm:py-8 lg:py-10">
-        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="py-4 text-slate-900 sm:py-6 lg:py-10">
+        <div className="mx-auto w-full max-w-7xl px-3 sm:px-4 md:px-6 lg:px-8">
           <div className="grid w-full border border-white bg-white shadow-[0_28px_80px_rgba(15,23,42,0.14)] lg:h-[calc(100vh-8rem)] lg:grid-cols-[55fr_45fr]">
 
             {/* ── Left panel ──────────────────────────────────────── */}
-            <section className="flex items-center bg-warm-cream px-5 py-8 sm:px-10 lg:px-16 xl:px-24 lg:py-6">
+            <section className="flex items-center bg-warm-cream px-4 py-6 sm:px-6 sm:py-8 lg:px-16 xl:px-24 lg:py-6">
               <div className="mx-auto w-full max-w-md">
 
                 {/* Logo */}
-                <div className="mb-8 flex items-center">
+                <div className="mb-6 sm:mb-8 flex items-center">
                   <img
                     src={images.logo}
                     alt="QurbaniX"
-                    className="h-24 w-24 object-contain"
+                    className="h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 object-contain"
                   />
                 </div>
 
                 {/* Green header banner */}
-                <div className="mb-6 rounded-[1.75rem] bg-primary p-6 text-white shadow-primary-soft sm:p-8">
+                <div className="mb-4 sm:mb-6 rounded-[1.75rem] bg-primary p-4 sm:p-6 text-white shadow-primary-soft sm:p-8">
                   <p className="text-xs font-bold uppercase tracking-[0.24em]">
                     Administrator Registration
                   </p>
-                  <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+                  <h1 className="mt-3 text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">
                     Register as an Administrator
                   </h1>
                   <p className="mt-4 max-w-lg text-sm leading-6 text-white/80 sm:text-base">
@@ -134,12 +134,12 @@ function AdminRegister() {
                 </div>
 
                 {/* Notice banner */}
-                <p className="mt-6 border-l-4 border-[var(--color-accent)] bg-white px-4 py-3 text-sm text-slate-700 shadow-sm">
+                <p className="mt-4 sm:mt-6 border-l-4 border-[var(--color-accent)] bg-white px-3 sm:px-4 py-2 sm:py-3 text-sm text-slate-700 shadow-sm">
                   Administrator accounts require approval before activation.
                 </p>
 
                 {/* Form card */}
-                <div className="mt-7 border border-slate-200 bg-white p-6 shadow-[0_20px_50px_rgba(15,23,42,0.08)] sm:p-8 lg:h-[340px]">
+                <div className="mt-5 sm:mt-7 border border-slate-200 bg-white p-4 sm:p-6 shadow-[0_20px_50px_rgba(15,23,42,0.08)] sm:p-8 lg:h-[340px]">
                   <div className="mb-6">
                     <h2 className="text-xl font-semibold text-slate-900">
                       Admin Details
@@ -150,7 +150,7 @@ function AdminRegister() {
                   </div>
 
                   <form className="space-y-6" onSubmit={handleSubmit} noValidate>
-                    <div className="grid gap-6 lg:grid-cols-2">
+                    <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
                       <FormField
                         label="Full Name"
                         name="fullName"

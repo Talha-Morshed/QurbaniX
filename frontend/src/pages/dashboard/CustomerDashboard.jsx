@@ -34,8 +34,8 @@ function CustomerDashboard() {
   const selectedPackage = packageOptions.find((item) => item.id === selectedPackageId) ?? packageOptions[0];
 
   return (
-    <div className="min-h-screen bg-warm-cream px-4 py-10 sm:px-8 lg:px-10">
-      <div className="mx-auto flex max-w-6xl flex-col rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_24px_80px_rgba(15,23,42,0.08)] sm:p-12 lg:p-14">
+    <div className="min-h-screen bg-warm-cream px-3 py-6 sm:px-4 sm:py-8 md:px-8 lg:px-10">
+      <div className="mx-auto flex max-w-6xl flex-col rounded-[2rem] border border-slate-200 bg-white p-5 shadow-[0_24px_80px_rgba(15,23,42,0.08)] sm:p-8 md:p-12 lg:p-14">
         <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-2xl">
             <div className="mb-4 flex items-center gap-3">
@@ -43,27 +43,27 @@ function CustomerDashboard() {
               <span className="text-sm font-bold tracking-[0.2em] text-primary">QurbaniX</span>
             </div>
             <p className="text-sm uppercase tracking-[0.3em] text-primary">Customer Dashboard</p>
-            <h1 className="mt-4 text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">Welcome back to your Qurbani planning hub.</h1>
+            <h1 className="mt-4 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-slate-900">Welcome back to your Qurbani planning hub.</h1>
             <p className="mt-5 text-lg text-slate-600">
               Review your upcoming plans, compare available packages, and move closer to a trusted booking experience.
             </p>
           </div>
 
-          <div className="rounded-[1.5rem] border border-warm-cream bg-warm-cream p-6 text-sm text-primary lg:min-w-[280px]">
+          <div className="rounded-[1.5rem] border border-warm-cream bg-warm-cream p-4 sm:p-5 md:p-6 text-sm text-primary lg:min-w-[280px]">
             <p className="font-semibold">What is next?</p>
-            <ul className="mt-4 space-y-3 text-primary">
+            <ul className="mt-3 sm:mt-4 space-y-2 sm:space-y-3 text-primary">
               <li>• Review your recent purchases</li>
               <li>• Manage your delivery preferences</li>
               <li>• Explore available Qurbani packages</li>
             </ul>
-            <Link to="/login/customer" className="premium-action mt-6 inline-flex rounded-2xl bg-primary px-4 py-3 font-semibold text-white hover:bg-primary-dark">
+            <Link to="/login/customer" className="premium-action mt-4 sm:mt-6 inline-flex rounded-2xl bg-primary px-4 py-3 font-semibold text-white hover:bg-primary-dark">
               Back to login
             </Link>
           </div>
         </div>
 
-        <div className="mt-10 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-          <section className="rounded-[2rem] border border-slate-200 bg-slate-50 p-6 sm:p-8">
+        <div className="mt-8 sm:mt-10 grid gap-5 sm:gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+          <section className="rounded-[2rem] border border-slate-200 bg-slate-50 p-5 sm:p-6 md:p-8">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm uppercase tracking-[0.25em] text-primary">Recommended packages</p>
@@ -105,12 +105,12 @@ function CustomerDashboard() {
             </div>
           </section>
 
-          <aside className="rounded-[2rem] border border-warm-cream bg-warm-cream p-6 sm:p-8">
+          <aside className="rounded-[2rem] border border-warm-cream bg-warm-cream p-5 sm:p-6 md:p-8">
             <p className="text-sm uppercase tracking-[0.25em] text-primary">Selected package</p>
-            <h3 className="mt-3 text-2xl font-semibold text-slate-900">{selectedPackage.name}</h3>
-            <p className="mt-3 text-sm leading-7 text-slate-700">{selectedPackage.description}</p>
+            <h3 className="mt-2 sm:mt-3 text-xl sm:text-2xl font-semibold text-slate-900">{selectedPackage.name}</h3>
+            <p className="mt-2 sm:mt-3 text-sm leading-6 sm:leading-7 text-slate-700">{selectedPackage.description}</p>
 
-            <div className="mt-6 rounded-[1.5rem] border border-warm-cream bg-white p-5">
+            <div className="mt-4 sm:mt-6 rounded-[1.5rem] border border-warm-cream bg-white p-4 sm:p-5">
               <p className="text-sm font-semibold text-slate-900">What is included</p>
               <ul className="mt-4 space-y-3 text-sm text-slate-700">
                 {selectedPackage.features.map((feature) => (

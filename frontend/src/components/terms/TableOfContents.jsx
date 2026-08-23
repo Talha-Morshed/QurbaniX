@@ -17,9 +17,9 @@ const links = [
 
 function TableOfContents() {
   return (
-    <nav className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5 shadow-sm">
-      <h3 className="text-base font-semibold text-slate-900">Contents</h3>
-      <ul className="mt-4 grid gap-2 text-sm text-slate-700 sm:grid-cols-2">
+    <nav className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-4 shadow-sm sm:p-5">
+      <h3 className="text-sm sm:text-base font-semibold text-slate-900">Contents</h3>
+      <ul className="mt-3 sm:mt-4 grid gap-1.5 sm:gap-2 text-xs sm:text-sm text-slate-700 sm:grid-cols-2">
         {links.map((link) => (
           <li key={link.id}>
             <a href={`#${link.id}`} className="transition hover:text-primary">

@@ -78,3 +78,27 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 375px) {
+  .role-selection__container {
+    padding: 1.5rem 0.75rem;
+  }
+
+  .role-selection__panel {
+    padding: 1.25rem;
+  }
+
+  .role-selection__badge {
+    font-size: 0.75rem;
+    padding: 0.5rem 0.8rem;
+  }
+
+  .role-selection__title {
+    font-size: 1.6rem;
+  }
+
+  .role-selection__description {
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+}

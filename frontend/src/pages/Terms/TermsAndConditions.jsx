@@ -7,8 +7,8 @@ function TermsAndConditions() {
 
   return (
     <div className="min-h-screen bg-warm-cream">
-      <div className="flex items-center justify-center px-4 py-8 text-slate-900 sm:px-6 lg:px-8">
-        <div className="w-full max-w-6xl rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_24px_80px_rgba(15,23,42,0.08)] sm:p-8 lg:p-10">
+      <div className="flex items-center justify-center px-3 py-6 sm:px-4 sm:py-8 lg:px-8">
+        <div className="w-full max-w-6xl rounded-[2rem] border border-slate-200 bg-white p-4 shadow-[0_24px_80px_rgba(15,23,42,0.08)] sm:p-6 md:p-8 lg:p-10">
         <div className="flex flex-col gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Terms & Conditions</h1>

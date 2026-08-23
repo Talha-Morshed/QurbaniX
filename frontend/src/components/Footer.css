@@ -90,3 +90,29 @@
     width: auto;
   }
 }
+
+@media (max-width: 375px) {
+  .footer {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .footer__logo {
+    height: 36px;
+  }
+
+  .footer__name {
+    font-size: 0.85rem;
+  }
+
+  .footer__tagline {
+    font-size: 0.7rem;
+  }
+
+  .footer__links a {
+    font-size: 0.82rem;
+  }
+
+  .footer__copyright {
+    font-size: 0.7rem;
+  }
+}

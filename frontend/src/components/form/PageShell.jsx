@@ -17,33 +17,33 @@ import images from '../../assets/images';
 
 function PageShell({ title, description, children, notice, hideHomeButton = false, hideLogo = false }) {
   return (
-    <main className="flex min-h-screen w-full items-center justify-center bg-warm-cream p-4 text-slate-900 sm:p-6 lg:h-screen lg:min-h-0 lg:overflow-hidden lg:p-8 xl:p-10">
+    <main className="flex min-h-screen w-full items-center justify-center bg-warm-cream p-2 text-slate-900 sm:p-4 lg:h-screen lg:min-h-0 lg:overflow-hidden lg:p-8 xl:p-10">
       <div className="grid w-full overflow-hidden border border-white bg-white shadow-[0_28px_80px_rgba(15,23,42,0.14)] lg:h-[calc(100vh-4rem)] lg:w-[min(90vw,1440px)] lg:grid-cols-[45fr_55fr] xl:h-[calc(100vh-5rem)]">
 
         {/* LEFT PANEL — Form area */}
-        <section className="flex items-center bg-warm-cream px-5 py-8 sm:px-10 lg:px-16 xl:px-24 lg:py-3">
+        <section className="flex items-center bg-warm-cream px-4 py-6 sm:px-6 sm:py-8 lg:px-16 xl:px-24 lg:py-3">
           <div className="mx-auto w-full max-w-md">
 
             {/* Logo */}
-            <div className="mb-4 flex items-center">
-              <img src={images.logo} alt="QurbaniX" className="h-24 w-24 object-contain" />
+            <div className="mb-3 sm:mb-4 flex items-center">
+              <img src={images.logo} alt="QurbaniX" className="h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 object-contain" />
             </div>
 
             {/* Green header banner with title */}
-            <div className="mb-4 rounded-[1.75rem] bg-primary p-4 text-white shadow-primary-soft sm:p-6">
+            <div className="mb-3 sm:mb-4 rounded-[1.75rem] bg-primary p-3 sm:p-4 text-white shadow-primary-soft sm:p-6">
               <p className="text-xs font-bold uppercase tracking-[0.24em] text-white/80">{title}</p>
-              <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">{description}</h1>
+              <h1 className="mt-2 sm:mt-3 text-2xl sm:text-3xl font-bold tracking-tight sm:text-4xl">{description}</h1>
             </div>
 
             {/* Notice banner (if provided) */}
             {notice && (
-              <p className="mb-4 border-l-4 border-[var(--color-accent)] bg-white px-4 py-3 text-sm text-slate-700 shadow-sm">
+              <p className="mb-3 sm:mb-4 border-l-4 border-[var(--color-accent)] bg-white px-3 sm:px-4 py-2 sm:py-3 text-sm text-slate-700 shadow-sm">
                 {notice}
               </p>
             )}
 
             {/* Form content card */}
-            <div className="mt-4 border border-slate-200 bg-white p-5 shadow-[0_20px_50px_rgba(15,23,42,0.08)] sm:p-6">
+            <div className="mt-3 sm:mt-4 border border-slate-200 bg-white p-4 shadow-[0_20px_50px_rgba(15,23,42,0.08)] sm:p-6">
               {children}
             </div>
           </div>
