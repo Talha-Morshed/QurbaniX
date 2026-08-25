@@ -132,7 +132,6 @@ function RoleRegistrationForm({ role, loginPath, onComplete, onPinRequested, sho
         <span>I agree to the <Link to="/terms" className="font-semibold text-primary hover:text-primary-dark">Terms & Conditions</Link>.<span className="block min-h-5 text-rose-600" role="alert" aria-live="polite">{errors.agree}</span></span>
       </label>
       <button type="submit" disabled={isSubmitting} className={`premium-action inline-flex min-w-52 items-center justify-center rounded-3xl bg-primary px-8 text-sm font-semibold text-white shadow-lg shadow-primary hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-600 ${compact ? 'py-3' : 'py-4'}`}>{isSubmitting ? 'Entering...' : 'Enter'}</button>
-      {showLogin && stage === 'fill' && <p className="text-center text-sm text-slate-600">Already have an account?{' '}<Link to={loginPath} className="font-semibold text-primary hover:text-primary-dark">Log In</Link></p>}
     </form>
   );
 }

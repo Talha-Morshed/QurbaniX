@@ -26,8 +26,8 @@ export default function LoginShell({
   if (splitLayout) {
     return (
       <main className="flex min-h-screen w-full items-center justify-center bg-warm-cream p-4 text-slate-900 sm:p-6 lg:h-screen lg:min-h-0 lg:overflow-hidden lg:p-8 xl:p-10">
-        <div className="grid w-full border border-white bg-white shadow-[0_28px_80px_rgba(15,23,42,0.14)] lg:h-[calc(100vh-4rem)] lg:w-[min(90vw,1440px)] lg:grid-cols-[45fr_55fr] xl:h-[calc(100vh-5rem)]">
-          <section className={`flex bg-warm-cream px-5 py-8 sm:px-10 lg:px-16 xl:px-24 ${alignFormTop ? 'items-start lg:pt-6' : 'items-center'} ${compact ? 'lg:pb-3' : 'lg:pb-6'}`}>
+        <div className="grid w-full border-2 border-primary bg-white shadow-[0_28px_80px_rgba(15,23,42,0.14)] lg:h-[calc(100vh-4rem)] lg:w-[min(90vw,1440px)] lg:grid-cols-[45fr_55fr] xl:h-[calc(100vh-5rem)]">
+          <section className={`flex border-b-2 border-primary bg-warm-cream px-5 py-8 sm:px-10 lg:border-b-0 lg:border-r-2 lg:border-primary lg:px-16 xl:px-24 ${alignFormTop ? 'items-start lg:pt-6' : 'items-center'} ${compact ? 'lg:pb-3' : 'lg:pb-6'}`}>
             <div className="mx-auto w-full max-w-md">
               <div className={`${compact ? 'mb-4' : 'mb-8'} flex items-center`}>
                 <img src={images.logo} alt="QurbaniX" className="h-24 w-24 object-contain" />
@@ -53,7 +53,7 @@ export default function LoginShell({
             </div>
           </section>
 
-          <section className="relative min-h-48 max-h-64 overflow-hidden border-t border-slate-200 bg-primary sm:min-h-64 lg:max-h-none lg:border-l lg:border-t-0">
+          <section className="relative min-h-48 max-h-64 overflow-hidden border-t-2 border-primary bg-primary sm:min-h-64 lg:max-h-none lg:border-l-2 lg:border-t-0">
             <img
               src={sideImage}
               alt="Qurbani services booking illustration"
