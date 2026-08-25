@@ -17,7 +17,7 @@ import { maskPhone, validatePhone } from '../../utils/validation';
 
 const initialState = { fullName: '', phone: '', agree: false };
 
-function RoleRegistrationForm({ role, loginPath, onComplete, showLogin = true, successTitle, successMessage }) {
+function RoleRegistrationForm({ role, loginPath, onComplete, showLogin = true, successTitle, successMessage, compact = false }) {
   const [form, setForm] = useState(initialState);
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
@@ -104,26 +104,26 @@ function RoleRegistrationForm({ role, loginPath, onComplete, showLogin = true, s
   /* PIN verification stage — enhanced with visual polish */
   if (stage === 'verify') {
     return (
-      <form className="space-y-6" onSubmit={verifyPin} noValidate>
-        <div className="space-y-5">
+      <form className={compact ? 'space-y-2' : 'space-y-6'} onSubmit={verifyPin} noValidate>
+        <div className={compact ? 'space-y-2' : 'space-y-5'}>
           {/* Verification header with phone info */}
-          <div className="flex items-center gap-3 p-4 bg-emerald-50 border border-emerald-100">
+          <div className={`${compact ? 'p-2' : 'p-4'} flex items-center gap-3 bg-emerald-50 border border-emerald-100`}>
             <div className="keep-circular flex-shrink-0 h-10 w-10 flex items-center justify-center bg-emerald-700 text-white">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             </div>
             <p className="text-sm text-slate-700">A 4-digit PIN was sent to <strong className="text-slate-900">{maskPhone(form.phone)}</strong></p>
           </div>
 
-          <label className="block space-y-2 text-sm font-medium text-slate-700">
+          <label className={`${compact ? 'space-y-1' : 'space-y-2'} block text-sm font-medium text-slate-700`}>
             <span>Enter PIN</span>
-            <input className={`w-full border px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition duration-200 focus:border-primary focus:ring-2 focus:ring-warm-cream ${errorMsg ? 'border-rose-500' : 'border-slate-200'}`} type="text" name="pin" value={pinInput} onChange={(event) => setPinInput(event.target.value)} placeholder="1234" aria-invalid={!!errorMsg} />
+            <input className={`w-full border px-4 ${compact ? 'py-2' : 'py-3'} text-sm text-slate-900 shadow-sm outline-none transition duration-200 focus:border-primary focus:ring-2 focus:ring-warm-cream ${errorMsg ? 'border-rose-500' : 'border-slate-200'}`} type="text" name="pin" value={pinInput} onChange={(event) => setPinInput(event.target.value)} placeholder="1234" aria-invalid={!!errorMsg} />
             {errorMsg && <p className="text-xs text-rose-600">{errorMsg}</p>}
           </label>
-          <div className="flex items-center justify-between gap-4">
-            <button type="submit" className="premium-action inline-flex items-center justify-center bg-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary hover:bg-primary-dark">Enter</button>
-            <button type="button" onClick={() => issuePin(true)} className="premium-action text-[0.35rem] font-semibold text-primary">Resend PIN</button>
+          <div className="flex items-center justify-between gap-3">
+            <button type="submit" className={`premium-action inline-flex items-center justify-center bg-primary px-6 text-sm font-semibold text-white shadow-lg shadow-primary hover:bg-primary-dark ${compact ? 'py-2' : 'py-3'}`}>Enter</button>
+            <button type="button" onClick={() => issuePin(true)} className="premium-action px-2 text-xs font-semibold text-primary">Resend PIN</button>
           </div>
-          <div className="flex items-center gap-4 text-xs text-slate-500">
+          <div className={`${compact ? 'hidden' : 'flex'} items-center gap-4 text-xs text-slate-500`}>
             <span>Attempts: {attempts} / 3</span>
             {pinExpiresAt && <span>Expires: {new Date(pinExpiresAt).toLocaleTimeString()}</span>}
           </div>
@@ -133,8 +133,8 @@ function RoleRegistrationForm({ role, loginPath, onComplete, showLogin = true, s
   }
 
   return (
-    <form className="space-y-6" onSubmit={handleSubmit} noValidate>
-      <div className="grid gap-6 lg:grid-cols-2">
+    <form className={compact ? 'space-y-2' : 'space-y-6'} onSubmit={handleSubmit} noValidate>
+      <div className={`grid ${compact ? 'gap-3' : 'gap-6'} lg:grid-cols-2`}>
         <FormField label="Full Name" name="fullName" value={form.fullName} onChange={handleChange} error={errors.fullName} placeholder="Enter your full name" required />
         <FormField label="Phone Number" name="phone" value={form.phone} onChange={handleChange} error={errors.phone} placeholder="01XXXXXXXXX" required />
       </div>
@@ -142,7 +142,7 @@ function RoleRegistrationForm({ role, loginPath, onComplete, showLogin = true, s
         <input type="checkbox" name="agree" checked={form.agree} onChange={handleChange} className="mt-1 h-5 w-5 rounded border-slate-300 text-primary focus:ring-warm-cream" />
         <span>I agree to the <Link to="/terms" className="font-semibold text-primary hover:text-primary-dark">Terms & Conditions</Link>.{errors.agree && <span className="block text-rose-600">{errors.agree}</span>}</span>
       </label>
-      <button type="submit" disabled={isSubmitting} className="premium-action inline-flex w-full items-center justify-center rounded-3xl bg-primary px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-primary hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-600">{isSubmitting ? 'Sending...' : 'Register & Send PIN'}</button>
+      <button type="submit" disabled={isSubmitting} className={`premium-action inline-flex w-full items-center justify-center rounded-3xl bg-primary px-6 text-sm font-semibold text-white shadow-lg shadow-primary hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-600 ${compact ? 'py-3' : 'py-4'}`}>{isSubmitting ? 'Sending...' : 'Register & Send PIN'}</button>
       {showLogin && <p className="text-center text-sm text-slate-600">Already have an account?{' '}<Link to={loginPath} className="font-semibold text-primary hover:text-primary-dark">Log In</Link></p>}
     </form>
   );

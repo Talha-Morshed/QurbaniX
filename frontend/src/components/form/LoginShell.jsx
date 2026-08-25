@@ -19,12 +19,15 @@ export default function LoginShell({
   children,
   splitLayout = false,
   compact = false,
+  formHeightClass = 'lg:h-[340px]',
+  alignFormTop = false,
+  sideImage = images.login,
 }) {
   if (splitLayout) {
     return (
       <main className="flex min-h-screen w-full items-center justify-center bg-warm-cream p-4 text-slate-900 sm:p-6 lg:h-screen lg:min-h-0 lg:overflow-hidden lg:p-8 xl:p-10">
         <div className="grid w-full border border-white bg-white shadow-[0_28px_80px_rgba(15,23,42,0.14)] lg:h-[calc(100vh-4rem)] lg:w-[min(90vw,1440px)] lg:grid-cols-[45fr_55fr] xl:h-[calc(100vh-5rem)]">
-          <section className={`flex items-center bg-warm-cream px-5 py-8 sm:px-10 lg:px-16 xl:px-24 ${compact ? 'lg:py-3' : 'lg:py-6'}`}>
+          <section className={`flex bg-warm-cream px-5 py-8 sm:px-10 lg:px-16 xl:px-24 ${alignFormTop ? 'items-start lg:pt-6' : 'items-center'} ${compact ? 'lg:pb-3' : 'lg:pb-6'}`}>
             <div className="mx-auto w-full max-w-md">
               <div className={`${compact ? 'mb-4' : 'mb-8'} flex items-center`}>
                 <img src={images.logo} alt="QurbaniX" className="h-24 w-24 object-contain" />
@@ -40,7 +43,7 @@ export default function LoginShell({
                 </p>
               )}
 
-              <div className={`${compact ? 'mt-4 p-5 sm:p-6' : 'mt-7 p-6 sm:p-8'} border border-slate-200 bg-white shadow-[0_20px_50px_rgba(15,23,42,0.08)] lg:h-[340px]`}>
+              <div className={`${compact ? 'mt-4 p-5 sm:p-6' : 'mt-7 p-6 sm:p-8'} border border-slate-200 bg-white shadow-[0_20px_50px_rgba(15,23,42,0.08)] ${formHeightClass}`}>
                 <div className={compact ? 'mb-4' : 'mb-6'}>
                   <h2 className="text-xl font-semibold text-slate-900">{formTitle}</h2>
                   <p className="mt-2 text-sm text-slate-600">{formSubtitle}</p>
@@ -52,7 +55,7 @@ export default function LoginShell({
 
           <section className="relative min-h-48 max-h-64 overflow-hidden border-t border-slate-200 bg-primary sm:min-h-64 lg:max-h-none lg:border-l lg:border-t-0">
             <img
-              src={images.login}
+              src={sideImage}
               alt="Qurbani services booking illustration"
               className="h-full w-full object-cover object-center"
             />
