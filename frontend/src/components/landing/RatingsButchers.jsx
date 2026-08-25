@@ -5,14 +5,6 @@ const Star = ({ className = 'w-5 h-5' }) => (
     <path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9 2.9-6z" />
   </svg>
 );
-
-
-const StarOutline = ({ className = 'w-5 h-5' }) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="#D4A72C" strokeWidth="1.6" strokeLinejoin="round" className={className}>
-    <path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9 2.9-6z" />
-  </svg>
-);
-
 const VerifiedBadge = () => (
   <svg viewBox="0 0 24 24" fill="#14532D" className="w-4 h-4 shrink-0">
     <path d="M12 1.8l2.4 2 3.1-.3 1 3 2.7 1.6-1 3 1 3-2.7 1.6-1 3-3.1-.3-2.4 2-2.4-2-3.1.3-1-3L2.8 15l1-3-1-3 2.7-1.6 1-3 3.1.3 2.4-2z" />

@@ -1,15 +1,3 @@
-/*
- * ── AdminRegister visual redesign ────────────────────────────────────
- * • Replaced PageShell with its own split-layout shell (mirrors LoginShell).
- * • Left panel  – warm-cream bg, logo, green header banner, notice banner,
- *                form card with all six fields.
- * • Right panel – full-height green bg with images.login butcher image and
- *                decorative circular overlays.
- * • All original form state, validation, and submit logic is preserved.
- * • No rounded corners; brand colours (bg-primary, text-primary, etc.) used
- *   throughout.  Submit button uses the premium-action class.
- */
-
 import { useState } from 'react';
 import Navbar from '../../components/Navbar';
 import FormField from '../../components/form/FormField';

@@ -1,15 +1,3 @@
-/* ============================================================
-   RoleRegistrationForm.jsx - Enhanced shared registration form
-   ============================================================
-   CHANGES MADE:
-   - Added comment block documenting visual enhancements
-   - Enhanced success state with animal image (camel) and better layout
-   - Improved PIN verification stage with visual polish
-   - Added animal image thumbnail to success state for brand reinforcement
-   - Preserved all existing form logic, validation, and PIN flow
-   - All state management, error handling, and callbacks unchanged
-   ============================================================ */
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import FormField from '../../components/form/FormField';

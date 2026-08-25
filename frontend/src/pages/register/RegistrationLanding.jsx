@@ -1,17 +1,3 @@
-/* ===========================================================
-   RegistrationLanding.jsx - Redesigned unified registration page
-   ===========================================================
-   CHANGES MADE:
-   - Removed the internal split-layout since PageShell now provides
-     the split layout with animal images on the right panel
-   - Content is now a focused single-column form area inside PageShell
-   - Customer role card uses customer-icon (Image 1: person silhouette)
-   - Butcher role card uses butcher-icon (Image 2: crossed cleavers)
-   - Improved step progress indicator styling
-   - Preserved all existing state management, step flow, and form logic
-   - Preserved sign-in link navigation
-   ============================================================ */
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import LoginShell from '../../components/form/LoginShell';

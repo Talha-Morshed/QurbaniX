@@ -1,6 +1,6 @@
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, ListFlowable, ListItem
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.units import mm
 from reportlab.lib.colors import HexColor
 
@@ -48,7 +48,6 @@ This is currently a frontend UI prototype rather than a full production system. 
 styles = getSampleStyleSheet()
 styles.add(ParagraphStyle(name='TitleStyle', parent=styles['Title'], fontName='Helvetica-Bold', fontSize=18, textColor=HexColor('#9b1455'), leading=22, spaceAfter=12))
 styles.add(ParagraphStyle(name='BodyStyle', parent=styles['BodyText'], fontName='Helvetica', fontSize=10.8, leading=14, spaceAfter=8, textColor=HexColor('#1f2937')))
-styles.add(ParagraphStyle(name='BoldBody', parent=styles['BodyText'], fontName='Helvetica-Bold', fontSize=10.8, leading=14, spaceAfter=8, textColor=HexColor('#111827')))
 
 story = []
 story.append(Paragraph('QurbaniX Project Analysis', style='TitleStyle'))

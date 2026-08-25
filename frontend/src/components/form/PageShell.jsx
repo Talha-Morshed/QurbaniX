@@ -1,21 +1,6 @@
-/* ============================================================
-   PageShell.jsx — Redesigned registration page shell
-   ============================================================
-   CHANGES MADE:
-   - Converted from single-column layout to split-layout (left form, right image panel)
-   - Right panel now shows butcher shop scene (Image 3) instead of animal grid
-   - Added green gradient right panel with decorative circular overlays
-   - Added logo display in the right panel header area
-   - Improved responsive behavior for mobile (stacked) and desktop (side-by-side)
-   - Preserved all existing props: title, description, children, notice
-   - Preserved Navbar integration and overall brand color system
-   NOTE: Replace images.login with images.butcherShop once butcher-shop.png
-         is added to assets/images/
-   ============================================================ */
-
 import images from '../../assets/images';
 
-function PageShell({ title, description, children, notice, hideHomeButton = false, hideLogo = false }) {
+function PageShell({ title, description, children, notice }) {
   return (
     <main className="flex min-h-screen w-full items-center justify-center bg-warm-cream p-4 text-slate-900 sm:p-6 lg:h-screen lg:min-h-0 lg:overflow-hidden lg:p-8 xl:p-10">
       <div className="grid w-full overflow-hidden border border-white bg-white shadow-[0_28px_80px_rgba(15,23,42,0.14)] lg:h-[calc(100vh-4rem)] lg:w-[min(90vw,1440px)] lg:grid-cols-[45fr_55fr] xl:h-[calc(100vh-5rem)]">
