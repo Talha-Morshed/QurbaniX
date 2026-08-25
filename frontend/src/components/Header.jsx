@@ -3,7 +3,6 @@ import './Header.css';
 import images from '../assets/images';
 
 const navItems = [
-  { label: 'Home', href: '#home' },
   { label: 'About', href: '#about' },
   { label: 'How It Works', href: '#how-it-works' },
   { label: 'Reviews', href: '#ratings' },
