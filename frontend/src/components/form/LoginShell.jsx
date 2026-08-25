@@ -34,7 +34,7 @@ export default function LoginShell({
               </div>
 
               <p className="text-xs font-bold uppercase tracking-[0.24em] text-primary">{pageTitle}</p>
-              <h1 className={`mt-3 font-bold tracking-tight text-slate-900 ${compact ? 'text-2xl sm:text-3xl' : 'text-3xl sm:text-4xl'}`}>{leftTitle}</h1>
+              <h1 className={`mt-3 font-semibold leading-[0.9] tracking-[-0.04em] text-primary ${compact ? 'text-3xl sm:text-4xl' : 'text-4xl sm:text-5xl lg:text-6xl'}`}>{leftTitle}</h1>
               <p className={`${compact ? 'mt-2' : 'mt-4'} max-w-lg text-sm leading-6 text-slate-600 sm:text-base`}>{leftDescription}</p>
 
               {notice && (

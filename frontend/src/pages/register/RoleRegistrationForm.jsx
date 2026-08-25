@@ -5,7 +5,7 @@ import { maskPhone, validatePhone } from '../../utils/validation';
 
 const initialState = { fullName: '', phone: '', agree: false };
 
-function RoleRegistrationForm({ role, loginPath, onComplete, showLogin = true, successTitle, successMessage, compact = false }) {
+function RoleRegistrationForm({ role, loginPath, onComplete, onPinRequested, showLogin = true, successTitle, successMessage, compact = false }) {
   const [form, setForm] = useState(initialState);
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
@@ -51,6 +51,7 @@ function RoleRegistrationForm({ role, loginPath, onComplete, showLogin = true, s
     window.setTimeout(() => setIsSubmitting(false), 400);
     issuePin();
     setStage('verify');
+    onPinRequested?.();
   };
 
   const verifyPin = (event) => {
@@ -109,7 +110,7 @@ function RoleRegistrationForm({ role, loginPath, onComplete, showLogin = true, s
           </label>
           <div className="flex items-center justify-between gap-3">
             <button type="submit" className={`premium-action inline-flex items-center justify-center bg-primary px-6 text-sm font-semibold text-white shadow-lg shadow-primary hover:bg-primary-dark ${compact ? 'py-2' : 'py-3'}`}>Enter</button>
-            <button type="button" onClick={() => issuePin(true)} className="premium-action px-2 text-xs font-semibold text-primary">Resend PIN</button>
+            <button type="button" onClick={() => issuePin(true)} className="premium-action inline-flex min-w-28 items-center justify-center px-3 py-2 text-sm font-semibold text-primary">Resend PIN</button>
           </div>
           <div className={`${compact ? 'hidden' : 'flex'} items-center gap-4 text-xs text-slate-500`}>
             <span>Attempts: {attempts} / 3</span>
@@ -130,8 +131,8 @@ function RoleRegistrationForm({ role, loginPath, onComplete, showLogin = true, s
         <input type="checkbox" name="agree" checked={form.agree} onChange={handleChange} className="mt-1 h-5 w-5 rounded border-slate-300 text-primary focus:ring-warm-cream" />
         <span>I agree to the <Link to="/terms" className="font-semibold text-primary hover:text-primary-dark">Terms & Conditions</Link>.{errors.agree && <span className="block text-rose-600">{errors.agree}</span>}</span>
       </label>
-      <button type="submit" disabled={isSubmitting} className={`premium-action inline-flex w-full items-center justify-center rounded-3xl bg-primary px-6 text-sm font-semibold text-white shadow-lg shadow-primary hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-600 ${compact ? 'py-3' : 'py-4'}`}>{isSubmitting ? 'Sending...' : 'Register & Send PIN'}</button>
-      {showLogin && <p className="text-center text-sm text-slate-600">Already have an account?{' '}<Link to={loginPath} className="font-semibold text-primary hover:text-primary-dark">Log In</Link></p>}
+      <button type="submit" disabled={isSubmitting} className={`premium-action inline-flex min-w-52 items-center justify-center rounded-3xl bg-primary px-8 text-sm font-semibold text-white shadow-lg shadow-primary hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-600 ${compact ? 'py-3' : 'py-4'}`}>{isSubmitting ? 'Entering...' : 'Enter'}</button>
+      {showLogin && stage === 'fill' && <p className="text-center text-sm text-slate-600">Already have an account?{' '}<Link to={loginPath} className="font-semibold text-primary hover:text-primary-dark">Log In</Link></p>}
     </form>
   );
 }

@@ -17,7 +17,7 @@ function PageShell({ title, description, children, notice }) {
             {/* Green header banner with title */}
             <div className="mb-4 rounded-[1.75rem] bg-primary p-4 text-white shadow-primary-soft sm:p-6">
               <p className="text-xs font-bold uppercase tracking-[0.24em] text-white/80">{title}</p>
-              <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">{description}</h1>
+              <h1 className="mt-3 text-3xl font-semibold leading-[0.9] tracking-[-0.04em] text-white sm:text-4xl">{description}</h1>
             </div>
 
             {/* Notice banner (if provided) */}
