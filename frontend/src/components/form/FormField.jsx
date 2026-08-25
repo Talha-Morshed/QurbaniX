@@ -27,11 +27,9 @@ function FormField({ label, icon, type = 'text', name, value, onChange, error, r
           ))}
         </datalist>
       )}
-      {error && (
-        <p id={`${name}-error`} className="text-xs text-rose-600">
-          {error}
-        </p>
-      )}
+      <p id={`${name}-error`} className="min-h-5 text-xs text-rose-600" role="alert" aria-live="polite">
+        {error}
+      </p>
     </label>
   );
 }

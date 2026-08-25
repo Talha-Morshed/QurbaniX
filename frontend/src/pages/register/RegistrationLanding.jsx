@@ -50,7 +50,7 @@ export default function RegistrationLanding() {
         </button>
       </div>
 
-      {roleSelectionError && <p className="mb-2 text-xs font-medium text-rose-600" role="alert">{roleSelectionError}</p>}
+      {roleSelectionError && <p className="mb-2 text-xs font-medium text-rose-600" role="alert" aria-live="polite">{roleSelectionError}</p>}
 
       {role === 'customer' ? <CustomerRegisterForm showLogin={false} compact onPinRequested={() => setPinRequested(true)} /> : <ButcherRegisterForm showLogin={false} compact onPinRequested={() => setPinRequested(true)} />}
 

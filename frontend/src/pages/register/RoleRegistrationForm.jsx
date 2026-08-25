@@ -106,7 +106,7 @@ function RoleRegistrationForm({ role, loginPath, onComplete, onPinRequested, sho
           <label className={`${compact ? 'space-y-1' : 'space-y-2'} block text-sm font-medium text-slate-700`}>
             <span>Enter PIN</span>
             <input className={`w-full border px-4 ${compact ? 'py-2' : 'py-3'} text-sm text-slate-900 shadow-sm outline-none transition duration-200 focus:border-primary focus:ring-2 focus:ring-warm-cream ${errorMsg ? 'border-rose-500' : 'border-slate-200'}`} type="text" name="pin" value={pinInput} onChange={(event) => setPinInput(event.target.value)} placeholder="1234" aria-invalid={!!errorMsg} />
-            {errorMsg && <p className="text-xs text-rose-600">{errorMsg}</p>}
+            <p className="min-h-5 text-xs text-rose-600" role="alert" aria-live="polite">{errorMsg}</p>
           </label>
           <div className="flex items-center justify-between gap-3">
             <button type="submit" className={`premium-action inline-flex items-center justify-center bg-primary px-6 text-sm font-semibold text-white shadow-lg shadow-primary hover:bg-primary-dark ${compact ? 'py-2' : 'py-3'}`}>Enter</button>
@@ -129,7 +129,7 @@ function RoleRegistrationForm({ role, loginPath, onComplete, onPinRequested, sho
       </div>
       <label className="flex items-start gap-3 text-sm text-slate-700">
         <input type="checkbox" name="agree" checked={form.agree} onChange={handleChange} className="mt-1 h-5 w-5 rounded border-slate-300 text-primary focus:ring-warm-cream" />
-        <span>I agree to the <Link to="/terms" className="font-semibold text-primary hover:text-primary-dark">Terms & Conditions</Link>.{errors.agree && <span className="block text-rose-600">{errors.agree}</span>}</span>
+        <span>I agree to the <Link to="/terms" className="font-semibold text-primary hover:text-primary-dark">Terms & Conditions</Link>.<span className="block min-h-5 text-rose-600" role="alert" aria-live="polite">{errors.agree}</span></span>
       </label>
       <button type="submit" disabled={isSubmitting} className={`premium-action inline-flex min-w-52 items-center justify-center rounded-3xl bg-primary px-8 text-sm font-semibold text-white shadow-lg shadow-primary hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-600 ${compact ? 'py-3' : 'py-4'}`}>{isSubmitting ? 'Entering...' : 'Enter'}</button>
       {showLogin && stage === 'fill' && <p className="text-center text-sm text-slate-600">Already have an account?{' '}<Link to={loginPath} className="font-semibold text-primary hover:text-primary-dark">Log In</Link></p>}
