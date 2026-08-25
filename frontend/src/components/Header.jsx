@@ -41,9 +41,32 @@ function Header() {
     return () => observer.disconnect();
   }, []);
 
+  const handleNavClick = (event, href) => {
+    event.preventDefault();
+
+    const targetId = href.replace('#', '');
+    const target = document.getElementById(targetId);
+
+    if (!target) return;
+
+    const header = document.querySelector('.header');
+    const headerStyle = header ? window.getComputedStyle(header) : null;
+    const isSticky = headerStyle && (headerStyle.position === 'sticky' || headerStyle.position === 'fixed');
+    const headerHeight = isSticky && header ? header.getBoundingClientRect().height : 0;
+    const targetPosition =
+      targetId === 'home'
+        ? 0
+        : window.scrollY + target.getBoundingClientRect().top - headerHeight;
+
+    window.scrollTo({
+      top: Math.max(targetPosition, 0),
+      behavior: 'smooth',
+    });
+  };
+
   return (
     <header className="header">
-      <a className="header__brand" href="#home" aria-label="Go to home section">
+      <a className="header__brand" href="#home" aria-label="Go to home section" onClick={(event) => handleNavClick(event, '#home')}>
         <img src={images.logo} alt="QurbaniX Logo" className="header__logo" />
       </a>
 
@@ -52,6 +75,7 @@ function Header() {
           <a
             key={item.href}
             href={item.href}
+            onClick={(event) => handleNavClick(event, item.href)}
             className={`header__nav-link ${activeSection === item.href.replace('#', '') ? 'is-active' : ''}`}
           >
             {item.label}
