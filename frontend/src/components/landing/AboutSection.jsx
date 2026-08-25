@@ -57,7 +57,7 @@ export default function AboutSection() {
             <div
               key={feature.title}
               className={`premium-action group p-8 flex flex-col items-start gap-5 shadow-sm hover:shadow-xl ${
-                feature.highlight ? 'bg-emerald-900 ring-1 ring-emerald-900' : 'bg-white ring-1 ring-slate-200'
+                feature.highlight ? 'bg-emerald-900 ring-1 ring-emerald-900' : 'bg-white border border-emerald-700/60'
               }`}
             >
               <div className={`inline-flex items-center justify-center w-14 h-14 ${feature.highlight ? 'bg-emerald-800 text-white' : 'bg-emerald-900 text-[#D4A72C]'}`}>

@@ -76,7 +76,7 @@ export default function HowItWorksSection() {
               <div
                 key={step.title}
                 className={`premium-action group flex h-full flex-col p-6 md:p-7 shadow-sm hover:shadow-lg ${
-                  isDark ? 'bg-emerald-900 ring-1 ring-emerald-900' : 'bg-white ring-1 ring-slate-200'
+                  isDark ? 'bg-emerald-900 ring-1 ring-emerald-900' : 'bg-white border border-emerald-700/60'
                 }`}
               >
                 <div className="flex items-center justify-between gap-3">
