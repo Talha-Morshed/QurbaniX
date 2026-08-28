@@ -2,19 +2,17 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import LoginShell from '../../components/form/LoginShell';
 import { maskPhone, validatePhone } from '../../utils/validation';
+import { api, setToken } from '../../api';
 
 function RoleLogin({ role, dashboardPath }) {
   const [form, setForm] = useState({ phone: '' });
   const [errors, setErrors] = useState({});
   const [stage, setStage] = useState('request');
   const [devPin, setDevPin] = useState('');
-  const [pinExpiresAt, setPinExpiresAt] = useState(null);
   const [pinInput, setPinInput] = useState('');
-  const [attempts, setAttempts] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const navigate = useNavigate();
-  const isDev = typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.MODE !== 'production';
 
   const validatePhoneOnly = () => {
     const nextErrors = {};
@@ -27,46 +25,43 @@ function RoleLogin({ role, dashboardPath }) {
     return Object.keys(nextErrors).length === 0;
   };
 
-  const generatePin = () => String(Math.floor(1000 + Math.random() * 9000));
-
-  const issuePin = (isResend = false) => {
-    const pin = generatePin();
-    setDevPin(pin);
-    setPinExpiresAt(Date.now() + 5 * 60 * 1000);
-    setAttempts(0);
-    setPinInput('');
-    setErrorMsg('');
-
-    if (isDev) {
-      // eslint-disable-next-line no-console
-      const roleLabel = isResend ? role.toLowerCase() : role;
-      console.log(`[DEV PIN] ${isResend ? 'Resent ' : ''}${roleLabel} ${isResend ? '' : 'login '}PIN for`, form.phone, ':', pin);
-    }
-  };
-
-  const sendPin = (event) => {
+  const sendPin = async (event) => {
     event.preventDefault();
     if (!validatePhoneOnly()) return;
 
     setIsSubmitting(true);
-    window.setTimeout(() => setIsSubmitting(false), 400);
-    issuePin();
-    setStage('verify');
+    setErrorMsg('');
+
+    try {
+      const data = await api.login(form.phone.trim());
+      setDevPin(data.dev_pin || '');
+      setStage('verify');
+    } catch (err) {
+      setErrorMsg(err.message || 'Failed to send PIN. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const verifyPin = (event) => {
+  const verifyPin = async (event) => {
     event.preventDefault();
     setErrorMsg('');
 
-    if (!pinExpiresAt || Date.now() > pinExpiresAt) {
-      setErrorMsg('The PIN has expired. Please resend.');
-    } else if (attempts >= 3) {
-      setErrorMsg('Too many failed attempts. Please resend PIN.');
-    } else if (pinInput.trim() === devPin) {
+    if (!pinInput.trim()) {
+      setErrorMsg('Please enter the PIN.');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const data = await api.loginVerify(form.phone.trim(), pinInput.trim());
+      setToken(data.token);
       navigate(dashboardPath, { replace: true });
-    } else {
-      setAttempts((current) => current + 1);
-      setErrorMsg('Incorrect PIN. Please try again.');
+    } catch (err) {
+      setErrorMsg(err.message || 'Incorrect PIN. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -84,6 +79,11 @@ function RoleLogin({ role, dashboardPath }) {
     >
       {stage === 'request' ? (
         <form className="space-y-6" onSubmit={sendPin} noValidate>
+          {errorMsg && (
+            <div className="rounded border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700" role="alert">
+              {errorMsg}
+            </div>
+          )}
           <label className="block space-y-2 text-sm font-medium text-slate-700">
             <span className="flex items-center gap-2">Phone Number</span>
             <input
@@ -99,7 +99,7 @@ function RoleLogin({ role, dashboardPath }) {
           </label>
 
           <button type="submit" disabled={isSubmitting} className="premium-action inline-flex min-w-40 items-center justify-center rounded-3xl bg-primary px-8 py-4 text-sm font-semibold text-white shadow-lg shadow-primary hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-600">
-            {isSubmitting ? 'Entering...' : 'Enter'}
+            {isSubmitting ? 'Sending...' : 'Send PIN'}
           </button>
 
           <p className="text-center text-sm text-slate-600">
@@ -111,23 +111,36 @@ function RoleLogin({ role, dashboardPath }) {
         <form className="space-y-4" onSubmit={verifyPin} noValidate>
           <div className="space-y-3">
             <p className="text-sm text-slate-700">A 4-digit PIN was sent to <strong className="text-slate-900">{maskPhone(form.phone)}</strong>.</p>
+
+            {devPin && (
+              <div className="rounded border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+                <strong>Dev PIN:</strong> {devPin}
+              </div>
+            )}
+
+            {errorMsg && (
+              <div className="rounded border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700" role="alert">
+                {errorMsg}
+              </div>
+            )}
+
             <label className="block space-y-2 text-sm font-medium text-slate-700">
               <span>Enter PIN</span>
               <input
-                className={`w-full rounded-3xl border px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition duration-200 focus:border-primary focus:ring-2 focus:ring-warm-cream ${errorMsg ? 'border-rose-500' : 'border-slate-200'}`}
+                className="w-full rounded-3xl border border-slate-200 px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition duration-200 focus:border-primary focus:ring-2 focus:ring-warm-cream"
                 type="text"
                 name="pin"
                 value={pinInput}
                 onChange={(event) => setPinInput(event.target.value)}
                 placeholder="1234"
-                aria-invalid={!!errorMsg}
               />
-              <p className="min-h-5 text-xs text-rose-600">{errorMsg}</p>
             </label>
 
             <div className="flex items-center justify-between gap-4">
-              <button type="submit" className="premium-action inline-flex items-center justify-center rounded-3xl bg-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary hover:bg-primary-dark">Enter</button>
-              <button type="button" onClick={() => issuePin(true)} className="premium-action inline-flex min-w-28 items-center justify-center px-3 py-2 text-sm font-semibold text-primary">Resend PIN</button>
+              <button type="submit" disabled={isSubmitting} className="premium-action inline-flex items-center justify-center rounded-3xl bg-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-slate-300">
+                {isSubmitting ? 'Verifying...' : 'Verify'}
+              </button>
+              <button type="button" onClick={sendPin} className="premium-action inline-flex min-w-28 items-center justify-center px-3 py-2 text-sm font-semibold text-primary">Resend PIN</button>
             </div>
           </div>
         </form>

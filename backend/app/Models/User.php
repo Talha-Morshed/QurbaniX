@@ -21,8 +21,12 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'phone',
+        'role',
         'email',
         'password',
+        'pin_hash',
+        'pin_expires_at',
     ];
 
     /**
@@ -32,6 +36,7 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',
+        'pin_hash',
         'remember_token',
     ];
 
@@ -44,6 +49,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'pin_expires_at' => 'datetime',
             'password' => 'hashed',
         ];
     }

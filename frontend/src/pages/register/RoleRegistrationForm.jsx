@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import FormField from '../../components/form/FormField';
-import { maskPhone, validatePhone } from '../../utils/validation';
+import { validatePhone } from '../../utils/validation';
+import { api, setToken } from '../../api';
 
 const initialState = { fullName: '', phone: '', agree: false };
 
@@ -9,14 +10,8 @@ function RoleRegistrationForm({ role, loginPath, onComplete, onPinRequested, sho
   const [form, setForm] = useState(initialState);
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
-  const [stage, setStage] = useState('fill');
-  const [devPin, setDevPin] = useState('');
-  const [pinExpiresAt, setPinExpiresAt] = useState(null);
-  const [pinInput, setPinInput] = useState('');
-  const [attempts, setAttempts] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  const isDev = typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.MODE !== 'production';
 
   const validate = () => {
     const nextErrors = {};
@@ -28,50 +23,27 @@ function RoleRegistrationForm({ role, loginPath, onComplete, onPinRequested, sho
     return Object.keys(nextErrors).length === 0;
   };
 
-  const generatePin = () => String(Math.floor(1000 + Math.random() * 9000));
-
-  const issuePin = (isResend = false) => {
-    const pin = generatePin();
-    setDevPin(pin);
-    setPinExpiresAt(Date.now() + 5 * 60 * 1000);
-    setAttempts(0);
-    setPinInput('');
-    setErrorMsg('');
-    if (isDev) {
-      // eslint-disable-next-line no-console
-      const roleLabel = isResend ? role.toLowerCase() : role;
-      console.log(`[DEV PIN] ${isResend ? 'Resent ' : ''}${roleLabel} registration PIN for`, form.phone, ':', pin);
-    }
-  };
-
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     if (!validate()) return;
-    setIsSubmitting(true);
-    window.setTimeout(() => setIsSubmitting(false), 400);
-    issuePin();
-    setStage('verify');
-    onPinRequested?.();
-  };
 
-  const verifyPin = (event) => {
-    event.preventDefault();
+    setIsSubmitting(true);
     setErrorMsg('');
-    if (!pinExpiresAt || Date.now() > pinExpiresAt) {
-      setErrorMsg('The PIN has expired. Please resend.');
-    } else if (attempts >= 3) {
-      setErrorMsg('Too many failed attempts. Please resend PIN.');
-    } else if (pinInput.trim() === devPin) {
+
+    try {
+      const data = await api.register({
+        name: form.fullName.trim(),
+        phone: form.phone.trim(),
+        role: role.toLowerCase(),
+      });
+
+      setToken(data.token);
       setSubmitted(true);
-      setStage('done');
       onComplete?.();
-      if (isDev) {
-        // eslint-disable-next-line no-console
-        console.log(`${role} registration data (dev):`, form);
-      }
-    } else {
-      setAttempts((current) => current + 1);
-      setErrorMsg('Incorrect PIN. Please try again.');
+    } catch (err) {
+      setErrorMsg(err.message || 'Registration failed. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -80,7 +52,6 @@ function RoleRegistrationForm({ role, loginPath, onComplete, onPinRequested, sho
     setForm((current) => ({ ...current, [name]: type === 'checkbox' ? checked : value }));
   };
 
-  /* Success state */
   if (submitted) {
     return (
       <div className="border border-warm-cream bg-warm-cream p-8 text-primary">
@@ -90,39 +61,13 @@ function RoleRegistrationForm({ role, loginPath, onComplete, onPinRequested, sho
     );
   }
 
-  /* PIN verification stage — enhanced with visual polish */
-  if (stage === 'verify') {
-    return (
-      <form className={compact ? 'space-y-2' : 'space-y-6'} onSubmit={verifyPin} noValidate>
-        <div className={compact ? 'space-y-2' : 'space-y-5'}>
-          {/* Verification header with phone info */}
-          <div className={`${compact ? 'p-2' : 'p-4'} flex items-center gap-3 bg-emerald-50 border border-emerald-100`}>
-            <div className="keep-circular flex-shrink-0 h-10 w-10 flex items-center justify-center bg-emerald-700 text-white">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            </div>
-            <p className="text-sm text-slate-700">A 4-digit PIN was sent to <strong className="text-slate-900">{maskPhone(form.phone)}</strong></p>
-          </div>
-
-          <label className={`${compact ? 'space-y-1' : 'space-y-2'} block text-sm font-medium text-slate-700`}>
-            <span>Enter PIN</span>
-            <input className={`w-full border px-4 ${compact ? 'py-2' : 'py-3'} text-sm text-slate-900 shadow-sm outline-none transition duration-200 focus:border-primary focus:ring-2 focus:ring-warm-cream ${errorMsg ? 'border-rose-500' : 'border-slate-200'}`} type="text" name="pin" value={pinInput} onChange={(event) => setPinInput(event.target.value)} placeholder="1234" aria-invalid={!!errorMsg} />
-            <p className="min-h-5 text-xs text-rose-600" role="alert" aria-live="polite">{errorMsg}</p>
-          </label>
-          <div className="flex items-center justify-between gap-3">
-            <button type="submit" className={`premium-action inline-flex items-center justify-center bg-primary px-6 text-sm font-semibold text-white shadow-lg shadow-primary hover:bg-primary-dark ${compact ? 'py-2' : 'py-3'}`}>Enter</button>
-            <button type="button" onClick={() => issuePin(true)} className="premium-action inline-flex min-w-28 items-center justify-center px-3 py-2 text-sm font-semibold text-primary">Resend PIN</button>
-          </div>
-          <div className={`${compact ? 'hidden' : 'flex'} items-center gap-4 text-xs text-slate-500`}>
-            <span>Attempts: {attempts} / 3</span>
-            {pinExpiresAt && <span>Expires: {new Date(pinExpiresAt).toLocaleTimeString()}</span>}
-          </div>
-        </div>
-      </form>
-    );
-  }
-
   return (
     <form className={compact ? 'space-y-2' : 'space-y-6'} onSubmit={handleSubmit} noValidate>
+      {errorMsg && (
+        <div className="rounded border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700" role="alert">
+          {errorMsg}
+        </div>
+      )}
       <div className={`grid ${compact ? 'gap-3' : 'gap-6'} lg:grid-cols-2`}>
         <FormField label="Full Name" name="fullName" value={form.fullName} onChange={handleChange} error={errors.fullName} placeholder="Enter your full name" required />
         <FormField label="Phone Number" name="phone" value={form.phone} onChange={handleChange} error={errors.phone} placeholder="01XXXXXXXXX" required />
@@ -131,7 +76,7 @@ function RoleRegistrationForm({ role, loginPath, onComplete, onPinRequested, sho
         <input type="checkbox" name="agree" checked={form.agree} onChange={handleChange} className="mt-1 h-5 w-5 rounded border-slate-300 text-primary focus:ring-warm-cream" />
         <span>I agree to the <Link to="/terms" className="font-semibold text-primary hover:text-primary-dark">Terms & Conditions</Link>.<span className="block min-h-5 text-rose-600" role="alert" aria-live="polite">{errors.agree}</span></span>
       </label>
-      <button type="submit" disabled={isSubmitting} className={`premium-action inline-flex min-w-52 items-center justify-center rounded-3xl bg-primary px-8 text-sm font-semibold text-white shadow-lg shadow-primary hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-600 ${compact ? 'py-3' : 'py-4'}`}>{isSubmitting ? 'Entering...' : 'Enter'}</button>
+      <button type="submit" disabled={isSubmitting} className={`premium-action inline-flex min-w-52 items-center justify-center rounded-3xl bg-primary px-8 text-sm font-semibold text-white shadow-lg shadow-primary hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-600 ${compact ? 'py-3' : 'py-4'}`}>{isSubmitting ? 'Registering...' : 'Register'}</button>
     </form>
   );
 }
