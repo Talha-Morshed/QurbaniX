@@ -64,6 +64,59 @@
 
 ---
 
+## Running with Docker
+
+The project is fully Dockerized. It runs:
+
+- **Backend** — Laravel (PHP 8.2) on `http://localhost:8000`
+- **Frontend** — React + Vite dev server on `http://localhost:5173`
+- **MySQL** — on `localhost:3306` (db: `qurbanix`, user: `qurbanix`, password: `password`)
+- **Redis** — on `localhost:6379`
+- **Mailpit** — mail catcher on `localhost:8025` (SMTP on `localhost:1025`)
+
+### Prerequisites
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (running)
+
+### Setup
+
+```bash
+# 1. Start Docker Desktop, then from the project root:
+docker compose build
+
+# 2. Start all services (first run pulls images ~ a few minutes):
+docker compose up -d
+```
+
+On first start the backend container automatically runs `composer install`,
+generates the app key, and runs migrations. The frontend container runs
+`npm install` on boot.
+
+### Usage
+
+| Service  | URL |
+|----------|-----|
+| Laravel API | http://localhost:8000/api |
+| React frontend | http://localhost:5173 |
+| Mailpit dashboard | http://localhost:8025 |
+
+Frontend API requests are proxied to the backend automatically.
+
+### Useful commands
+
+```bash
+docker compose logs -f laravel.test   # backend logs
+docker compose logs -f frontend       # frontend logs
+docker compose ps                     # service status
+docker compose up -d --build          # rebuild after dependency changes
+docker compose down                   # stop services
+docker compose down -v                # stop and wipe the database volume
+docker compose exec mysql mysql -u qurbanix -p qurbanix   # MySQL shell
+```
+
+To override ports/credentials (e.g. if port `8000` is taken), copy
+`.env.example` to `.env` at the project root and adjust the values.
+
 ## Project Modules
 
 - User Authentication
