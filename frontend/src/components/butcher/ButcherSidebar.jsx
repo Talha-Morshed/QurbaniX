@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import images from '../../assets/images';
 
 const navigation = [
@@ -22,11 +22,14 @@ function Icon({ name, size = 18 }) {
     user: 'M20 21a8 8 0 0 0-16 0m12-13a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z',
     inbox: 'M4 5h16v14H4zM4 15h4l2 2h4l2-2h4',
     scissors: 'm6 6 12 12M6 18 18 6M6 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM6 14a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z',
+    close: 'M6 6l12 12M18 6 6 18',
   };
   return <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={paths[name]} /></svg>;
 }
 
 function ButcherSidebar() {
+  const location = useLocation();
+
   return (
     <aside className="butcher-sidebar">
       <Link to="/dashboard/butcher" className="butcher-brand" aria-label="QurbaniX butcher dashboard">
@@ -35,12 +38,13 @@ function ButcherSidebar() {
       </Link>
       <p className="butcher-nav-label">Workspace</p>
       <nav aria-label="Butcher dashboard navigation">
-        {navigation.map(([label, icon], index) => (
-          <a key={label} href={`#${label.toLowerCase().replaceAll(' ', '-')}`} className={`butcher-nav-item ${index === 0 ? 'is-active' : ''}`}>
-            <Icon name={icon} />
-            <span>{label}</span>
-          </a>
-        ))}
+        {navigation.map(([label, icon]) => {
+          const path = label === 'Dashboard' ? '/dashboard/butcher' : label === 'Bookings' ? '/dashboard/butcher/bookings' : `#${label.toLowerCase().replaceAll(' ', '-')}`;
+          const isActive = location.pathname === path;
+          const item = <><Icon name={icon} /><span>{label}</span></>;
+
+          return label === 'Dashboard' || label === 'Bookings' ? <Link key={label} to={path} className={`butcher-nav-item ${isActive ? 'is-active' : ''}`}>{item}</Link> : <a key={label} href={path} className={`butcher-nav-item ${isActive ? 'is-active' : ''}`}>{item}</a>;
+        })}
       </nav>
       <div className="butcher-sidebar-footer">
         <div className="butcher-help-mark">?</div>

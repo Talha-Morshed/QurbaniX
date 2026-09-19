@@ -1,0 +1,7 @@
+export const butcherBookings = [
+  { id: 'QX-1001', customer: 'Rahim Ahmed', phone: '+880 1712-345678', service: 'Full service slaughter & cutting', animal: 'Cow Qurbani', date: 'June 7, 2026', time: '10:00 AM', location: 'Dhanmondi, Dhaka', amount: '৳8,500', status: 'Pending', bookedOn: 'June 2, 2026' },
+  { id: 'QX-1002', customer: 'Nusrat Jahan', phone: '+880 1819-443210', service: 'Slaughter, cutting & packaging', animal: 'Goat Qurbani', date: 'June 7, 2026', time: '12:30 PM', location: 'Gulshan 1, Dhaka', amount: '৳4,800', status: 'Accepted', bookedOn: 'June 1, 2026' },
+  { id: 'QX-1003', customer: 'Fahim Karim', phone: '+880 1611-928374', service: 'Meat cutting & packaging', animal: 'Cow Qurbani', date: 'June 7, 2026', time: '3:00 PM', location: 'Uttara Sector 4, Dhaka', amount: '৳6,200', status: 'Completed', bookedOn: 'May 30, 2026' },
+  { id: 'QX-1004', customer: 'Samira Haque', phone: '+880 1912-551290', service: 'Full service slaughter & cutting', animal: 'Goat Qurbani', date: 'June 8, 2026', time: '9:00 AM', location: 'Banani, Dhaka', amount: '৳4,800', status: 'Pending', bookedOn: 'June 3, 2026' },
+  { id: 'QX-1005', customer: 'Tanvir Hasan', phone: '+880 1555-883201', service: 'Slaughter & share distribution', animal: 'Cow Qurbani', date: 'June 8, 2026', time: '11:30 AM', location: 'Mohammadpur, Dhaka', amount: '৳7,500', status: 'Cancelled', bookedOn: 'May 28, 2026' },
+];
