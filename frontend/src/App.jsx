@@ -15,6 +15,7 @@ import CustomerDashboard from './pages/dashboard/CustomerDashboard.jsx';
 import ButcherDashboard from './pages/dashboard/ButcherDashboard.jsx';
 import Bookings from './pages/butcher/Bookings.jsx';
 import ServicesPricing from './pages/butcher/ServicesPricing.jsx';
+import Availability from './pages/butcher/Availability.jsx';
 import TermsAndConditions from './pages/Terms/TermsAndConditions.jsx';
 
 function App() {
@@ -37,6 +38,7 @@ function App() {
         <Route path="/dashboard/butcher" element={<ButcherDashboard />} />
         <Route path="/dashboard/butcher/bookings" element={<Bookings />} />
         <Route path="/dashboard/butcher/services" element={<ServicesPricing />} />
+        <Route path="/dashboard/butcher/availability" element={<Availability />} />
         <Route path="/terms" element={<TermsAndConditions />} />
         <Route path="*" element={<LandingPage />} />
       </Routes>
