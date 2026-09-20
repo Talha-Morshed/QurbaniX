@@ -14,6 +14,7 @@ import ButcherResetPassword from './pages/login/ButcherResetPassword.jsx';
 import CustomerDashboard from './pages/dashboard/CustomerDashboard.jsx';
 import ButcherDashboard from './pages/dashboard/ButcherDashboard.jsx';
 import Bookings from './pages/butcher/Bookings.jsx';
+import ServicesPricing from './pages/butcher/ServicesPricing.jsx';
 import TermsAndConditions from './pages/Terms/TermsAndConditions.jsx';
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
         <Route path="/dashboard/customer" element={<CustomerDashboard />} />
         <Route path="/dashboard/butcher" element={<ButcherDashboard />} />
         <Route path="/dashboard/butcher/bookings" element={<Bookings />} />
+        <Route path="/dashboard/butcher/services" element={<ServicesPricing />} />
         <Route path="/terms" element={<TermsAndConditions />} />
         <Route path="*" element={<LandingPage />} />
       </Routes>
