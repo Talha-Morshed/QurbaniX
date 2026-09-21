@@ -1,0 +1,9 @@
+function statusClass(status) {
+  return `payment-status payment-status-${status.toLowerCase()}`;
+}
+
+function PaymentHistory({ payments, onView }) {
+  return <section className="butcher-panel payment-history"><div className="panel-heading"><div><p className="eyebrow">Recent transactions</p><h2>Payment history <span className="payment-count">{payments.length}</span></h2></div><button type="button" className="text-action">Download report <span aria-hidden="true">↓</span></button></div><div className="payment-table-wrap"><table className="payment-table"><thead><tr><th>Transaction</th><th>Customer</th><th>Service</th><th>Date</th><th>Amount</th><th>Method</th><th>Status</th><th><span className="sr-only">Action</span></th></tr></thead><tbody>{payments.map((payment) => <tr key={payment.transactionId}><td data-label="Transaction"><strong>{payment.transactionId}</strong><span>{payment.bookingId}</span></td><td data-label="Customer">{payment.customer}</td><td data-label="Service"><strong>{payment.animal}</strong><span>{payment.service}</span></td><td data-label="Date">{payment.date}</td><td data-label="Amount"><strong>{payment.amount}</strong></td><td data-label="Method">{payment.method}</td><td data-label="Status"><span className={statusClass(payment.status)}>{payment.status}</span></td><td data-label="Action"><button type="button" className="row-action" onClick={() => onView(payment)} aria-label={`View ${payment.transactionId}`}>•••</button></td></tr>)}</tbody></table>{!payments.length && <div className="payment-empty"><strong>No payments found</strong><span>Try a different filter or search term.</span></div>}</div></section>;
+}
+
+export default PaymentHistory;
