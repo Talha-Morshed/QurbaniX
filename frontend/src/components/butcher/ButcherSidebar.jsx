@@ -39,11 +39,11 @@ function ButcherSidebar() {
       <p className="butcher-nav-label">Workspace</p>
       <nav aria-label="Butcher dashboard navigation">
         {navigation.map(([label, icon]) => {
-          const path = label === 'Dashboard' ? '/dashboard/butcher' : label === 'Bookings' ? '/dashboard/butcher/bookings' : label === 'Services & Pricing' ? '/dashboard/butcher/services' : label === 'Availability' ? '/dashboard/butcher/availability' : label === 'Earnings' ? '/dashboard/butcher/earnings' : label === 'Reviews' ? '/dashboard/butcher/reviews' : `#${label.toLowerCase().replaceAll(' ', '-')}`;
+          const path = label === 'Dashboard' ? '/dashboard/butcher' : label === 'Bookings' ? '/dashboard/butcher/bookings' : label === 'Services & Pricing' ? '/dashboard/butcher/services' : label === 'Availability' ? '/dashboard/butcher/availability' : label === 'Earnings' ? '/dashboard/butcher/earnings' : label === 'Reviews' ? '/dashboard/butcher/reviews' : label === 'Profile' ? '/dashboard/butcher/profile' : `#${label.toLowerCase().replaceAll(' ', '-')}`;
           const isActive = location.pathname === path;
           const item = <><Icon name={icon} /><span>{label}</span></>;
 
-          return ['Dashboard', 'Bookings', 'Services & Pricing', 'Availability', 'Earnings', 'Reviews'].includes(label) ? <Link key={label} to={path} className={`butcher-nav-item ${isActive ? 'is-active' : ''}`}>{item}</Link> : <a key={label} href={path} className={`butcher-nav-item ${isActive ? 'is-active' : ''}`}>{item}</a>;
+          return ['Dashboard', 'Bookings', 'Services & Pricing', 'Availability', 'Earnings', 'Reviews', 'Profile'].includes(label) ? <Link key={label} to={path} className={`butcher-nav-item ${isActive ? 'is-active' : ''}`}>{item}</Link> : <a key={label} href={path} className={`butcher-nav-item ${isActive ? 'is-active' : ''}`}>{item}</a>;
         })}
       </nav>
       <div className="butcher-sidebar-footer">

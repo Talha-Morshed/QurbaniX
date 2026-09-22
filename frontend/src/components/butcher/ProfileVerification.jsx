@@ -1,0 +1,5 @@
+function ProfileVerification({ meta }) {
+  return <div className="profile-side-column"><section className="butcher-panel verification-panel"><div className="panel-heading"><div><p className="eyebrow">Trust and safety</p><h2>Verification</h2></div></div><p className="verification-copy">Your profile has been verified by QurbaniX.</p><div className="verification-list">{['Verification status', 'Identity', 'Phone', 'Professional information'].map((item) => <div key={item}><span>{item}</span><strong><i /> Verified</strong></div>)}</div></section><section className="butcher-panel account-panel"><div className="panel-heading"><div><p className="eyebrow">Your account</p><h2>Account information</h2></div></div><div className="account-list"><div><span>Account role</span><strong>Butcher</strong></div><div><span>Member since</span><strong>{meta.memberSince}</strong></div><div><span>Phone verification</span><strong className="account-verified">Verified</strong></div></div></section></div>;
+}
+
+export default ProfileVerification;

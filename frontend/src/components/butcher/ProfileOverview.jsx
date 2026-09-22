@@ -1,0 +1,5 @@
+function ProfileOverview({ profile, meta, onChangePhoto }) {
+  return <section className="profile-overview butcher-panel"><div className="profile-identity"><div className="profile-photo">RA</div><div><p className="eyebrow">Professional profile</p><h2>{profile.name}</h2><span className="profile-verified"><i /> Verified Butcher</span><button type="button" className="profile-photo-button" onClick={onChangePhoto}>Change Photo</button></div></div><div className="profile-facts"><div><span>Location</span><strong>{meta.location}</strong></div><div><span>Experience</span><strong>{profile.experience} years</strong></div><div><span>Overall rating</span><strong>{meta.rating} <b>★</b></strong></div><div><span>Completed services</span><strong>{meta.completedServices}</strong></div></div></section>;
+}
+
+export default ProfileOverview;

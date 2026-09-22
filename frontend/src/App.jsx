@@ -18,6 +18,7 @@ import ServicesPricing from './pages/butcher/ServicesPricing.jsx';
 import Availability from './pages/butcher/Availability.jsx';
 import Earnings from './pages/butcher/Earnings.jsx';
 import Reviews from './pages/butcher/Reviews.jsx';
+import Profile from './pages/butcher/Profile.jsx';
 import TermsAndConditions from './pages/Terms/TermsAndConditions.jsx';
 
 function App() {
@@ -43,6 +44,7 @@ function App() {
         <Route path="/dashboard/butcher/availability" element={<Availability />} />
         <Route path="/dashboard/butcher/earnings" element={<Earnings />} />
         <Route path="/dashboard/butcher/reviews" element={<Reviews />} />
+        <Route path="/dashboard/butcher/profile" element={<Profile />} />
         <Route path="/terms" element={<TermsAndConditions />} />
         <Route path="*" element={<LandingPage />} />
       </Routes>
