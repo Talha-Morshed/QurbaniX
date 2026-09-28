@@ -56,6 +56,9 @@ function CustomerDashboard() {
               <li>• Manage your delivery preferences</li>
               <li>• Explore available Qurbani packages</li>
             </ul>
+            <Link to="/dashboard/customer/find-butcher" className="premium-action mt-6 inline-flex w-full items-center justify-center border border-primary bg-white px-4 py-3 font-semibold text-primary hover:bg-warm-cream">
+              Find verified butchers
+            </Link>
             <Link to="/login/customer" className="premium-action mt-6 inline-flex rounded-2xl bg-primary px-4 py-3 font-semibold text-white hover:bg-primary-dark">
               Back to login
             </Link>

@@ -8,10 +8,23 @@ async function request(endpoint, options = {}) {
   };
 
   const response = await fetch(url, config);
-  const data = await response.json();
+  const responseText = await response.text();
+  let data = null;
+
+  if (responseText) {
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      data = null;
+    }
+  }
 
   if (!response.ok) {
-    throw { status: response.status, ...data };
+    throw {
+      status: response.status,
+      ...(data && typeof data === 'object' ? data : {}),
+      message: data?.message || `Request failed with status ${response.status}.`,
+    };
   }
 
   return data;
