@@ -12,7 +12,8 @@ import ButcherForgotPassword from './pages/login/ButcherForgotPassword.jsx';
 import CustomerResetPassword from './pages/login/CustomerResetPassword.jsx';
 import ButcherResetPassword from './pages/login/ButcherResetPassword.jsx';
 import CustomerDashboard from './pages/dashboard/CustomerDashboard.jsx';
-import FindButchers, { ButcherProfilePlaceholder } from './pages/customer/FindButchers.jsx';
+import FindButchers from './pages/customer/FindButchers.jsx';
+import ButcherDetails, { BookingPlaceholder } from './pages/customer/ButcherDetails.jsx';
 import ButcherDashboard from './pages/dashboard/ButcherDashboard.jsx';
 import Bookings from './pages/butcher/Bookings.jsx';
 import ServicesPricing from './pages/butcher/ServicesPricing.jsx';
@@ -40,7 +41,8 @@ function App() {
         <Route path="/reset-password/butcher" element={<ButcherResetPassword />} />
         <Route path="/dashboard/customer" element={<CustomerDashboard />} />
         <Route path="/dashboard/customer/find-butcher" element={<FindButchers />} />
-        <Route path="/dashboard/customer/find-butcher/:butcherId" element={<ButcherProfilePlaceholder />} />
+        <Route path="/dashboard/customer/find-butcher/:butcherId" element={<ButcherDetails />} />
+        <Route path="/dashboard/customer/book/:butcherId" element={<BookingPlaceholder />} />
         <Route path="/dashboard/butcher" element={<ButcherDashboard />} />
         <Route path="/dashboard/butcher/bookings" element={<Bookings />} />
         <Route path="/dashboard/butcher/services" element={<ServicesPricing />} />

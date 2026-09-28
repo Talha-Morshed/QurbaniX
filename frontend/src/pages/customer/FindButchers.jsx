@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import images from '../../assets/images';
 import {
   butcherAnimals,
@@ -11,7 +11,7 @@ import './FindButchers.css';
 
 const initialSort = 'recommended';
 
-function CustomerNavigation() {
+export function CustomerNavigation() {
   return (
     <header className="finder-nav">
       <div className="finder-nav-inner">
@@ -28,7 +28,7 @@ function CustomerNavigation() {
   );
 }
 
-function VerifiedMark({ verified }) {
+export function VerifiedMark({ verified }) {
   return (
     <span className={`finder-verification ${verified ? 'is-verified' : 'is-pending'}`}>
       {verified ? (
@@ -284,48 +284,6 @@ function FindButchers() {
             )}
           </section>
         </div>
-      </main>
-    </div>
-  );
-}
-
-export function ButcherProfilePlaceholder() {
-  const { butcherId } = useParams();
-  const butcher = butchers.find((item) => item.id === butcherId);
-
-  return (
-    <div className="find-butcher-page">
-      <CustomerNavigation />
-      <main className="profile-placeholder-main">
-        <Link className="profile-back-link" to="/dashboard/customer/find-butcher">← Back to butchers</Link>
-        <section className="profile-placeholder-panel">
-          {butcher ? (
-            <>
-              <div className="profile-placeholder-person">
-                {butcher.image ? <img src={butcher.image} alt={butcher.name} /> : <span>{butcher.initials}</span>}
-                <div>
-                  <p className="finder-eyebrow">Butcher profile</p>
-                  <h1>{butcher.name}</h1>
-                  <VerifiedMark verified={butcher.verified} />
-                  <p className="butcher-card-location">{butcher.area}</p>
-                </div>
-              </div>
-              <div className="profile-placeholder-stats">
-                <div><span>Rating</span><strong>★ {butcher.rating.toFixed(1)} <small>({butcher.reviews} reviews)</small></strong></div>
-                <div><span>Experience</span><strong>{butcher.experience} years</strong></div>
-                <div><span>Starting price</span><strong>৳{butcher.startingPrice.toLocaleString('en-BD')}</strong></div>
-              </div>
-              <p className="profile-placeholder-note">Full butcher profiles are coming in the next step.</p>
-            </>
-          ) : (
-            <>
-              <p className="finder-eyebrow">Butcher profile</p>
-              <h1>Profile not found</h1>
-              <p className="profile-placeholder-note">This butcher is not in the current directory.</p>
-            </>
-          )}
-          <Link className="finder-search-button profile-return-button" to="/dashboard/customer/find-butcher">Return to results</Link>
-        </section>
       </main>
     </div>
   );
