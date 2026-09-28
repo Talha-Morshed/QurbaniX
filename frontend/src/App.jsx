@@ -14,6 +14,7 @@ import ButcherResetPassword from './pages/login/ButcherResetPassword.jsx';
 import CustomerDashboard from './pages/dashboard/CustomerDashboard.jsx';
 import FindButchers from './pages/customer/FindButchers.jsx';
 import ButcherDetails, { BookingPlaceholder } from './pages/customer/ButcherDetails.jsx';
+import Booking, { PaymentPlaceholder } from './pages/customer/Booking.jsx';
 import ButcherDashboard from './pages/dashboard/ButcherDashboard.jsx';
 import Bookings from './pages/butcher/Bookings.jsx';
 import ServicesPricing from './pages/butcher/ServicesPricing.jsx';
@@ -42,7 +43,8 @@ function App() {
         <Route path="/dashboard/customer" element={<CustomerDashboard />} />
         <Route path="/dashboard/customer/find-butcher" element={<FindButchers />} />
         <Route path="/dashboard/customer/find-butcher/:butcherId" element={<ButcherDetails />} />
-        <Route path="/dashboard/customer/book/:butcherId" element={<BookingPlaceholder />} />
+        <Route path="/dashboard/customer/book/:butcherId" element={<Booking />} />
+        <Route path="/dashboard/customer/payment/:butcherId" element={<PaymentPlaceholder />} />
         <Route path="/dashboard/butcher" element={<ButcherDashboard />} />
         <Route path="/dashboard/butcher/bookings" element={<Bookings />} />
         <Route path="/dashboard/butcher/services" element={<ServicesPricing />} />
