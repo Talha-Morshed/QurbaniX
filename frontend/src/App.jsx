@@ -17,6 +17,7 @@ import ButcherDetails, { BookingPlaceholder } from './pages/customer/ButcherDeta
 import Booking, { PaymentPlaceholder } from './pages/customer/Booking.jsx';
 import { BookingConfirmation, BookingDetails, BookingHistory } from './pages/customer/CustomerBookings.jsx';
 import { CustomerReviewFormPage, MyReviewsPage } from './pages/customer/CustomerReviews.jsx';
+import CustomerProfile from './pages/customer/CustomerProfile.jsx';
 import ButcherDashboard from './pages/dashboard/ButcherDashboard.jsx';
 import Bookings from './pages/butcher/Bookings.jsx';
 import ServicesPricing from './pages/butcher/ServicesPricing.jsx';
@@ -52,6 +53,7 @@ function App() {
         <Route path="/customer/booking-confirmation/:id" element={<BookingConfirmation />} />
         <Route path="/customer/reviews" element={<MyReviewsPage />} />
         <Route path="/customer/reviews/:bookingId" element={<CustomerReviewFormPage />} />
+        <Route path="/customer/profile" element={<CustomerProfile />} />
         <Route path="/dashboard/butcher" element={<ButcherDashboard />} />
         <Route path="/dashboard/butcher/bookings" element={<Bookings />} />
         <Route path="/dashboard/butcher/services" element={<ServicesPricing />} />

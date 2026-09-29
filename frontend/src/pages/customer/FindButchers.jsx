@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import images from '../../assets/images';
 import {
   butcherAnimals,
@@ -12,6 +12,7 @@ import './FindButchers.css';
 const initialSort = 'recommended';
 
 export function CustomerNavigation() {
+  const { pathname } = useLocation();
   return (
     <header className="finder-nav">
       <div className="finder-nav-inner">
@@ -20,8 +21,11 @@ export function CustomerNavigation() {
           <span>Qurbani<span className="finder-brand-x">X</span></span>
         </Link>
         <nav className="finder-nav-links" aria-label="Customer navigation">
-          <Link to="/dashboard/customer/find-butcher" aria-current="page">Find Butchers</Link>
-          <Link to="/dashboard/customer">Customer home</Link>
+          <Link to="/dashboard/customer" aria-current={pathname === '/dashboard/customer' ? 'page' : undefined}>Dashboard</Link>
+          <Link to="/dashboard/customer/find-butcher" aria-current={pathname.startsWith('/dashboard/customer/find-butcher') ? 'page' : undefined}>Find Butchers</Link>
+          <Link to="/customer/bookings" aria-current={pathname.startsWith('/customer/bookings') ? 'page' : undefined}>Bookings</Link>
+          <Link to="/customer/reviews" aria-current={pathname === '/customer/reviews' ? 'page' : undefined}>Reviews</Link>
+          <Link to="/customer/profile" aria-current={pathname === '/customer/profile' ? 'page' : undefined}>Profile</Link>
         </nav>
       </div>
     </header>

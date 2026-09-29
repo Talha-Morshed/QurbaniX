@@ -16,7 +16,8 @@
 .finder-brand { display: inline-flex; align-items: center; gap: 10px; color: var(--finder-green); font-size: 15px; font-weight: 800; letter-spacing: .08em; text-decoration: none; }
 .finder-brand img { width: 34px; height: 34px; object-fit: contain; }
 .finder-brand-x { color: var(--finder-gold); }
-.finder-nav-links { display: flex; align-items: stretch; gap: 28px; align-self: stretch; }
+.finder-nav-links { display: flex; min-width: 0; align-items: stretch; gap: 20px; align-self: stretch; overflow-x: auto; scrollbar-width: none; }
+.finder-nav-links::-webkit-scrollbar { display: none; }
 .finder-nav-links a { display: flex; align-items: center; border-bottom: 3px solid transparent; color: #59675e; font-size: 13px; font-weight: 650; text-decoration: none; }
 .finder-nav-links a[aria-current="page"], .finder-nav-links a:hover { border-bottom-color: var(--finder-gold); color: var(--finder-green); }
 .finder-main { width: min(1280px, calc(100% - 48px)); margin: 0 auto; padding: 36px 0 64px; }
@@ -122,8 +123,8 @@
 
 @media (max-width: 760px) {
   .finder-nav-inner { min-height: 60px; padding: 0 17px; }
-  .finder-nav-links { gap: 16px; }
-  .finder-nav-links a { font-size: 11px; }
+  .finder-nav-links { flex: 1; justify-content: flex-end; gap: 13px; }
+  .finder-nav-links a { flex: 0 0 auto; font-size: 10px; }
   .finder-main { width: min(100% - 32px, 620px); padding-top: 27px; }
   .finder-layout { grid-template-columns: 1fr; }
   .finder-filters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: end; gap: 0 14px; }
@@ -136,8 +137,8 @@
   .finder-nav-inner { align-items: center; gap: 10px; padding: 0 13px; }
   .finder-brand { gap: 6px; font-size: 12px; }
   .finder-brand img { width: 28px; height: 28px; }
-  .finder-nav-links { gap: 11px; }
-  .finder-nav-links a { font-size: 10px; }
+  .finder-nav-links { gap: 12px; }
+  .finder-nav-links a { font-size: 9px; }
   .finder-main, .profile-placeholder-main { width: calc(100% - 26px); }
   .finder-main { padding-top: 23px; }
   .finder-intro h1 { font-size: 27px; }
