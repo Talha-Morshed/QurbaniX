@@ -59,6 +59,9 @@ function CustomerDashboard() {
             <Link to="/dashboard/customer/find-butcher" className="premium-action mt-6 inline-flex w-full items-center justify-center border border-primary bg-white px-4 py-3 font-semibold text-primary hover:bg-warm-cream">
               Find verified butchers
             </Link>
+            <Link to="/customer/bookings" className="premium-action mt-3 inline-flex w-full items-center justify-center border border-primary bg-white px-4 py-3 font-semibold text-primary hover:bg-warm-cream">
+              Booking history
+            </Link>
             <Link to="/login/customer" className="premium-action mt-6 inline-flex rounded-2xl bg-primary px-4 py-3 font-semibold text-white hover:bg-primary-dark">
               Back to login
             </Link>

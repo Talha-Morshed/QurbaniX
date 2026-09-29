@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { butchers } from '../../components/customer/butchersData';
 import { butcherProfileDetails, getButcherServices } from '../../components/customer/butcherProfileData';
+import { createCustomerBooking } from '../../components/customer/customerBookings';
 import { validatePhone } from '../../utils/validation';
 import { CustomerNavigation, VerifiedMark } from './FindButchers';
 import './ButcherDetails.css';
@@ -406,6 +407,7 @@ function BookingPage() {
 export function PaymentPlaceholder() {
   const { butcherId } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const booking = location.state?.booking;
   const butcher = butchers.find((item) => item.id === butcherId);
   const services = butcher ? getButcherServices(butcher) : [];
@@ -419,8 +421,8 @@ export function PaymentPlaceholder() {
         <BookingProgress step={4} />
         <section className="payment-placeholder-panel">
           <p className="booking-kicker">Step 5 · Payment</p>
-          <h1>Payment setup is coming next</h1>
-          <p>Your booking details are ready. Payment processing is not available in this preview.</p>
+          <h1>Pay your booking advance</h1>
+          <p>This is a mock payment preview. No real payment method or charge is involved.</p>
           {booking && butcher && selectedService ? (
             <div className="payment-preview-summary">
               <div><span>Butcher</span><strong>{butcher.name}</strong></div>
@@ -434,10 +436,23 @@ export function PaymentPlaceholder() {
           ) : (
             <p className="payment-preview-note">Open this step after reviewing a booking to see its summary here.</p>
           )}
-          <p className="payment-preview-note">No booking or payment has been submitted.</p>
+          <p className="payment-preview-note">The remaining balance is paid in cash after the service.</p>
           <div className="booking-step-actions">
             <Link className="booking-secondary-button" to={bookingPath} state={{ booking, step: 3 }}>Back to Review</Link>
-            <Link className="booking-primary-button" to={`/dashboard/customer/find-butcher/${butcherId}`}>Return to profile</Link>
+            {booking && butcher && selectedService ? (
+              <button
+                className="booking-primary-button"
+                type="button"
+                onClick={() => {
+                  const savedBooking = createCustomerBooking({ booking, butcher, service: selectedService });
+                  navigate(`/customer/booking-confirmation/${encodeURIComponent(savedBooking.id)}`);
+                }}
+              >
+                Mock pay advance ৳{Math.ceil(selectedService.price * 0.2).toLocaleString('en-BD')}
+              </button>
+            ) : (
+              <Link className="booking-primary-button" to={`/dashboard/customer/find-butcher/${butcherId}`}>Return to profile</Link>
+            )}
           </div>
         </section>
       </main>
