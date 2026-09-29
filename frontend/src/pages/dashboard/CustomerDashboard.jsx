@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getCustomerAccount, getCustomerNotifications } from '../../components/customer/customerAccount';
 import { getCustomerBookings, getCustomerReviews } from '../../components/customer/customerBookings';
@@ -7,6 +8,14 @@ import { CustomerNavigation, VerifiedMark } from '../customer/FindButchers';
 import './CustomerDashboard.css';
 
 const money = (amount) => `৳${Number(amount || 0).toLocaleString('en-BD')}`;
+
+const plannerAnimals = {
+  Goat: { sharesPerAnimal: 1, basePrice: 3200, descriptor: 'best for small and medium family plans' },
+  Sheep: { sharesPerAnimal: 1, basePrice: 3000, descriptor: 'balanced budget option for shared or family use' },
+  Cow: { sharesPerAnimal: 7, basePrice: 52000, descriptor: 'fits larger family or shared sacrifice plans' },
+  'Shared Cow': { sharesPerAnimal: 1, basePrice: 7500, descriptor: 'ideal for cost-sharing with family or friends' },
+  Camel: { sharesPerAnimal: 7, basePrice: 70000, descriptor: 'premium choice for large gatherings and celebrations' },
+};
 
 function formatDate(date) {
   if (!date) return 'Date not set';
@@ -42,6 +51,37 @@ function CustomerDashboard() {
   const bookings = getCustomerBookings();
   const reviews = getCustomerReviews();
   const notifications = [...getCustomerNotifications()].sort((first, second) => second.date.localeCompare(first.date));
+  const [plannerHouseholdSize, setPlannerHouseholdSize] = useState(4);
+  const [plannerAnimal, setPlannerAnimal] = useState('Goat');
+  const [plannerBudget, setPlannerBudget] = useState(15000);
+  const [plannerLocation, setPlannerLocation] = useState('Dhanmondi, Dhaka');
+
+  const plannerInsight = useMemo(() => {
+    const householdSize = Math.max(1, Number(plannerHouseholdSize) || 1);
+    const animalProfile = plannerAnimals[plannerAnimal] || plannerAnimals.Goat;
+    const sharesNeeded = Math.max(1, Math.ceil(householdSize / 2));
+    const unitsNeeded = Math.max(1, Math.ceil(sharesNeeded / animalProfile.sharesPerAnimal));
+    const estimatedMinimum = unitsNeeded * animalProfile.basePrice;
+    const estimatedMaximum = estimatedMinimum + (animalProfile.basePrice * 0.22);
+    const budgetValue = Number(plannerBudget) || 0;
+    const budgetGap = estimatedMaximum - budgetValue;
+    const matchedButchers = butchers.filter((butcher) => {
+      const matchesAnimal = butcher.animals.includes(plannerAnimal) || (plannerAnimal === 'Shared Cow' && butcher.animals.includes('Shared Cow'));
+      return butcher.verified && matchesAnimal && (!plannerLocation || butcher.area === plannerLocation);
+    }).slice(0, 2);
+
+    return {
+      householdSize,
+      sharesNeeded,
+      unitsNeeded,
+      estimatedMinimum,
+      estimatedMaximum,
+      budgetGap,
+      matchedButchers,
+      budgetStatus: budgetValue >= estimatedMaximum ? 'within-budget' : 'needs-more',
+    };
+  }, [plannerAnimal, plannerBudget, plannerHouseholdSize, plannerLocation]);
+
   const today = new Date().toISOString().slice(0, 10);
   const eligibleUpcomingBookings = bookings
     .filter((booking) => ['Pending', 'Confirmed', 'In Progress'].includes(booking.status) && booking.date >= today)
@@ -84,6 +124,82 @@ function CustomerDashboard() {
               ) : (
                 <div className="customer-dashboard-empty"><p>No upcoming bookings</p><Link className="booking-primary-button" to="/dashboard/customer/find-butcher">Find a Verified Butcher</Link></div>
               )}
+            </section>
+
+            <section className="customer-dashboard-panel customer-planner-panel">
+              <DashboardSectionHeading eyebrow="Planning tool" title="Smart Qurbani Planner" />
+              <div className="customer-planner-layout">
+                <div className="customer-planner-form">
+                  <label className="customer-planner-field">
+                    <span>Household size</span>
+                    <input type="number" min="1" max="25" value={plannerHouseholdSize} onChange={(event) => setPlannerHouseholdSize(event.target.value)} />
+                  </label>
+                  <label className="customer-planner-field">
+                    <span>Animal type</span>
+                    <select value={plannerAnimal} onChange={(event) => setPlannerAnimal(event.target.value)}>
+                      {Object.keys(plannerAnimals).map((animal) => (
+                        <option key={animal} value={animal}>{animal}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="customer-planner-field">
+                    <span>Budget target</span>
+                    <input type="number" min="2000" step="500" value={plannerBudget} onChange={(event) => setPlannerBudget(event.target.value)} />
+                  </label>
+                  <label className="customer-planner-field">
+                    <span>Preferred area</span>
+                    <select value={plannerLocation} onChange={(event) => setPlannerLocation(event.target.value)}>
+                      <option value="Dhanmondi, Dhaka">Dhanmondi, Dhaka</option>
+                      <option value="Gulshan, Dhaka">Gulshan, Dhaka</option>
+                      <option value="Mirpur, Dhaka">Mirpur, Dhaka</option>
+                      <option value="Uttara, Dhaka">Uttara, Dhaka</option>
+                      <option value="Mohammadpur, Dhaka">Mohammadpur, Dhaka</option>
+                      <option value="Banani, Dhaka">Banani, Dhaka</option>
+                      <option value="Chattogram">Chattogram</option>
+                    </select>
+                  </label>
+                </div>
+
+                <div className="customer-planner-summary">
+                  <span className="planner-tag">Recommended</span>
+                  <h3>{plannerAnimal === 'Shared Cow' ? '1 shared cow bundle' : `${plannerInsight.unitsNeeded} ${plannerAnimal.toLowerCase()} ${plannerAnimal === 'Goat' || plannerAnimal === 'Sheep' ? 'animals' : 'unit(s)'}`}</h3>
+                  <p>
+                    For {plannerInsight.householdSize} family members, a {plannerAnimal.toLowerCase()} setup is estimated to cover about {plannerInsight.sharesNeeded} share(s).
+                  </p>
+                  <div className="planner-total-row">
+                    <span>Estimated spend</span>
+                    <strong>{money(plannerInsight.estimatedMaximum)}</strong>
+                  </div>
+                  <div className={`planner-budget-note ${plannerInsight.budgetStatus}`}>
+                    {plannerInsight.budgetStatus === 'within-budget'
+                      ? `You are within budget by ${money(Math.max(plannerInsight.budgetGap * -1, 0))}.`
+                      : `You need about ${money(Math.max(plannerInsight.budgetGap, 0))} more to stay comfortable.`}
+                  </div>
+                </div>
+              </div>
+
+              <div className="customer-planner-matches">
+                <div className="planner-matches-header">
+                  <strong>Best local matches</strong>
+                  <span>{plannerLocation}</span>
+                </div>
+                {plannerInsight.matchedButchers.length ? (
+                  plannerInsight.matchedButchers.map((butcher) => (
+                    <div key={butcher.id} className="planner-match-item">
+                      <div>
+                        <strong>{butcher.name}</strong>
+                        <small>{butcher.area}</small>
+                      </div>
+                      <div>
+                        <span>★ {butcher.rating.toFixed(1)}</span>
+                        <strong>{money(butcher.startingPrice)}</strong>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="planner-empty-state">No matched butchers available for this combination yet.</div>
+                )}
+              </div>
             </section>
 
             <section className="customer-dashboard-panel">
