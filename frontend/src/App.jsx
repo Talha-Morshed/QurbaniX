@@ -15,7 +15,8 @@ import CustomerDashboard from './pages/dashboard/CustomerDashboard.jsx';
 import FindButchers from './pages/customer/FindButchers.jsx';
 import ButcherDetails, { BookingPlaceholder } from './pages/customer/ButcherDetails.jsx';
 import Booking, { PaymentPlaceholder } from './pages/customer/Booking.jsx';
-import { BookingConfirmation, BookingDetails, BookingHistory, ReviewPlaceholder } from './pages/customer/CustomerBookings.jsx';
+import { BookingConfirmation, BookingDetails, BookingHistory } from './pages/customer/CustomerBookings.jsx';
+import { CustomerReviewFormPage, MyReviewsPage } from './pages/customer/CustomerReviews.jsx';
 import ButcherDashboard from './pages/dashboard/ButcherDashboard.jsx';
 import Bookings from './pages/butcher/Bookings.jsx';
 import ServicesPricing from './pages/butcher/ServicesPricing.jsx';
@@ -49,7 +50,8 @@ function App() {
         <Route path="/customer/bookings" element={<BookingHistory />} />
         <Route path="/customer/bookings/:id" element={<BookingDetails />} />
         <Route path="/customer/booking-confirmation/:id" element={<BookingConfirmation />} />
-        <Route path="/customer/reviews/:id" element={<ReviewPlaceholder />} />
+        <Route path="/customer/reviews" element={<MyReviewsPage />} />
+        <Route path="/customer/reviews/:bookingId" element={<CustomerReviewFormPage />} />
         <Route path="/dashboard/butcher" element={<ButcherDashboard />} />
         <Route path="/dashboard/butcher/bookings" element={<Bookings />} />
         <Route path="/dashboard/butcher/services" element={<ServicesPricing />} />

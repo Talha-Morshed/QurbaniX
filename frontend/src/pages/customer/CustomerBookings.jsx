@@ -110,7 +110,7 @@ function BookingDetails() {
         </header>
         <BookingProgress booking={booking} />
         {booking.status === 'Completed' ? (
-          <section className="customer-booking-outcome is-completed"><strong>Service completed {formatDate(booking.completedDate)}</strong><span>Total {money(booking.total)} · Advance {money(booking.advancePaid)} · Remaining cash {money(booking.total - booking.advancePaid)} · Payment completed</span><Link className="booking-secondary-button" to={`/customer/reviews/${encodeURIComponent(booking.id)}`}>Leave a Review</Link></section>
+          <section className="customer-booking-outcome is-completed"><strong>Service completed {formatDate(booking.completedDate)}</strong><span>Total {money(booking.total)} · Advance {money(booking.advancePaid)} · Remaining cash {money(booking.total - booking.advancePaid)} · Payment completed</span><Link className="booking-secondary-button" to={`/customer/reviews/${encodeURIComponent(booking.id)}`}>{booking.review ? 'Review Submitted' : 'Leave a Review'}</Link></section>
         ) : null}
         <div className="customer-booking-detail-grid">
           <DetailSection title="Booking Information">

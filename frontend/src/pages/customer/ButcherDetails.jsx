@@ -1,6 +1,7 @@
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { butchers } from '../../components/customer/butchersData';
 import { butcherProfileDetails, getButcherServices } from '../../components/customer/butcherProfileData';
+import { getCustomerReviewsForButcher } from '../../components/customer/customerBookings';
 import { CustomerNavigation, VerifiedMark } from './FindButchers';
 import './ButcherDetails.css';
 
@@ -42,7 +43,33 @@ function ButcherDetails() {
   }
 
   const services = getButcherServices(butcher);
-  const reviewCount = butcher.reviews.toLocaleString('en-BD');
+  const customerReviews = getCustomerReviewsForButcher(butcherId);
+  const totalReviewCount = butcher.reviews + customerReviews.length;
+  const overallRating = (
+    butcher.rating * butcher.reviews
+    + customerReviews.reduce((total, review) => total + review.rating, 0)
+  ) / totalReviewCount;
+  const reviewCount = totalReviewCount.toLocaleString('en-BD');
+  const currentRatingDistribution = ratingDistribution.map((row) => {
+    const mockCount = Math.round(butcher.reviews * row.percent / 100);
+    const submittedCount = customerReviews.filter((review) => review.rating === row.stars).length;
+    return { ...row, percent: Math.round((mockCount + submittedCount) / totalReviewCount * 100) };
+  });
+  const profileReviews = [
+    ...profile.reviews,
+    ...customerReviews.map((review) => ({
+      id: review.id,
+      customer: review.customerName,
+      rating: review.rating,
+      date: review.date,
+      service: review.service,
+      text: review.comment,
+      serviceRating: review.serviceRating,
+      professionalismRating: review.professionalismRating,
+      punctualityRating: review.punctualityRating,
+      cleanlinessRating: review.cleanlinessRating,
+    })),
+  ];
   const canBook = butcher.verified && butcher.availability !== 'Unavailable';
   const bookingBlockMessage = butcher.verified ? 'Currently unavailable' : 'Available after verification';
   const bookingPath = (serviceId) => `/dashboard/customer/book/${butcher.id}?service=${encodeURIComponent(serviceId)}`;
@@ -66,8 +93,8 @@ function ButcherDetails() {
             <p className="details-profile-location">{butcher.area}</p>
           </div>
           <div className="details-profile-rating">
-            <strong>{butcher.rating.toFixed(1)}</strong>
-            <StarRating rating={butcher.rating} />
+            <strong>{overallRating.toFixed(1)}</strong>
+            <StarRating rating={overallRating} />
             <span>{reviewCount} reviews</span>
           </div>
           <div className="details-profile-stats">
@@ -134,12 +161,12 @@ function ButcherDetails() {
               </div>
               <div className="details-rating-summary">
                 <div className="details-rating-score">
-                  <strong>{butcher.rating.toFixed(1)}</strong>
-                  <StarRating rating={butcher.rating} />
+                    <strong>{overallRating.toFixed(1)}</strong>
+                    <StarRating rating={overallRating} />
                   <span>Based on customer reviews</span>
                 </div>
                 <div className="details-rating-bars" aria-label="Rating distribution">
-                  {ratingDistribution.map((row) => (
+                  {currentRatingDistribution.map((row) => (
                     <div className="details-rating-row" key={row.stars}>
                       <span>{row.stars} stars</span>
                       <span className="details-rating-track"><span style={{ width: `${row.percent}%` }} /></span>
@@ -149,7 +176,7 @@ function ButcherDetails() {
                 </div>
               </div>
               <div className="details-review-list">
-                {profile.reviews.map((review) => (
+                {profileReviews.map((review) => (
                   <article className="details-review" key={review.id}>
                     <div className="details-review-topline">
                       <div>
@@ -160,6 +187,7 @@ function ButcherDetails() {
                     </div>
                     <p className="details-review-service">{review.service}</p>
                     <p className="details-review-text">“{review.text}”</p>
+                    {review.serviceRating ? <p className="details-review-categories">Service {review.serviceRating}/5 · Professionalism {review.professionalismRating}/5 · Punctuality {review.punctualityRating}/5 · Cleanliness {review.cleanlinessRating}/5</p> : null}
                   </article>
                 ))}
               </div>

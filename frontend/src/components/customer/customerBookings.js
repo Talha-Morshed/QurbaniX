@@ -119,3 +119,44 @@ export function createCustomerBooking({ booking, butcher, service }) {
   writeBookings([customerBooking, ...bookings]);
   return customerBooking;
 }
+
+export function getCustomerReviews() {
+  return getCustomerBookings()
+    .filter((booking) => booking.review)
+    .map((booking) => ({ ...booking.review, booking }));
+}
+
+export function getCustomerReviewsForButcher(butcherId) {
+  return getCustomerReviews().filter((review) => review.butcherId === butcherId);
+}
+
+export function saveCustomerReview(bookingId, review) {
+  const bookings = getCustomerBookings();
+  const bookingIndex = bookings.findIndex((booking) => booking.id === bookingId);
+  const booking = bookings[bookingIndex];
+  if (!booking || booking.status !== 'Completed') return null;
+
+  const overallRating = Number(review.rating);
+  const savedReview = {
+    id: booking.review?.id || `review-${booking.id}`,
+    bookingId: booking.id,
+    reference: booking.reference,
+    butcherId: booking.butcherId,
+    butcherName: booking.butcherName,
+    customerName: booking.customerName || 'Customer',
+    rating: overallRating,
+    serviceRating: Number(review.serviceRating) || overallRating,
+    professionalismRating: Number(review.professionalismRating) || overallRating,
+    punctualityRating: Number(review.punctualityRating) || overallRating,
+    cleanlinessRating: Number(review.cleanlinessRating) || overallRating,
+    service: booking.serviceName,
+    comment: review.comment.trim(),
+    recommended: review.recommended || '',
+    date: booking.review?.date || new Date().toLocaleDateString('en-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
+    status: booking.review?.status || 'Published',
+  };
+
+  bookings[bookingIndex] = { ...booking, review: savedReview };
+  writeBookings(bookings);
+  return savedReview;
+}
