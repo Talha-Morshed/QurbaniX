@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import images from '../../assets/images';
+import { getCustomerNotifications } from '../../components/customer/customerAccount';
 import {
   butcherAnimals,
   butcherLocations,
@@ -13,6 +14,14 @@ const initialSort = 'recommended';
 
 export function CustomerNavigation() {
   const { pathname } = useLocation();
+  const [unreadCount, setUnreadCount] = useState(() => getCustomerNotifications().filter((item) => !item.read).length);
+
+  useEffect(() => {
+    const refreshUnreadCount = () => setUnreadCount(getCustomerNotifications().filter((item) => !item.read).length);
+    window.addEventListener('customer-notifications-change', refreshUnreadCount);
+    return () => window.removeEventListener('customer-notifications-change', refreshUnreadCount);
+  }, []);
+
   return (
     <header className="finder-nav">
       <div className="finder-nav-inner">
@@ -20,13 +29,19 @@ export function CustomerNavigation() {
           <img src={images.logo} alt="" />
           <span>Qurbani<span className="finder-brand-x">X</span></span>
         </Link>
-        <nav className="finder-nav-links" aria-label="Customer navigation">
-          <Link to="/dashboard/customer" aria-current={pathname === '/dashboard/customer' ? 'page' : undefined}>Dashboard</Link>
-          <Link to="/dashboard/customer/find-butcher" aria-current={pathname.startsWith('/dashboard/customer/find-butcher') ? 'page' : undefined}>Find Butchers</Link>
-          <Link to="/customer/bookings" aria-current={pathname.startsWith('/customer/bookings') ? 'page' : undefined}>Bookings</Link>
-          <Link to="/customer/reviews" aria-current={pathname === '/customer/reviews' ? 'page' : undefined}>Reviews</Link>
-          <Link to="/customer/profile" aria-current={pathname === '/customer/profile' ? 'page' : undefined}>Profile</Link>
-        </nav>
+        <div className="finder-nav-actions">
+          <nav className="finder-nav-links" aria-label="Customer navigation">
+            <Link to="/dashboard/customer" aria-current={pathname === '/dashboard/customer' ? 'page' : undefined}>Dashboard</Link>
+            <Link to="/dashboard/customer/find-butcher" aria-current={pathname.startsWith('/dashboard/customer/find-butcher') ? 'page' : undefined}>Find Butchers</Link>
+            <Link to="/customer/bookings" aria-current={pathname.startsWith('/customer/bookings') ? 'page' : undefined}>Bookings</Link>
+            <Link to="/customer/reviews" aria-current={pathname === '/customer/reviews' ? 'page' : undefined}>Reviews</Link>
+            <Link to="/customer/profile" aria-current={pathname === '/customer/profile' ? 'page' : undefined}>Profile</Link>
+          </nav>
+          <Link className="finder-notification-link" to="/customer/notifications" aria-label={`Notifications${unreadCount ? `, ${unreadCount} unread` : ''}`} aria-current={pathname === '/customer/notifications' ? 'page' : undefined}>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" /></svg>
+            {unreadCount ? <span className="finder-notification-count">{unreadCount > 9 ? '9+' : unreadCount}</span> : null}
+          </Link>
+        </div>
       </div>
     </header>
   );
