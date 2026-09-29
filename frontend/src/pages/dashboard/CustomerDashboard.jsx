@@ -1,151 +1,166 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import images from '../../assets/images';
+import { getCustomerAccount, getCustomerNotifications } from '../../components/customer/customerAccount';
+import { getCustomerBookings, getCustomerReviews } from '../../components/customer/customerBookings';
+import { butchers } from '../../components/customer/butchersData';
+import { getButcherServices } from '../../components/customer/butcherProfileData';
+import { CustomerNavigation, VerifiedMark } from '../customer/FindButchers';
+import './CustomerDashboard.css';
 
-const packageOptions = [
-  {
-    id: 1,
-    name: 'Family Essentials',
-    price: '৳18,500',
-    badge: 'Most booked',
-    description: 'A balanced package for small households with verified butchers and doorstep delivery.',
-    features: ['1 full animal share', 'Fresh cut and packaging', 'Flexible delivery window'],
-  },
-  {
-    id: 2,
-    name: 'Premium Choice',
-    price: '৳24,000',
-    badge: 'Best value',
-    description: 'A premium selection with priority scheduling and more flexible service coverage.',
-    features: ['Priority booking support', 'Premium meat selection', 'Dedicated customer assistance'],
-  },
-  {
-    id: 3,
-    name: 'Community Share',
-    price: '৳12,900',
-    badge: 'Budget friendly',
-    description: 'A shared option for community groups that want a simple, affordable experience.',
-    features: ['Shared allocation', 'Simple booking flow', 'Verified butcher matching'],
-  },
-];
+const money = (amount) => `৳${Number(amount || 0).toLocaleString('en-BD')}`;
+
+function formatDate(date) {
+  if (!date) return 'Date not set';
+  return new Date(`${date}T12:00:00`).toLocaleDateString('en-BD', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function formatTime(time) {
+  if (!time) return 'Time not set';
+  const [hour, minute] = time.split(':').map(Number);
+  return new Date(2000, 0, 1, hour, minute).toLocaleTimeString('en-BD', { hour: 'numeric', minute: '2-digit' });
+}
+
+function statusClass(status) {
+  return `customer-dashboard-status status-${status.toLowerCase().replaceAll(' ', '-')}`;
+}
+
+function DashboardSectionHeading({ eyebrow, title, to, action }) {
+  return (
+    <div className="customer-dashboard-section-heading">
+      <div><p className="finder-eyebrow">{eyebrow}</p><h2>{title}</h2></div>
+      {to ? <Link to={to}>{action} <span aria-hidden="true">→</span></Link> : null}
+    </div>
+  );
+}
+
+function NotificationTypeIcon({ type }) {
+  const symbols = { booking: 'B', payment: '$', service: 'S', review: '★', account: 'A' };
+  return <span className={`customer-dashboard-notification-icon type-${type}`} aria-hidden="true">{symbols[type] || '•'}</span>;
+}
 
 function CustomerDashboard() {
-  const [selectedPackageId, setSelectedPackageId] = useState(packageOptions[0].id);
-  const selectedPackage = packageOptions.find((item) => item.id === selectedPackageId) ?? packageOptions[0];
+  const account = getCustomerAccount();
+  const bookings = getCustomerBookings();
+  const reviews = getCustomerReviews();
+  const notifications = [...getCustomerNotifications()].sort((first, second) => second.date.localeCompare(first.date));
+  const today = new Date().toISOString().slice(0, 10);
+  const eligibleUpcomingBookings = bookings
+    .filter((booking) => ['Pending', 'Confirmed', 'In Progress'].includes(booking.status) && booking.date >= today)
+    .sort((first, second) => first.date.localeCompare(second.date));
+  const upcomingBooking = eligibleUpcomingBookings[0];
+  const recentBookings = [...bookings].sort((first, second) => second.createdDate.localeCompare(first.createdDate)).slice(0, 4);
+  const nextReviewBooking = bookings.find((booking) => booking.status === 'Completed' && !booking.review);
+  const writeReviewPath = nextReviewBooking ? `/customer/reviews/${encodeURIComponent(nextReviewBooking.id)}` : '/customer/reviews';
+  const latestReview = [...reviews].sort((first, second) => second.date.localeCompare(first.date))[0];
+  const verifiedButchers = butchers.filter((butcher) => butcher.verified).slice(0, 3);
+  const pendingBookings = bookings.filter((booking) => booking.status === 'Pending').length;
+  const completedBookings = bookings.filter((booking) => booking.status === 'Completed').length;
 
   return (
-    <div className="min-h-screen bg-warm-cream px-4 py-10 sm:px-8 lg:px-10">
-      <div className="mx-auto flex max-w-6xl flex-col rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_24px_80px_rgba(15,23,42,0.08)] sm:p-12 lg:p-14">
-        <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
-          <div className="max-w-2xl">
-            <div className="mb-4 flex items-center gap-3">
-              <img src={images.logo} alt="QurbaniX" className="h-10 w-10 object-contain rounded-lg" />
-              <span className="text-sm font-bold tracking-[0.2em] text-primary">QurbaniX</span>
-            </div>
-            <p className="text-sm uppercase tracking-[0.3em] text-primary">Customer Dashboard</p>
-            <h1 className="mt-4 text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">Welcome back to your Qurbani planning hub.</h1>
-            <p className="mt-5 text-lg text-slate-600">
-              Review your upcoming plans, compare available packages, and move closer to a trusted booking experience.
-            </p>
+    <div className="find-butcher-page customer-dashboard-page">
+      <CustomerNavigation />
+      <main className="customer-dashboard-main">
+        <header className="customer-dashboard-welcome">
+          <div><p className="finder-eyebrow">Customer dashboard</p><h1>Welcome back, {account.profile.name}</h1><p>Manage your Qurbani services, bookings, and payments from one place.</p></div>
+          <Link className="booking-primary-button" to="/dashboard/customer/find-butcher">Find a Verified Butcher <span aria-hidden="true">→</span></Link>
+        </header>
+
+        <section className="customer-dashboard-stats" aria-label="Booking summary">
+          <Link to="/customer/bookings"><strong>{bookings.length}</strong><span>Total bookings</span><small>All your service requests</small></Link>
+          <Link to="/customer/bookings"><strong>{pendingBookings}</strong><span>Pending bookings</span><small>Awaiting butcher confirmation</small></Link>
+          <Link to="/customer/bookings"><strong>{completedBookings}</strong><span>Completed bookings</span><small>Finished services</small></Link>
+          <Link to="/customer/reviews"><strong>{reviews.length}</strong><span>Reviews written</span><small>Your shared experiences</small></Link>
+        </section>
+
+        <div className="customer-dashboard-content">
+          <div className="customer-dashboard-primary">
+            <section className="customer-dashboard-panel customer-upcoming-panel">
+              <DashboardSectionHeading eyebrow="Next on your calendar" title="Upcoming Booking" />
+              {upcomingBooking ? (
+                <div className="customer-upcoming-details">
+                  <div className="customer-upcoming-title"><div><h3>{upcomingBooking.butcherName}</h3><VerifiedMark verified={upcomingBooking.butcherVerified} /></div><span className={statusClass(upcomingBooking.status)}>{upcomingBooking.status}</span></div>
+                  <dl><div><dt>Service</dt><dd>{upcomingBooking.serviceName} · {upcomingBooking.animal}</dd></div><div><dt>Date &amp; time</dt><dd>{formatDate(upcomingBooking.date)} · {formatTime(upcomingBooking.time)}</dd></div><div><dt>Location</dt><dd>{upcomingBooking.area}, {upcomingBooking.city}</dd></div><div><dt>Remaining</dt><dd>{money(upcomingBooking.remaining)}</dd></div></dl>
+                  <Link className="booking-secondary-button" to={`/customer/bookings/${encodeURIComponent(upcomingBooking.id)}`}>View Booking</Link>
+                </div>
+              ) : (
+                <div className="customer-dashboard-empty"><p>No upcoming bookings</p><Link className="booking-primary-button" to="/dashboard/customer/find-butcher">Find a Verified Butcher</Link></div>
+              )}
+            </section>
+
+            <section className="customer-dashboard-panel">
+              <DashboardSectionHeading eyebrow="Your activity" title="Recent Bookings" to="/customer/bookings" action="View All Bookings" />
+              {recentBookings.length ? (
+                <div className="customer-recent-bookings">
+                  {recentBookings.map((booking) => (
+                    <article className="customer-recent-booking" key={booking.id}>
+                      <div className="customer-recent-booking-copy"><strong>{booking.reference}</strong><span>{booking.butcherName} · {booking.serviceName}</span><small>{formatDate(booking.date)}</small></div>
+                      <div className="customer-recent-booking-meta"><strong>{money(booking.total)}</strong><span className={statusClass(booking.status)}>{booking.status}</span><Link to={`/customer/bookings/${encodeURIComponent(booking.id)}`}>View <span aria-hidden="true">→</span></Link></div>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <div className="customer-dashboard-empty"><p>No bookings yet.</p><Link to="/dashboard/customer/find-butcher">Find a Verified Butcher</Link></div>
+              )}
+            </section>
           </div>
 
-          <div className="rounded-[1.5rem] border border-warm-cream bg-warm-cream p-6 text-sm text-primary lg:min-w-[280px]">
-            <p className="font-semibold">What is next?</p>
-            <ul className="mt-4 space-y-3 text-primary">
-              <li>• Review your recent purchases</li>
-              <li>• Manage your delivery preferences</li>
-              <li>• Explore available Qurbani packages</li>
-            </ul>
-            <Link to="/dashboard/customer/find-butcher" className="premium-action mt-6 inline-flex w-full items-center justify-center border border-primary bg-white px-4 py-3 font-semibold text-primary hover:bg-warm-cream">
-              Find verified butchers
-            </Link>
-            <Link to="/customer/bookings" className="premium-action mt-3 inline-flex w-full items-center justify-center border border-primary bg-white px-4 py-3 font-semibold text-primary hover:bg-warm-cream">
-              Booking history
-            </Link>
-            <Link to="/customer/reviews" className="premium-action mt-3 inline-flex w-full items-center justify-center border border-primary bg-white px-4 py-3 font-semibold text-primary hover:bg-warm-cream">
-              My Reviews
-            </Link>
-            <Link to="/customer/profile" className="premium-action mt-3 inline-flex w-full items-center justify-center border border-primary bg-white px-4 py-3 font-semibold text-primary hover:bg-warm-cream">
-              Profile &amp; Settings
-            </Link>
-            <Link to="/customer/notifications" className="premium-action mt-3 inline-flex w-full items-center justify-center border border-primary bg-white px-4 py-3 font-semibold text-primary hover:bg-warm-cream">
-              Notifications
-            </Link>
-            <Link to="/login/customer" className="premium-action mt-6 inline-flex rounded-2xl bg-primary px-4 py-3 font-semibold text-white hover:bg-primary-dark">
-              Back to login
-            </Link>
-          </div>
-        </div>
+          <aside className="customer-dashboard-secondary">
+            <section className="customer-dashboard-panel">
+              <DashboardSectionHeading eyebrow="Latest updates" title="Notifications" to="/customer/notifications" action="View All Notifications" />
+              {notifications.length ? (
+                <div className="customer-dashboard-notifications">
+                  {notifications.slice(0, 4).map((notification) => (
+                    <Link className={`customer-dashboard-notification ${notification.read ? '' : 'is-unread'}`} key={notification.id} to="/customer/notifications">
+                      <NotificationTypeIcon type={notification.type} />
+                      <span><strong>{notification.title}</strong><small>{notification.message}</small><time>{new Date(notification.date).toLocaleString('en-BD', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' })}</time></span>
+                      {!notification.read ? <i aria-label="Unread" /> : null}
+                    </Link>
+                  ))}
+                </div>
+              ) : <div className="customer-dashboard-empty"><p>You&apos;re all caught up.</p></div>}
+            </section>
 
-        <div className="mt-10 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-          <section className="rounded-[2rem] border border-slate-200 bg-slate-50 p-6 sm:p-8">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm uppercase tracking-[0.25em] text-primary">Recommended packages</p>
-                <h2 className="mt-2 text-2xl font-semibold text-slate-900">Pick a plan that fits your family</h2>
-              </div>
-              <span className="inline-flex w-fit rounded-full border border-warm-cream bg-white px-3 py-2 text-sm font-medium text-primary">
-                Updated today
-              </span>
-            </div>
+            <section className="customer-dashboard-panel">
+              <DashboardSectionHeading eyebrow="Customer feedback" title="Your Reviews" to="/customer/reviews" action="View All Reviews" />
+              {latestReview ? (
+                <article className="customer-dashboard-review">
+                  <div><strong>{latestReview.butcherName}</strong><span>{'★'.repeat(latestReview.rating)} · {latestReview.rating}.0 / 5</span></div>
+                  <p>{latestReview.comment}</p>
+                  <small>{latestReview.service} · {latestReview.date}</small>
+                </article>
+              ) : (
+                <div className="customer-dashboard-empty"><p>You haven&apos;t written any reviews yet.</p>{nextReviewBooking ? <Link to={writeReviewPath}>Review a completed booking</Link> : <Link to="/customer/bookings">View completed bookings</Link>}</div>
+              )}
+            </section>
 
-            <div className="mt-6 grid gap-4 md:grid-cols-2">
-              {packageOptions.map((item) => {
-                const isActive = item.id === selectedPackageId;
-
-                return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => setSelectedPackageId(item.id)}
-                    className={`premium-action rounded-[1.5rem] border p-5 text-left ${
-                              isActive
-                                ? 'border-primary bg-warm-cream shadow-primary'
-                                : 'border-slate-200 bg-white hover:border-primary hover:shadow-sm'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="text-sm font-semibold text-slate-900">{item.name}</p>
-                        <p className="mt-2 text-sm text-slate-600">{item.description}</p>
-                      </div>
-                      <span className="rounded-full accent-badge px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em]">
-                        {item.badge}
-                      </span>
-                    </div>
-                    <p className="mt-5 text-2xl font-semibold text-slate-900">{item.price}</p>
-                  </button>
-                );
-              })}
-            </div>
-          </section>
-
-          <aside className="rounded-[2rem] border border-warm-cream bg-warm-cream p-6 sm:p-8">
-            <p className="text-sm uppercase tracking-[0.25em] text-primary">Selected package</p>
-            <h3 className="mt-3 text-2xl font-semibold text-slate-900">{selectedPackage.name}</h3>
-            <p className="mt-3 text-sm leading-7 text-slate-700">{selectedPackage.description}</p>
-
-            <div className="mt-6 rounded-[1.5rem] border border-warm-cream bg-white p-5">
-              <p className="text-sm font-semibold text-slate-900">What is included</p>
-              <ul className="mt-4 space-y-3 text-sm text-slate-700">
-                {selectedPackage.features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-2">
-                    <span className="mt-1 text-primary">•</span>
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <button
-              type="button"
-              className="premium-action mt-6 inline-flex w-full items-center justify-center rounded-3xl bg-primary px-6 py-3 text-sm font-semibold text-white hover:bg-primary-dark"
-            >
-              Book this package
-            </button>
+            <section className="customer-dashboard-panel customer-quick-actions-panel">
+              <DashboardSectionHeading eyebrow="Shortcuts" title="Quick Actions" />
+              <nav className="customer-dashboard-quick-actions" aria-label="Customer quick actions">
+                <Link to="/dashboard/customer/find-butcher"><span aria-hidden="true">⌕</span>Find a Butcher</Link>
+                <Link to="/customer/bookings"><span aria-hidden="true">▤</span>View Bookings</Link>
+                <Link to={writeReviewPath}><span aria-hidden="true">★</span>Write a Review</Link>
+                <Link to="/customer/notifications"><span aria-hidden="true">♧</span>Notifications</Link>
+                <Link to="/customer/profile"><span aria-hidden="true">◉</span>My Profile</Link>
+              </nav>
+            </section>
           </aside>
         </div>
-      </div>
+
+        <section className="customer-dashboard-panel customer-verified-section">
+          <DashboardSectionHeading eyebrow="Local professionals" title="Verified Butchers" to="/dashboard/customer/find-butcher" action="Find More Butchers" />
+          <div className="customer-dashboard-butcher-grid">
+            {verifiedButchers.map((butcher) => {
+              const mainService = butcher.services[0] || getButcherServices(butcher)[0]?.name;
+              return (
+                <article className="customer-dashboard-butcher" key={butcher.id}>
+                  <div className="customer-dashboard-butcher-person">{butcher.image ? <img src={butcher.image} alt={butcher.name} /> : <span>{butcher.initials}</span>}<div><h3>{butcher.name}</h3><VerifiedMark verified={butcher.verified} /><p>★ {butcher.rating.toFixed(1)} · {butcher.area}</p></div></div>
+                  <div className="customer-dashboard-butcher-service"><span>{mainService}</span><strong>From {money(butcher.startingPrice)}</strong></div>
+                  <Link to={`/dashboard/customer/find-butcher/${butcher.id}`}>View Profile <span aria-hidden="true">→</span></Link>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+      </main>
     </div>
   );
 }
