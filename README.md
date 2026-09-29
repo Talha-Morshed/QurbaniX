@@ -102,6 +102,10 @@ generates the app key, and runs migrations. The frontend container runs
 
 Frontend API requests are proxied to the backend automatically.
 
+### Backend API
+
+The Laravel API persists customer accounts, butcher profiles and services, availability, bookings, payments, reviews, addresses, and notifications in the configured SQL database. The database seeder intentionally adds no demo users or marketplace records. See [backend/README.md](./backend/README.md) for local setup, authentication, API areas, and payment-provider limitations.
+
 ### Useful commands
 
 ```bash

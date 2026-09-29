@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureUserRole;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -12,7 +13,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Adnan: Make role checks reusable on customer, butcher, and admin route groups.
+        $middleware->alias(['role' => EnsureUserRole::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

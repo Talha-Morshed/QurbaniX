@@ -15,6 +15,7 @@ if [ -z "$(grep -E '^APP_KEY=.+' .env || true)" ]; then
     php artisan key:generate --force
 fi
 
-php artisan migrate --force || true
+# Adnan: Stop startup on migration failure instead of serving the API with a missing schema.
+php artisan migrate --force
 
 exec php artisan serve --host=0.0.0.0 --port=80

@@ -33,7 +33,7 @@ function RoleLogin({ role, dashboardPath }) {
     setErrorMsg('');
 
     try {
-      const data = await api.login(form.phone.trim());
+      const data = await api.login(form.phone.trim(), role.toLowerCase());
       setDevPin(data.dev_pin || '');
       setStage('verify');
     } catch (err) {

@@ -1,59 +1,68 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# QurbaniX API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Laravel 12 REST API for customer, butcher, booking, payment, review, and administration workflows. Marketplace records are persisted in the configured SQL database. The seeder intentionally creates no sample users or marketplace records.
 
-## About Laravel
+## Setup
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Requirements: PHP 8.2+, Composer, and MySQL 8+ (MySQL is the configured application database).
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+```powershell
+Copy-Item .env.example .env
+php artisan key:generate
+# Create the configured database and account in MySQL, or use the project's Docker MySQL service.
+php artisan migrate
+php artisan serve
+```
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+The backend `.env.example` defaults to `qurbanix` at `127.0.0.1:3306` with the local-development account `qurbanix`. Change the credentials to match your MySQL setup. The frontend Vite server proxies `/api` requests to `http://127.0.0.1:8000` by default. Set `VITE_API_PROXY_TARGET` when the API uses a different host.
 
-## Learning Laravel
+For a local development MySQL installation, run the following as a MySQL administrator (use a private password and update `DB_PASSWORD` to match):
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+```sql
+CREATE DATABASE qurbanix CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'qurbanix'@'localhost' IDENTIFIED BY 'change-this-local-password';
+GRANT ALL PRIVILEGES ON qurbanix.* TO 'qurbanix'@'localhost';
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Do not use development credentials as production secrets.
 
-## Laravel Sponsors
+Run backend tests:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```powershell
+php artisan test
+```
 
-### Premium Partners
+## Authentication
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Registration and login use phone numbers and Sanctum bearer tokens:
 
-## Contributing
+- `POST /api/register` — create a customer or butcher account
+- `POST /api/login` — request a short-lived PIN
+- `POST /api/login/verify` — verify the PIN and receive a bearer token
+- `GET /api/me` and `POST /api/logout`
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+The current PIN delivery is development-only: the PIN is returned in the JSON response only in local/development environments. Configure an SMS provider before enabling production phone verification. Admin accounts cannot self-register; create them through a trusted operator process.
 
-## Code of Conduct
+Send the token on protected requests as `Authorization: Bearer <token>`.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## API areas
 
-## Security Vulnerabilities
+| Area | Routes |
+| --- | --- |
+| Butcher directory | `GET /api/butchers`, `GET /api/butchers/{user}` |
+| Customer profile and addresses | `/api/customer/profile`, `/api/customer/addresses` |
+| Customer bookings | `/api/customer/bookings` and booking status, payment, and review subroutes |
+| Customer notifications | `/api/customer/notifications` and read-state subroutes |
+| Butcher workspace | `/api/butcher/profile`, `/services`, `/availability`, `/bookings`, `/reviews` |
+| Butcher cash-payment confirmation | `POST /api/butcher/payments/{payment}/confirm` |
+| Admin operations | `/api/admin/users`, `/bookings`, and butcher verification |
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Customer and butcher endpoints are role-gated. Booking status changes are checked against the customer/butcher relationship and an explicit transition list. Booking creation checks verification, service availability, schedule, time range, and daily capacity. Review creation is limited to a customer's completed booking.
 
-## License
+## Payments
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Payment records are persistent and remain pending until confirmed. Cash payments require confirmation from both customer and butcher. bKash, Nagad, and card payment records can be requested but cannot be settled by this API yet; a provider integration and verified callback are required before online payments can be treated as paid. No endpoint marks an online payment successful based on a client-supplied value.
+
+## Data model
+
+Migrations create butcher profiles and services, customer addresses, weekly schedules and date exceptions, bookings, payment records, reviews, and notifications. `php artisan migrate` applies the schema; `php artisan db:seed` does not add demo records.
