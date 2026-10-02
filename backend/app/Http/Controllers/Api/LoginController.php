@@ -31,7 +31,7 @@ class LoginController extends Controller
     {
         $request->validate([
             'phone' => ['required', 'string', 'regex:/^01\d{9}$/'],
-            'role' => ['nullable', 'string', 'in:customer,butcher'],
+            'role' => ['nullable', 'string', 'in:customer,butcher,admin'],
         ]);
 
         $user = User::where('phone', $request->phone)->first();
@@ -81,7 +81,7 @@ class LoginController extends Controller
         $request->validate([
             'phone' => ['required', 'string', 'regex:/^01\d{9}$/'],
             'pin' => ['required', 'string', 'size:4'],
-            'role' => ['nullable', 'string', 'in:customer,butcher'],
+            'role' => ['nullable', 'string', 'in:customer,butcher,admin'],
         ]);
 
         $user = User::where('phone', $request->phone)->first();

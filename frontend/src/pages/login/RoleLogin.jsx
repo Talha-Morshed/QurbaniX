@@ -61,6 +61,7 @@ function RoleLogin({ role }) {
       const dashboardPaths = {
         customer: '/dashboard/customer',
         butcher: '/dashboard/butcher',
+        admin: '/dashboard/admin',
       };
       const authenticatedDashboard = dashboardPaths[data.user?.role];
 

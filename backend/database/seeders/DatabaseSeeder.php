@@ -6,9 +6,9 @@ use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    /** Adnan: Keep fresh databases free of demo accounts and fake marketplace listings. */
+    /** Adnan: Keep fresh databases free of demo accounts and fake marketplace listings, while still creating the required platform admin account. */
     public function run(): void
     {
-        // Intentionally empty: application accounts and marketplace data are created through the API.
+        $this->call(AdminSeeder::class);
     }
 }

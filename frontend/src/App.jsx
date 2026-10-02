@@ -7,6 +7,7 @@ import ButcherRegister from './pages/register/ButcherRegister.jsx';
 import AdminRegister from './pages/register/AdminRegister.jsx';
 import CustomerLogin from './pages/login/CustomerLogin.jsx';
 import ButcherLogin from './pages/login/ButcherLogin.jsx';
+import AdminLogin from './pages/login/AdminLogin.jsx';
 import CustomerForgotPassword from './pages/login/CustomerForgotPassword.jsx';
 import ButcherForgotPassword from './pages/login/ButcherForgotPassword.jsx';
 import CustomerResetPassword from './pages/login/CustomerResetPassword.jsx';
@@ -20,6 +21,7 @@ import { CustomerReviewFormPage, MyReviewsPage } from './pages/customer/Customer
 import CustomerProfile from './pages/customer/CustomerProfile.jsx';
 import CustomerNotifications from './pages/customer/CustomerNotifications.jsx';
 import ButcherDashboard from './pages/dashboard/ButcherDashboard.jsx';
+import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 import Bookings from './pages/butcher/Bookings.jsx';
 import ServicesPricing from './pages/butcher/ServicesPricing.jsx';
 import Availability from './pages/butcher/Availability.jsx';
@@ -41,6 +43,7 @@ function App() {
         <Route path="/register/admin" element={<AdminRegister />} />
         <Route path="/login/customer" element={<CustomerLogin />} />
         <Route path="/login/butcher" element={<ButcherLogin />} />
+        <Route path="/login/admin" element={<AdminLogin />} />
         <Route path="/forgot-password/customer" element={<CustomerForgotPassword />} />
         <Route path="/forgot-password/butcher" element={<ButcherForgotPassword />} />
         <Route path="/reset-password/customer" element={<CustomerResetPassword />} />
@@ -67,6 +70,9 @@ function App() {
           <Route path="/dashboard/butcher/earnings" element={<Earnings />} />
           <Route path="/dashboard/butcher/reviews" element={<Reviews />} />
           <Route path="/dashboard/butcher/profile" element={<Profile />} />
+        </Route>
+        <Route element={<ProtectedRoute role="admin" />}>
+          <Route path="/dashboard/admin" element={<AdminDashboard />} />
         </Route>
         <Route path="/terms" element={<TermsAndConditions />} />
         <Route path="*" element={<LandingPage />} />

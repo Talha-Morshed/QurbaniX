@@ -146,6 +146,97 @@ class MarketplaceApiTest extends TestCase
             ->assertJsonStructure(['token']);
     }
 
+    public function test_admin_can_request_and_verify_pin_with_the_admin_role(): void
+    {
+        $this->app['env'] = 'local';
+        $admin = User::factory()->create(['phone' => '01912345678', 'role' => 'admin']);
+
+        $pinResponse = $this->postJson('/api/login', [
+            'phone' => $admin->phone,
+            'role' => 'admin',
+        ])->assertOk();
+
+        $this->postJson('/api/login/verify', [
+            'phone' => $admin->phone,
+            'pin' => $pinResponse->json('dev_pin'),
+            'role' => 'admin',
+        ])->assertOk()
+            ->assertJsonPath('user.phone', $admin->phone)
+            ->assertJsonPath('user.role', 'admin')
+            ->assertJsonStructure(['token']);
+    }
+
+    public function test_customer_cannot_access_admin_functionality(): void
+    {
+        $customer = User::factory()->create(['role' => 'customer']);
+
+        $this->actingAs($customer)
+            ->getJson('/api/admin/users')
+            ->assertForbidden();
+    }
+
+    public function test_butcher_cannot_access_admin_functionality(): void
+    {
+        $butcher = User::factory()->create(['role' => 'butcher']);
+
+        $this->actingAs($butcher)
+            ->getJson('/api/admin/users')
+            ->assertForbidden();
+    }
+
+    public function test_admin_can_verify_a_pending_butcher(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $butcher = User::factory()->create(['role' => 'butcher']);
+        $butcher->butcherProfile()->create([
+            'area' => 'Dhanmondi',
+            'city' => 'Dhaka',
+            'verification_status' => 'pending',
+        ]);
+
+        $this->actingAs($admin)
+            ->patchJson("/api/admin/butchers/{$butcher->id}/verification", [
+                'verification_status' => 'verified',
+            ])
+            ->assertOk()
+            ->assertJsonPath('profile.verification_status', 'verified');
+
+        $this->assertSame('verified', $butcher->fresh()->butcherProfile->verification_status);
+
+        $this->getJson('/api/butchers')
+            ->assertOk()
+            ->assertJsonCount(1, 'data');
+    }
+
+    public function test_pending_and_rejected_butchers_remain_excluded_from_the_verified_directory(): void
+    {
+        $verified = User::factory()->create(['role' => 'butcher']);
+        $verified->butcherProfile()->create([
+            'area' => 'Gulshan',
+            'city' => 'Dhaka',
+            'verification_status' => 'verified',
+        ]);
+
+        $pending = User::factory()->create(['role' => 'butcher']);
+        $pending->butcherProfile()->create([
+            'area' => 'Uttara',
+            'city' => 'Dhaka',
+            'verification_status' => 'pending',
+        ]);
+
+        $rejected = User::factory()->create(['role' => 'butcher']);
+        $rejected->butcherProfile()->create([
+            'area' => 'Mirpur',
+            'city' => 'Dhaka',
+            'verification_status' => 'rejected',
+        ]);
+
+        $this->getJson('/api/butchers')
+            ->assertOk()
+            ->assertJsonPath('data.0.id', $verified->id)
+            ->assertJsonMissingPath('data.1');
+    }
+
     public function test_login_rejects_a_valid_but_nonexistent_phone_number(): void
     {
         $this->postJson('/api/login', [

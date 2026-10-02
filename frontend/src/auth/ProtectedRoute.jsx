@@ -4,11 +4,13 @@ import { useAuth } from './AuthContext';
 const loginPaths = {
   customer: '/login/customer',
   butcher: '/login/butcher',
+  admin: '/login/admin',
 };
 
 const dashboardPaths = {
   customer: '/dashboard/customer',
   butcher: '/dashboard/butcher',
+  admin: '/dashboard/admin',
 };
 
 export default function ProtectedRoute({ role }) {

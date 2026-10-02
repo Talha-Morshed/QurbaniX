@@ -40,6 +40,8 @@ export const api = {
   register: (data) => request('/register', { method: 'POST', body: JSON.stringify(data) }),
   login: (phone, role) => request('/login', { method: 'POST', body: JSON.stringify({ phone, role }) }),
   loginVerify: (phone, pin, role) => request('/login/verify', { method: 'POST', body: JSON.stringify({ phone, pin, role }) }),
+  adminUsers: (filters = {}) => request(`/admin/users${Object.keys(filters).length ? `?${new URLSearchParams(filters)}` : ''}`),
+  verifyButcher: (id, data) => request(`/admin/butchers/${encodeURIComponent(id)}/verification`, { method: 'PATCH', body: JSON.stringify(data) }),
   me: () => request('/me'),
   logout: () => request('/logout', { method: 'POST' }),
   butchers: (filters = {}) => request(`/butchers?${new URLSearchParams(filters)}`),
