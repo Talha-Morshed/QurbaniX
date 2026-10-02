@@ -4,7 +4,7 @@ import LoginShell from '../../components/form/LoginShell';
 import { maskPhone, validatePhone } from '../../utils/validation';
 import { api, setToken } from '../../api';
 
-function RoleLogin({ role, dashboardPath }) {
+function RoleLogin({ role }) {
   const [form, setForm] = useState({ phone: '' });
   const [errors, setErrors] = useState({});
   const [stage, setStage] = useState('request');
@@ -56,8 +56,19 @@ function RoleLogin({ role, dashboardPath }) {
 
     try {
       const data = await api.loginVerify(form.phone.trim(), pinInput.trim());
+      const dashboardPaths = {
+        customer: '/dashboard/customer',
+        butcher: '/dashboard/butcher',
+      };
+      const authenticatedDashboard = dashboardPaths[data.user.role];
+
+      if (!authenticatedDashboard) {
+        setErrorMsg('This account role cannot sign in here.');
+        return;
+      }
+
       setToken(data.token);
-      navigate(dashboardPath, { replace: true });
+      navigate(authenticatedDashboard, { replace: true });
     } catch (err) {
       setErrorMsg(err.message || 'Incorrect PIN. Please try again.');
     } finally {

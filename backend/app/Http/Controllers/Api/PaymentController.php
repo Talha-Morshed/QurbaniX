@@ -115,6 +115,58 @@ class PaymentController extends Controller
         ]);
     }
 
+    /** Record the customer's confirmation for a cash payment. */
+    public function confirmCustomer(Request $request, Payment $payment, NotificationService $notifications): JsonResponse
+    {
+        [$payment, $booking] = DB::transaction(function () use ($request, $payment, $notifications): array {
+            $payment = Payment::query()->whereKey($payment->id)->lockForUpdate()->firstOrFail();
+            $booking = Booking::query()->whereKey($payment->booking_id)->lockForUpdate()->firstOrFail();
+
+            abort_unless($booking->customer_id === $request->user()->id, 404);
+            abort_unless($payment->method === 'cash', 422, 'Online payments can only be confirmed by a configured provider callback.');
+            abort_if($booking->status === 'Cancelled', 422, 'Cancelled bookings cannot be paid.');
+            abort_if($payment->status !== 'pending', 409, 'This payment is no longer pending.');
+            abort_if($payment->payer_confirmed_at !== null, 409, 'You have already confirmed this payment.');
+
+            $payment->payer_confirmed_at = now();
+
+            if ($payment->receiver_confirmed_at) {
+                $payment->status = 'paid';
+                $payment->confirmed_by = $request->user()->id;
+                $payment->confirmed_at = now();
+                if ($payment->purpose === 'advance') {
+                    $booking->payment_status = 'Advance paid';
+                } else {
+                    $booking->payment_status = 'Paid in full';
+                    $booking->remaining_amount = 0;
+                }
+                $booking->save();
+                $notifications->send(
+                    $booking->butcher,
+                    'payment',
+                    'Cash payment confirmed',
+                    "The {$payment->purpose} payment for booking {$booking->reference} was confirmed by both parties.",
+                    $booking,
+                );
+            }
+
+            $payment->save();
+
+            return [$payment, $booking];
+        });
+
+        $payment = $payment->fresh();
+        $booking = $booking->fresh();
+
+        return response()->json([
+            'message' => $payment->status === 'paid'
+                ? 'Payment confirmed by both parties.'
+                : 'Your confirmation is recorded. The other party must confirm receipt.',
+            'payment' => $payment,
+            'booking' => $booking,
+        ]);
+    }
+
     /** Adnan: Return payment history only for bookings involving the signed-in user. */
     public function index(Request $request): JsonResponse
     {

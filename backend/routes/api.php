@@ -35,6 +35,7 @@ Route::middleware('auth:sanctum')->group(function (): void {
         Route::get('/bookings/{booking}', [BookingController::class, 'show']);
         Route::patch('/bookings/{booking}/status', [BookingController::class, 'updateStatus']);
         Route::post('/bookings/{booking}/payments', [PaymentController::class, 'store']);
+        Route::post('/payments/{payment}/confirm', [PaymentController::class, 'confirmCustomer']);
         Route::post('/bookings/{booking}/reviews', [CustomerController::class, 'createReview']);
         Route::get('/reviews', [CustomerController::class, 'reviews']);
         Route::get('/notifications', [CustomerController::class, 'notifications']);

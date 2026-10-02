@@ -34,9 +34,7 @@ class LoginController extends Controller
             'role' => ['nullable', 'string', 'in:customer,butcher,admin'],
         ]);
 
-        $user = User::where('phone', $request->phone)
-            ->when($request->filled('role'), fn ($query) => $query->where('role', $request->string('role')->toString()))
-            ->first();
+        $user = User::where('phone', $request->phone)->first();
 
         if (! $user) {
             return response()->json([
