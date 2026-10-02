@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 const specializations = ['Cow Qurbani', 'Goat Qurbani', 'Sheep Qurbani', 'Shared Qurbani'];
 
-function ProfileForm({ profile, onChange, onSave, onReset }) {
+function ProfileForm({ profile, onChange, onSave, onReset, isSaving, error }) {
   const [newArea, setNewArea] = useState('');
   const [isAddingArea, setIsAddingArea] = useState(false);
   const update = (field, value) => onChange({ ...profile, [field]: value });
@@ -21,17 +21,16 @@ function ProfileForm({ profile, onChange, onSave, onReset }) {
         <div className="panel-heading"><div><p className="eyebrow">Contact details</p><h2>Personal information</h2></div></div>
         <div className="profile-fields">
           <label>Full name<input required value={profile.name} onChange={(event) => update('name', event.target.value)} /></label>
-          <label>Phone number<input required value={profile.phone} onChange={(event) => update('phone', event.target.value)} /></label>
-          <label>Address<input value={profile.address} onChange={(event) => update('address', event.target.value)} /></label>
-          <label>City<input value={profile.city} onChange={(event) => update('city', event.target.value)} /></label>
-          <label>Area<input value={profile.area} onChange={(event) => update('area', event.target.value)} /></label>
+          <label>Email<input type="email" value={profile.email} onChange={(event) => update('email', event.target.value)} /></label>
+          <label>Phone number<input value={profile.phone} readOnly /></label>
+          <label>City<input required value={profile.city} onChange={(event) => update('city', event.target.value)} /></label>
+          <label>Area<input required value={profile.area} onChange={(event) => update('area', event.target.value)} /></label>
         </div>
       </section>
       <section className="butcher-panel profile-section">
         <div className="panel-heading"><div><p className="eyebrow">Professional details</p><h2>Professional information</h2></div></div>
         <div className="profile-fields">
-          <label>Years of experience<input required min="0" type="number" value={profile.experience} onChange={(event) => update('experience', event.target.value)} /></label>
-          <label>Specialization<select value={profile.specialization} onChange={(event) => update('specialization', event.target.value)}>{specializations.map((item) => <option key={item}>{item}</option>)}</select></label>
+          <label>Specialization<select value={profile.specialization} onChange={(event) => update('specialization', event.target.value)}><option value="">Select a specialization</option>{specializations.map((item) => <option key={item}>{item}</option>)}</select></label>
           <label className="profile-wide">Short professional bio<textarea rows="4" value={profile.bio} onChange={(event) => update('bio', event.target.value)} /></label>
           <div className="profile-wide service-area-field">
             <span>Service areas</span>
@@ -42,7 +41,8 @@ function ProfileForm({ profile, onChange, onSave, onReset }) {
           </div>
         </div>
       </section>
-      <div className="profile-form-actions"><button type="button" className="profile-reset" onClick={onReset}>Reset changes</button><button type="submit" className="profile-save">Save Changes</button></div>
+      {error && <p className="profile-form-error" role="alert">{error}</p>}
+      <div className="profile-form-actions"><button type="button" className="profile-reset" onClick={onReset} disabled={isSaving}>Reset changes</button><button type="submit" className="profile-save" disabled={isSaving}>{isSaving ? 'Saving…' : 'Save Changes'}</button></div>
     </form>
   );
 }
