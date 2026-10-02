@@ -1,13 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import images from '../../assets/images';
+import { api } from '../../api';
 import { getCustomerNotifications } from '../../components/customer/customerAccount';
-import {
-  butcherAnimals,
-  butcherLocations,
-  butcherServices,
-  butchers,
-} from '../../components/customer/butchersData';
+import { getButcherFilterOptions, mapDirectoryButcher } from '../../utils/butcherDirectory';
 import './FindButchers.css';
 
 const initialSort = 'recommended';
@@ -74,7 +70,7 @@ function ButcherCard({ butcher }) {
         </div>
         <div className="butcher-price">
           <span>Starting from</span>
-          <strong>৳{butcher.startingPrice.toLocaleString('en-BD')}</strong>
+            <strong>{butcher.startingPrice == null ? 'Not listed' : `৳${butcher.startingPrice.toLocaleString('en-BD')}`}</strong>
         </div>
       </div>
 
@@ -83,7 +79,7 @@ function ButcherCard({ butcher }) {
         <strong>{butcher.rating.toFixed(1)}</strong>
         <span>{butcher.reviews} reviews</span>
         <span className="butcher-rating-separator" aria-hidden="true" />
-        <span>{butcher.experience} years experience</span>
+        <span>{butcher.experience == null ? 'Experience not listed' : `${butcher.experience} years experience`}</span>
       </div>
 
       <div className="butcher-card-services">
@@ -123,33 +119,65 @@ function FindButchers() {
   const [maximumPrice, setMaximumPrice] = useState('');
   const [minimumRating, setMinimumRating] = useState('');
   const [availability, setAvailability] = useState('');
-  const [verifiedOnly, setVerifiedOnly] = useState(true);
   const [sortBy, setSortBy] = useState(initialSort);
+  const [butchers, setButchers] = useState([]);
+  const [filterOptions, setFilterOptions] = useState({ locations: [], services: [], animals: [] });
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [page, setPage] = useState(1);
+  const [retryKey, setRetryKey] = useState(0);
+  const [pagination, setPagination] = useState({ currentPage: 1, lastPage: 1, total: 0 });
+  const filterOptionsLoaded = useRef(false);
 
-  const matchingButchers = butchers.filter((butcher) => {
-    const searchText = searchTerm.trim().toLowerCase();
-    const searchableText = [butcher.name, butcher.area, ...butcher.animals, ...butcher.services]
-      .join(' ')
-      .toLowerCase();
+  useEffect(() => {
+    const filters = { page, per_page: 24, sort: sortBy };
+    const search = searchTerm.trim();
+    if (search) filters.search = search;
+    if (location) {
+      const selectedLocation = JSON.parse(location);
+      if (selectedLocation.area) filters.area = selectedLocation.area;
+      if (selectedLocation.city) filters.city = selectedLocation.city;
+    }
+    if (service) filters.service = service;
+    if (animal) filters.animal = animal;
+    if (minimumPrice) filters.minimum_price = minimumPrice;
+    if (maximumPrice) filters.maximum_price = maximumPrice;
+    if (minimumRating) filters.minimum_rating = minimumRating;
+    if (availability === 'Available') filters.available = 1;
 
-    return (!searchText || searchableText.includes(searchText))
-      && (!location || butcher.area === location)
-      && (!service || butcher.services.includes(service))
-      && (!animal || butcher.animals.includes(animal))
-      && (!minimumPrice || butcher.startingPrice >= Number(minimumPrice))
-      && (!maximumPrice || butcher.startingPrice <= Number(maximumPrice))
-      && (!minimumRating || butcher.rating >= Number(minimumRating))
-      && (!availability || butcher.availability === availability)
-      && (!verifiedOnly || butcher.verified);
-  });
+    let isCurrentRequest = true;
+    setIsLoading(true);
+    setError('');
 
-  const visibleButchers = [...matchingButchers].sort((first, second) => {
-    if (sortBy === 'rating') return second.rating - first.rating;
-    if (sortBy === 'price-low') return first.startingPrice - second.startingPrice;
-    if (sortBy === 'price-high') return second.startingPrice - first.startingPrice;
-    if (sortBy === 'completed') return second.completedServices - first.completedServices;
-    return Number(second.recommended) - Number(first.recommended) || second.rating - first.rating;
-  });
+    api.butchers(filters)
+      .then((response) => {
+        if (!isCurrentRequest) return;
+        const records = response.data || [];
+        setButchers(records.map(mapDirectoryButcher));
+        setPagination({
+          currentPage: Number(response.current_page) || 1,
+          lastPage: Number(response.last_page) || 1,
+          total: Number(response.total) || 0,
+        });
+        if (!filterOptionsLoaded.current) {
+          setFilterOptions(getButcherFilterOptions(records));
+          filterOptionsLoaded.current = true;
+        }
+      })
+      .catch((requestError) => {
+        if (!isCurrentRequest) return;
+        setError(requestError?.message || 'Unable to load butchers. Please try again.');
+        setButchers([]);
+        setPagination({ currentPage: 1, lastPage: 1, total: 0 });
+      })
+      .finally(() => {
+        if (isCurrentRequest) setIsLoading(false);
+      });
+
+    return () => {
+      isCurrentRequest = false;
+    };
+  }, [animal, availability, location, maximumPrice, minimumPrice, minimumRating, page, retryKey, searchTerm, service, sortBy]);
 
   const clearFilters = () => {
     setSearchInput('');
@@ -161,8 +189,8 @@ function FindButchers() {
     setMaximumPrice('');
     setMinimumRating('');
     setAvailability('');
-    setVerifiedOnly(true);
     setSortBy(initialSort);
+    setPage(1);
   };
 
   return (
@@ -181,6 +209,7 @@ function FindButchers() {
           onSubmit={(event) => {
             event.preventDefault();
             setSearchTerm(searchInput);
+              setPage(1);
           }}
         >
           <label className="finder-field finder-search-text">
@@ -194,16 +223,16 @@ function FindButchers() {
           </label>
           <label className="finder-field">
             <span>Location</span>
-            <select value={location} onChange={(event) => setLocation(event.target.value)}>
+            <select value={location} onChange={(event) => { setLocation(event.target.value); setPage(1); }}>
               <option value="">Select location</option>
-              {butcherLocations.map((item) => <option key={item} value={item}>{item}</option>)}
+              {filterOptions.locations.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
             </select>
           </label>
           <label className="finder-field">
             <span>Service</span>
-            <select value={service} onChange={(event) => setService(event.target.value)}>
+            <select value={service} onChange={(event) => { setService(event.target.value); setPage(1); }}>
               <option value="">Select service</option>
-              {butcherServices.map((item) => <option key={item} value={item}>{item}</option>)}
+              {filterOptions.services.map((item) => <option key={item} value={item}>{item}</option>)}
             </select>
           </label>
           <button className="finder-search-button" type="submit">Search</button>
@@ -221,9 +250,9 @@ function FindButchers() {
 
             <label className="finder-filter-field">
               <span>Animal</span>
-              <select value={animal} onChange={(event) => setAnimal(event.target.value)}>
+              <select value={animal} onChange={(event) => { setAnimal(event.target.value); setPage(1); }}>
                 <option value="">All animals</option>
-                {butcherAnimals.map((item) => <option key={item} value={item}>{item}</option>)}
+                {filterOptions.animals.map((item) => <option key={item} value={item}>{item}</option>)}
               </select>
             </label>
 
@@ -232,19 +261,19 @@ function FindButchers() {
               <div className="finder-price-inputs">
                 <label>
                   <span className="sr-only">Minimum price</span>
-                  <input type="number" min="0" inputMode="numeric" placeholder="Min" value={minimumPrice} onChange={(event) => setMinimumPrice(event.target.value)} />
+                  <input type="number" min="0" inputMode="numeric" placeholder="Min" value={minimumPrice} onChange={(event) => { setMinimumPrice(event.target.value); setPage(1); }} />
                 </label>
                 <span aria-hidden="true">to</span>
                 <label>
                   <span className="sr-only">Maximum price</span>
-                  <input type="number" min="0" inputMode="numeric" placeholder="Max" value={maximumPrice} onChange={(event) => setMaximumPrice(event.target.value)} />
+                  <input type="number" min="0" inputMode="numeric" placeholder="Max" value={maximumPrice} onChange={(event) => { setMaximumPrice(event.target.value); setPage(1); }} />
                 </label>
               </div>
             </fieldset>
 
             <label className="finder-filter-field">
               <span>Minimum rating</span>
-              <select value={minimumRating} onChange={(event) => setMinimumRating(event.target.value)}>
+              <select value={minimumRating} onChange={(event) => { setMinimumRating(event.target.value); setPage(1); }}>
                 <option value="">Any rating</option>
                 <option value="4.5">4.5+</option>
                 <option value="4">4.0+</option>
@@ -254,16 +283,14 @@ function FindButchers() {
 
             <label className="finder-filter-field">
               <span>Availability</span>
-              <select value={availability} onChange={(event) => setAvailability(event.target.value)}>
+              <select value={availability} onChange={(event) => { setAvailability(event.target.value); setPage(1); }}>
                 <option value="">Any availability</option>
                 <option value="Available">Available</option>
-                <option value="Limited slots">Limited slots</option>
-                <option value="Unavailable">Unavailable</option>
               </select>
             </label>
 
             <label className="finder-verified-toggle">
-              <input type="checkbox" checked={verifiedOnly} onChange={(event) => setVerifiedOnly(event.target.checked)} />
+              <input type="checkbox" checked disabled />
               <span className="finder-checkbox" aria-hidden="true" />
               <span><strong>Verified only</strong><small>Show approved professionals</small></span>
             </label>
@@ -274,12 +301,12 @@ function FindButchers() {
               <div>
                 <p className="finder-eyebrow">Trusted local professionals</p>
                 <h2 id="finder-results-heading" aria-live="polite">
-                  {visibleButchers.length} {visibleButchers.length === 1 ? 'butcher' : 'butchers'} found
+                  {pagination.total} {pagination.total === 1 ? 'butcher' : 'butchers'} found
                 </h2>
               </div>
               <label className="finder-sort">
                 <span>Sort by</span>
-                <select value={sortBy} onChange={(event) => setSortBy(event.target.value)}>
+                <select value={sortBy} onChange={(event) => { setSortBy(event.target.value); setPage(1); }}>
                   <option value="recommended">Recommended</option>
                   <option value="rating">Highest Rated</option>
                   <option value="price-low">Lowest Price</option>
@@ -289,9 +316,17 @@ function FindButchers() {
               </label>
             </div>
 
-            {visibleButchers.length > 0 ? (
+            {isLoading ? (
+              <div className="finder-empty-state" role="status"><h3>Loading butchers</h3><p>Fetching verified professionals from the directory.</p></div>
+            ) : error ? (
+              <div className="finder-empty-state" role="alert">
+                <h3>Unable to load butchers</h3>
+                <p>{error}</p>
+                <button type="button" className="finder-search-button" onClick={() => setRetryKey((current) => current + 1)}>Try again</button>
+              </div>
+            ) : butchers.length > 0 ? (
               <div className="butcher-results-grid">
-                {visibleButchers.map((butcher) => <ButcherCard key={butcher.id} butcher={butcher} />)}
+                {butchers.map((butcher) => <ButcherCard key={butcher.id} butcher={butcher} />)}
               </div>
             ) : (
               <div className="finder-empty-state">
@@ -301,6 +336,14 @@ function FindButchers() {
                 <button type="button" className="finder-search-button" onClick={clearFilters}>Clear filters</button>
               </div>
             )}
+
+            {!isLoading && !error && pagination.lastPage > 1 ? (
+              <nav aria-label="Butcher directory pages" className="finder-pagination">
+                <button type="button" className="finder-search-button" disabled={pagination.currentPage <= 1} onClick={() => setPage((current) => Math.max(1, current - 1))}>Previous</button>
+                <span>Page {pagination.currentPage} of {pagination.lastPage}</span>
+                <button type="button" className="finder-search-button" disabled={pagination.currentPage >= pagination.lastPage} onClick={() => setPage((current) => Math.min(pagination.lastPage, current + 1))}>Next</button>
+              </nav>
+            ) : null}
           </section>
         </div>
       </main>

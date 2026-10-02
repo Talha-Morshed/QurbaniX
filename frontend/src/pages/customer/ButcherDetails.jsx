@@ -1,17 +1,11 @@
+import { useEffect, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { api } from '../../api';
 import { butchers } from '../../components/customer/butchersData';
-import { butcherProfileDetails, getButcherServices } from '../../components/customer/butcherProfileData';
-import { getCustomerReviewsForButcher } from '../../components/customer/customerBookings';
+import { getButcherServices } from '../../components/customer/butcherProfileData';
+import { mapButcherDetailsResponse } from '../../utils/butcherDirectory';
 import { CustomerNavigation, VerifiedMark } from './FindButchers';
 import './ButcherDetails.css';
-
-const ratingDistribution = [
-  { stars: 5, percent: 82 },
-  { stars: 4, percent: 12 },
-  { stars: 3, percent: 4 },
-  { stars: 2, percent: 1 },
-  { stars: 1, percent: 1 },
-];
 
 function StarRating({ rating, label }) {
   return (
@@ -23,18 +17,49 @@ function StarRating({ rating, label }) {
 
 function ButcherDetails() {
   const { butcherId } = useParams();
-  const butcher = butchers.find((item) => item.id === butcherId);
-  const profile = butcherProfileDetails[butcherId];
+  const [butcher, setButcher] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [retryKey, setRetryKey] = useState(0);
 
-  if (!butcher || !profile) {
+  useEffect(() => {
+    let isCurrentRequest = true;
+    setIsLoading(true);
+    setError(null);
+
+    api.butcher(butcherId)
+      .then((response) => {
+        if (isCurrentRequest) setButcher(mapButcherDetailsResponse(response));
+      })
+      .catch((requestError) => {
+        if (!isCurrentRequest) return;
+        setButcher(null);
+        setError({
+          status: requestError?.status,
+          message: requestError?.message || 'Unable to load this butcher profile. Please try again.',
+        });
+      })
+      .finally(() => {
+        if (isCurrentRequest) setIsLoading(false);
+      });
+
+    return () => {
+      isCurrentRequest = false;
+    };
+  }, [butcherId, retryKey]);
+
+  if (isLoading || error || !butcher) {
+    const notFound = error?.status === 404;
+
     return (
       <div className="find-butcher-page butcher-details-page">
         <CustomerNavigation />
         <main className="butcher-details-main">
           <Link className="details-back-link" to="/dashboard/customer/find-butcher">← Back to Butchers</Link>
           <section className="details-not-found">
-            <h1>Butcher profile not found</h1>
-            <p>This profile is not available in the current directory.</p>
+            <h1>{isLoading ? 'Loading butcher profile' : notFound ? 'Butcher profile not found' : 'Unable to load butcher profile'}</h1>
+            <p>{isLoading ? 'Fetching verified profile details.' : notFound ? 'This profile is not available in the current directory.' : error?.message}</p>
+            {!isLoading && error && !notFound ? <button type="button" className="finder-search-button" onClick={() => setRetryKey((current) => current + 1)}>Try again</button> : null}
             <Link className="finder-search-button" to="/dashboard/customer/find-butcher">Browse verified butchers</Link>
           </section>
         </main>
@@ -42,36 +67,17 @@ function ButcherDetails() {
     );
   }
 
-  const services = getButcherServices(butcher);
-  const customerReviews = getCustomerReviewsForButcher(butcherId);
-  const totalReviewCount = butcher.reviews + customerReviews.length;
-  const overallRating = (
-    butcher.rating * butcher.reviews
-    + customerReviews.reduce((total, review) => total + review.rating, 0)
-  ) / totalReviewCount;
+  const services = butcher.services;
+  const totalReviewCount = butcher.reviewsCount;
+  const overallRating = butcher.rating;
   const reviewCount = totalReviewCount.toLocaleString('en-BD');
-  const currentRatingDistribution = ratingDistribution.map((row) => {
-    const mockCount = Math.round(butcher.reviews * row.percent / 100);
-    const submittedCount = customerReviews.filter((review) => review.rating === row.stars).length;
-    return { ...row, percent: Math.round((mockCount + submittedCount) / totalReviewCount * 100) };
-  });
-  const profileReviews = [
-    ...profile.reviews,
-    ...customerReviews.map((review) => ({
-      id: review.id,
-      customer: review.customerName,
-      rating: review.rating,
-      date: review.date,
-      service: review.service,
-      text: review.comment,
-      serviceRating: review.serviceRating,
-      professionalismRating: review.professionalismRating,
-      punctualityRating: review.punctualityRating,
-      cleanlinessRating: review.cleanlinessRating,
-    })),
-  ];
-  const canBook = butcher.verified && butcher.availability !== 'Unavailable';
-  const bookingBlockMessage = butcher.verified ? 'Currently unavailable' : 'Available after verification';
+  const currentRatingDistribution = butcher.ratingDistribution;
+  const canBook = butcher.verified && butcher.availability !== 'Unavailable' && services.length > 0;
+  const bookingBlockMessage = !butcher.verified
+    ? 'Available after verification'
+    : butcher.availability === 'Unavailable'
+      ? 'Currently unavailable'
+      : 'No services currently listed';
   const bookingPath = (serviceId) => `/dashboard/customer/book/${butcher.id}?service=${encodeURIComponent(serviceId)}`;
 
   return (
@@ -98,8 +104,8 @@ function ButcherDetails() {
             <span>{reviewCount} reviews</span>
           </div>
           <div className="details-profile-stats">
-            <div><strong>{butcher.experience}</strong><span>Years experience</span></div>
-            <div><strong>{butcher.completedServices}</strong><span>Completed services</span></div>
+            <div><strong>{butcher.experience ?? '—'}</strong><span>Years experience</span></div>
+            <div><strong>{butcher.completedServices ?? '—'}</strong><span>Completed services</span></div>
             <div><strong>{butcher.availability}</strong><span>Current availability</span></div>
           </div>
         </section>
@@ -109,11 +115,13 @@ function ButcherDetails() {
             <section className="details-section" aria-labelledby="details-about-heading">
               <p className="finder-eyebrow">Professional background</p>
               <h2 id="details-about-heading">About</h2>
-              <p className="details-about-copy">{profile.bio}</p>
+                <p className="details-about-copy">{butcher.bio}</p>
               <div className="details-specializations">
                 <h3>Specializations</h3>
                 <ul>
-                  {profile.specializations.map((item) => <li key={item}>{item}</li>)}
+                    {butcher.specializations.length
+                      ? butcher.specializations.map((item) => <li key={item}>{item}</li>)
+                      : <li>Not listed</li>}
                 </ul>
               </div>
             </section>
@@ -176,7 +184,7 @@ function ButcherDetails() {
                 </div>
               </div>
               <div className="details-review-list">
-                {profileReviews.map((review) => (
+                    {butcher.reviews.map((review) => (
                   <article className="details-review" key={review.id}>
                     <div className="details-review-topline">
                       <div>
@@ -202,7 +210,7 @@ function ButcherDetails() {
                 <span aria-hidden="true" />{butcher.availability === 'Unavailable' ? 'Currently unavailable' : 'Available for bookings'}
               </p>
               <div className="details-schedule">
-                {profile.schedule.map(([day, hours]) => (
+                {butcher.schedule.map(([day, hours]) => (
                   <div key={day}><strong>{day}</strong><span>{hours}</span></div>
                 ))}
               </div>
@@ -213,7 +221,7 @@ function ButcherDetails() {
               <h2 id="details-areas-heading">Service Areas</h2>
               <p className="details-area-lead">Serving {butcher.area}</p>
               <ul className="details-area-list">
-                {profile.serviceAreas.map((area) => <li key={area}>{area}</li>)}
+                {butcher.serviceAreas.map((area) => <li key={area}>{area}</li>)}
               </ul>
             </section>
 
@@ -221,7 +229,7 @@ function ButcherDetails() {
               <p className="finder-eyebrow">Service contact</p>
               <h2 id="details-contact-heading">Contact Information</h2>
               <dl className="details-contact-list">
-                <div><dt>Phone</dt><dd>{profile.phone}</dd></div>
+                <div><dt>Phone</dt><dd>{butcher.phone}</dd></div>
                 <div><dt>Primary area</dt><dd>{butcher.area}</dd></div>
               </dl>
             </section>
