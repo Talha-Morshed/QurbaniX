@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getCustomerNotifications, saveCustomerNotifications } from '../../components/customer/customerAccount';
+import { api } from '../../api';
 import { CustomerNavigation } from './FindButchers';
 import './CustomerNotifications.css';
 
@@ -32,6 +32,20 @@ function notificationTarget(notification) {
   return null;
 }
 
+function mapApiNotification(record) {
+  const type = ['booking', 'payment', 'service', 'review', 'account'].includes(record.type) ? record.type : 'account';
+  return {
+    id: String(record.id),
+    type,
+    title: record.title,
+    message: record.message,
+    date: record.created_at,
+    read: Boolean(record.read_at),
+    bookingId: record.booking_id ? String(record.booking_id) : '',
+    action: type === 'review' ? 'review' : ['booking', 'payment'].includes(type) ? 'booking' : type === 'account' ? 'profile' : '',
+  };
+}
+
 function NotificationIcon({ type }) {
   return (
     <span className={`customer-notification-icon icon-${type}`} aria-hidden="true">
@@ -47,34 +61,71 @@ function NotificationIcon({ type }) {
 }
 
 function CustomerNotifications() {
-  const [notifications, setNotifications] = useState(getCustomerNotifications);
+  const [notifications, setNotifications] = useState([]);
   const [activeFilter, setActiveFilter] = useState('all');
   const [notice, setNotice] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [updatingId, setUpdatingId] = useState(null);
+  const [retryKey, setRetryKey] = useState(0);
+
+  useEffect(() => {
+    let isCurrentRequest = true;
+    setIsLoading(true);
+    setError('');
+    api.customerNotifications({ per_page: 100 })
+      .then((response) => {
+        if (isCurrentRequest) setNotifications((response.data || []).map(mapApiNotification));
+      })
+      .catch((requestError) => {
+        if (!isCurrentRequest) return;
+        setNotifications([]);
+        setError(requestError?.message || 'Unable to load your notifications.');
+      })
+      .finally(() => {
+        if (isCurrentRequest) setIsLoading(false);
+      });
+    return () => {
+      isCurrentRequest = false;
+    };
+  }, [retryKey]);
+
   const unreadCount = notifications.filter((notification) => !notification.read).length;
   const visibleNotifications = notifications
     .filter((notification) => activeFilter === 'all'
       || (activeFilter === 'unread' ? !notification.read : notification.type === activeFilter))
     .sort((first, second) => second.date.localeCompare(first.date));
 
-  const updateNotifications = (nextNotifications) => {
-    setNotifications(saveCustomerNotifications(nextNotifications));
-  };
-
-  const markRead = (id) => {
+  const markRead = async (id) => {
     const selected = notifications.find((notification) => notification.id === id);
     if (!selected || selected.read) return;
-    updateNotifications(notifications.map((notification) => notification.id === id ? { ...notification, read: true } : notification));
+    setUpdatingId(id);
+    setError('');
+    try {
+      const response = await api.markNotificationRead(id);
+      const updated = mapApiNotification(response.notification);
+      setNotifications((current) => current.map((notification) => notification.id === id ? updated : notification));
+    } catch (requestError) {
+      setError(requestError?.message || 'Unable to mark this notification as read.');
+    } finally {
+      setUpdatingId(null);
+    }
   };
 
-  const markAllRead = () => {
+  const markAllRead = async () => {
     if (!unreadCount) return;
-    updateNotifications(notifications.map((notification) => ({ ...notification, read: true })));
-    setNotice('All notifications marked as read.');
-  };
-
-  const deleteNotification = (id) => {
-    updateNotifications(notifications.filter((notification) => notification.id !== id));
-    setNotice('Notification removed.');
+    setIsUpdating(true);
+    setError('');
+    try {
+      await api.markAllNotificationsRead();
+      setNotifications((current) => current.map((notification) => ({ ...notification, read: true })));
+      setNotice('All notifications marked as read.');
+    } catch (requestError) {
+      setError(requestError?.message || 'Unable to mark notifications as read.');
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   return (
@@ -83,15 +134,17 @@ function CustomerNotifications() {
       <main className="customer-notifications-main">
         <header className="customer-notifications-heading">
           <div><p className="finder-eyebrow">Customer account</p><h1>Notifications</h1><p>{unreadCount ? `${unreadCount} unread notification${unreadCount === 1 ? '' : 's'}` : 'You are all caught up.'}</p></div>
-          <button className="booking-secondary-button" type="button" disabled={!unreadCount} onClick={markAllRead}>Mark all as read</button>
+          <button className="booking-secondary-button" type="button" disabled={!unreadCount || isUpdating} onClick={markAllRead}>Mark all as read</button>
         </header>
         {notice ? <p className="customer-notifications-notice" role="status">{notice}</p> : null}
+        {error ? <div className="customer-notifications-notice" role="alert"><p>{error}</p><button className="booking-secondary-button" type="button" onClick={() => setRetryKey((current) => current + 1)}>Try again</button></div> : null}
         <div className="customer-notification-filters" role="tablist" aria-label="Filter notifications">
           {filters.map(([filter, label]) => (
             <button type="button" role="tab" aria-selected={activeFilter === filter} className={activeFilter === filter ? 'is-active' : ''} key={filter} onClick={() => setActiveFilter(filter)}>{label}</button>
           ))}
         </div>
-        {visibleNotifications.length ? (
+        {isLoading ? <p role="status">Loading notifications...</p> : null}
+        {!isLoading && !error && visibleNotifications.length ? (
           <section className="customer-notification-list" aria-label={`${filters.find(([filter]) => filter === activeFilter)?.[1]} notifications`}>
             {visibleNotifications.map((notification) => {
               const target = notificationTarget(notification);
@@ -107,15 +160,16 @@ function CustomerNotifications() {
                   {target ? <Link className="customer-notification-content" to={target} onClick={() => markRead(notification.id)}>{content}</Link> : <button className="customer-notification-content" type="button" onClick={() => markRead(notification.id)}>{content}</button>}
                   <div className="customer-notification-tools">
                     {!notification.read ? <span className="customer-unread-label"><span />Unread</span> : null}
-                    <button className="customer-notification-delete" type="button" aria-label={`Delete ${notification.title} notification`} onClick={() => deleteNotification(notification.id)}>Delete</button>
+                    {updatingId === notification.id ? <span role="status">Updating...</span> : null}
                   </div>
                 </article>
               );
             })}
           </section>
-        ) : (
+        ) : null}
+        {!isLoading && !error && !visibleNotifications.length ? (
           <section className="customer-notifications-empty"><span aria-hidden="true">✓</span><h2>No notifications</h2><p>You&apos;re all caught up.</p></section>
-        )}
+        ) : null}
       </main>
     </div>
   );

@@ -6,6 +6,30 @@ function dateOnly(value) {
   return value ? String(value).slice(0, 10) : '';
 }
 
+export function mapApiReview(record, booking = record.booking || {}) {
+  const butcher = record.butcher || booking.butcher || {};
+  const service = booking.service || {};
+  const rating = Number(record.rating) || 0;
+
+  return {
+    id: String(record.id),
+    bookingId: String(record.booking_id || booking.id || ''),
+    reference: booking.reference || '',
+    butcherId: String(record.butcher_id || booking.butcher_id || butcher.id || ''),
+    butcherName: butcher.name || 'Butcher',
+    rating,
+    serviceRating: Number(record.service_rating) || rating,
+    professionalismRating: Number(record.professionalism_rating) || rating,
+    punctualityRating: Number(record.punctuality_rating) || rating,
+    cleanlinessRating: Number(record.cleanliness_rating) || rating,
+    service: service.name || 'Service',
+    comment: record.comment || '',
+    recommended: record.recommendation || '',
+    date: dateOnly(record.created_at),
+    status: record.status ? `${record.status[0].toUpperCase()}${record.status.slice(1)}` : 'Published',
+  };
+}
+
 export function mapApiBooking(record) {
   const butcher = record.butcher || {};
   const profile = butcher.butcher_profile || {};
@@ -47,7 +71,7 @@ export function mapApiBooking(record) {
     status: record.status,
     paymentStatus: record.payment_status || 'Unpaid',
     cancellationMessage: record.cancellation_reason || '',
-    review: record.review || null,
+    review: record.review ? mapApiReview(record.review, record) : null,
     transactionReference: payments.find((payment) => payment.provider_reference)?.provider_reference || '',
   };
 }

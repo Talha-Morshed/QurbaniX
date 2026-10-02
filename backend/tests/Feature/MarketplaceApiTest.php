@@ -8,6 +8,7 @@ use App\Models\ButcherService;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 /** Adnan: Check that API flows persist real data and enforce account access and booking rules. */
@@ -235,6 +236,170 @@ class MarketplaceApiTest extends TestCase
             ->assertOk()
             ->assertJsonPath('data.0.id', $verified->id)
             ->assertJsonMissingPath('data.1');
+    }
+
+    public function test_customer_booking_history_and_details_are_limited_to_the_signed_in_customer(): void
+    {
+        ['customer' => $customer, 'booking' => $booking] = $this->createPaymentScenario();
+        ['booking' => $anotherCustomersBooking] = $this->createPaymentScenario();
+
+        $this->actingAs($customer)
+            ->getJson('/api/customer/bookings')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', $booking->id)
+            ->assertJsonPath('data.0.reference', $booking->reference);
+
+        $this->getJson("/api/customer/bookings/{$booking->id}")
+            ->assertOk()
+            ->assertJsonPath('booking.id', $booking->id)
+            ->assertJsonPath('booking.service.name', 'Goat Qurbani');
+
+        $this->getJson("/api/customer/bookings/{$anotherCustomersBooking->id}")
+            ->assertNotFound();
+    }
+
+    public function test_customer_reviews_require_ownership_completion_and_valid_fields_and_cannot_be_duplicated(): void
+    {
+        ['customer' => $customer, 'booking' => $completedBooking] = $this->createPaymentScenario(
+            bookingAttributes: ['status' => 'Completed', 'completed_at' => now()],
+        );
+        ['booking' => $pendingBooking] = $this->createPaymentScenario(
+            bookingAttributes: ['customer_id' => $customer->id, 'status' => 'Pending'],
+        );
+        ['booking' => $invalidReviewBooking] = $this->createPaymentScenario(
+            bookingAttributes: ['customer_id' => $customer->id, 'status' => 'Completed', 'completed_at' => now()],
+        );
+        $payload = [
+            'rating' => 5,
+            'service_rating' => 4,
+            'professionalism_rating' => 5,
+            'punctuality_rating' => 4,
+            'cleanliness_rating' => 5,
+            'comment' => 'Excellent service from start to finish.',
+            'recommendation' => 'yes',
+        ];
+
+        $this->actingAs($customer)
+            ->postJson("/api/customer/bookings/{$completedBooking->id}/reviews", $payload)
+            ->assertCreated()
+            ->assertJsonPath('review.rating', 5)
+            ->assertJsonPath('review.recommendation', 'yes');
+
+        $this->getJson('/api/customer/reviews')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.booking.reference', $completedBooking->reference);
+
+        $this->postJson("/api/customer/bookings/{$completedBooking->id}/reviews", $payload)
+            ->assertStatus(409);
+
+        $this->postJson("/api/customer/bookings/{$pendingBooking->id}/reviews", $payload)
+            ->assertUnprocessable();
+
+        $this->postJson("/api/customer/bookings/{$invalidReviewBooking->id}/reviews", [
+            ...$payload,
+            'rating' => 6,
+            'comment' => 'Bad',
+        ])->assertUnprocessable()
+            ->assertJsonValidationErrors(['rating', 'comment']);
+
+        $otherCustomer = User::factory()->create(['role' => 'customer']);
+        $this->actingAs($otherCustomer)
+            ->postJson("/api/customer/bookings/{$completedBooking->id}/reviews", $payload)
+            ->assertNotFound();
+    }
+
+    public function test_customer_notifications_are_scoped_and_read_actions_persist(): void
+    {
+        $customer = User::factory()->create(['role' => 'customer']);
+        $anotherCustomer = User::factory()->create(['role' => 'customer']);
+        $notification = $customer->userNotifications()->create([
+            'type' => 'booking',
+            'title' => 'Booking confirmed',
+            'message' => 'Your booking is confirmed.',
+        ]);
+        $anotherCustomersNotification = $anotherCustomer->userNotifications()->create([
+            'type' => 'booking',
+            'title' => 'Private notification',
+            'message' => 'This belongs to another customer.',
+        ]);
+
+        $this->actingAs($customer)
+            ->getJson('/api/customer/notifications')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', $notification->id)
+            ->assertJsonPath('data.0.read_at', null);
+
+        $this->patchJson("/api/customer/notifications/{$notification->id}/read")
+            ->assertOk()
+            ->assertJsonPath('notification.id', $notification->id);
+        $this->assertNotNull($notification->fresh()->read_at);
+
+        $this->patchJson('/api/customer/notifications/read-all')->assertOk();
+        $allReadResponse = $this->getJson('/api/customer/notifications')
+            ->assertOk()
+            ->assertJsonCount(1, 'data');
+        $this->assertNotNull($allReadResponse->json('data.0.read_at'));
+
+        $this->patchJson("/api/customer/notifications/{$anotherCustomersNotification->id}/read")
+            ->assertNotFound();
+    }
+
+    public function test_customer_profile_preferences_and_addresses_use_persisted_customer_data(): void
+    {
+        $customer = User::factory()->create(['role' => 'customer', 'name' => 'Original Name']);
+        $anotherCustomer = User::factory()->create(['role' => 'customer']);
+
+        $this->actingAs($customer)
+            ->getJson('/api/customer/profile')
+            ->assertOk()
+            ->assertJsonPath('user.id', $customer->id)
+            ->assertJsonPath('user.name', 'Original Name');
+
+        $this->putJson('/api/customer/profile', [
+            'name' => 'Updated Name',
+            'email' => 'updated@example.test',
+            'preferences' => [
+                'booking_updates' => false,
+                'payment_updates' => true,
+                'butcher_messages' => false,
+                'review_notifications' => true,
+                'promotions' => true,
+            ],
+        ])->assertOk()
+            ->assertJsonPath('user.name', 'Updated Name')
+            ->assertJsonPath('preferences.booking_updates', false)
+            ->assertJsonPath('preferences.promotions', true);
+
+        $addressResponse = $this->postJson('/api/customer/addresses', [
+            'label' => 'Home',
+            'address' => 'House 10, Road 2',
+            'area' => 'Dhanmondi',
+            'city' => 'Dhaka',
+            'instructions' => 'Call on arrival.',
+        ])->assertCreated()
+            ->assertJsonPath('address.address', 'House 10, Road 2');
+        $addressId = $addressResponse->json('address.id');
+
+        $this->putJson("/api/customer/addresses/{$addressId}", [
+            'address' => 'House 12, Road 3',
+            'area' => 'Gulshan',
+            'city' => 'Dhaka',
+        ])->assertOk()
+            ->assertJsonPath('address.address', 'House 12, Road 3');
+
+        $this->actingAs($anotherCustomer)
+            ->putJson("/api/customer/addresses/{$addressId}", ['area' => 'Uttara'])
+            ->assertNotFound();
+
+        $this->actingAs($customer)
+            ->deleteJson("/api/customer/addresses/{$addressId}")
+            ->assertOk();
+        $this->assertDatabaseMissing('customer_addresses', ['id' => $addressId]);
+        $this->assertSame('Updated Name', $customer->fresh()->name);
+        $this->assertFalse($customer->fresh()->preferences['booking_updates']);
     }
 
     public function test_login_rejects_a_valid_but_nonexistent_phone_number(): void
@@ -509,7 +674,7 @@ class MarketplaceApiTest extends TestCase
             'is_available' => true,
         ]);
         $booking = Booking::create(array_merge([
-            'reference' => 'QBX-TEST-001',
+            'reference' => 'QBX-TEST-'.Str::upper(Str::random(8)),
             'customer_id' => $customer->id,
             'butcher_id' => $butcher->id,
             'service_id' => $service->id,

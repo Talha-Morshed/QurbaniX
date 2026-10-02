@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { getCustomerBooking, getCustomerReviews, saveCustomerReview } from '../../components/customer/customerBookings';
+import { api } from '../../api';
+import { mapApiBooking, mapApiReview } from '../../utils/apiBookings';
 import { CustomerNavigation, VerifiedMark } from './FindButchers';
 import './CustomerReviews.css';
 
@@ -60,7 +61,7 @@ function ReviewContext({ booking }) {
   );
 }
 
-function ReviewForm({ booking, onSubmit, form, setForm, error }) {
+function ReviewForm({ booking, onSubmit, form, setForm, error, isSubmitting }) {
   const setField = (field, value) => setForm((current) => ({ ...current, [field]: value }));
   return (
     <form className="customer-review-form" onSubmit={onSubmit}>
@@ -91,13 +92,13 @@ function ReviewForm({ booking, onSubmit, form, setForm, error }) {
       </fieldset>
       <div className="customer-review-form-actions">
         <Link className="booking-secondary-button" to={`/customer/bookings/${encodeURIComponent(booking.id)}`}>Back to Booking</Link>
-        <button className="booking-primary-button" type="submit">Submit Review</button>
+        <button className="booking-primary-button" type="submit" disabled={isSubmitting}>{isSubmitting ? 'Submitting...' : 'Submit Review'}</button>
       </div>
     </form>
   );
 }
 
-function ReviewSuccess({ booking, review, onEdit }) {
+function ReviewSuccess({ booking, review }) {
   return (
     <section className="customer-review-success">
       <p className="finder-eyebrow">Review submitted</p>
@@ -108,7 +109,6 @@ function ReviewSuccess({ booking, review, onEdit }) {
       <div className="customer-review-form-actions">
         <Link className="booking-primary-button" to={`/dashboard/customer/find-butcher/${booking.butcherId}`}>View Butcher</Link>
         <Link className="booking-secondary-button" to="/customer/bookings">Back to Booking History</Link>
-        <button className="booking-secondary-button" type="button" onClick={onEdit}>Edit Review</button>
       </div>
     </section>
   );
@@ -116,67 +116,142 @@ function ReviewSuccess({ booking, review, onEdit }) {
 
 export function CustomerReviewFormPage() {
   const { bookingId } = useParams();
-  const booking = getCustomerBooking(bookingId);
-  const initialReview = booking?.review;
-  const [form, setForm] = useState(() => ({
-    rating: initialReview?.rating || 0,
-    serviceRating: initialReview?.serviceRating || 0,
-    professionalismRating: initialReview?.professionalismRating || 0,
-    punctualityRating: initialReview?.punctualityRating || 0,
-    cleanlinessRating: initialReview?.cleanlinessRating || 0,
-    comment: initialReview?.comment || '',
-    recommended: initialReview?.recommended || '',
-  }));
-  const [savedReview, setSavedReview] = useState(initialReview || null);
-  const [isEditing, setIsEditing] = useState(!initialReview);
+  const [booking, setBooking] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
+  const [form, setForm] = useState({ rating: 0, serviceRating: 0, professionalismRating: 0, punctualityRating: 0, cleanlinessRating: 0, comment: '', recommended: '' });
+  const [savedReview, setSavedReview] = useState(null);
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [retryKey, setRetryKey] = useState(0);
 
-  if (!booking || booking.status !== 'Completed') {
-    return <ReviewNotFound />;
-  }
+  useEffect(() => {
+    let isCurrentRequest = true;
+    setIsLoading(true);
+    setLoadError('');
 
-  const submitReview = (event) => {
+    api.customerBooking(bookingId)
+      .then((response) => {
+        if (!isCurrentRequest) return;
+        const record = response.booking;
+        const mappedBooking = mapApiBooking(record);
+        setBooking(mappedBooking);
+        setSavedReview(mappedBooking.review);
+        if (mappedBooking.review) {
+          setForm({
+            rating: mappedBooking.review.rating,
+            serviceRating: mappedBooking.review.serviceRating,
+            professionalismRating: mappedBooking.review.professionalismRating,
+            punctualityRating: mappedBooking.review.punctualityRating,
+            cleanlinessRating: mappedBooking.review.cleanlinessRating,
+            comment: mappedBooking.review.comment,
+            recommended: mappedBooking.review.recommended,
+          });
+        }
+      })
+      .catch((requestError) => {
+        if (isCurrentRequest) setLoadError(requestError?.message || 'This booking is not available for review.');
+      })
+      .finally(() => {
+        if (isCurrentRequest) setIsLoading(false);
+      });
+
+    return () => {
+      isCurrentRequest = false;
+    };
+  }, [bookingId, retryKey]);
+
+  const submitReview = async (event) => {
     event.preventDefault();
     if (!form.rating) {
       setError('Select an overall rating to continue.');
       return;
     }
-    if (!form.comment.trim()) {
-      setError('Add a comment about your experience.');
+    if (form.comment.trim().length < 5) {
+      setError('Add a comment with at least 5 characters.');
       return;
     }
-    const review = saveCustomerReview(booking.id, form);
-    if (!review) {
-      setError('This booking is not available for review.');
-      return;
-    }
-    setSavedReview(review);
-    setIsEditing(false);
+
+    setIsSubmitting(true);
     setError('');
+    try {
+      const response = await api.createReview(booking.id, {
+        rating: form.rating,
+        service_rating: form.serviceRating || null,
+        professionalism_rating: form.professionalismRating || null,
+        punctuality_rating: form.punctualityRating || null,
+        cleanliness_rating: form.cleanlinessRating || null,
+        comment: form.comment.trim(),
+        recommendation: form.recommended || null,
+      });
+      setSavedReview(mapApiReview(response.review));
+    } catch (requestError) {
+      const validationMessage = Object.values(requestError?.errors || {}).flat()[0];
+      setError(requestError?.status === 409
+        ? 'This booking already has a review.'
+        : validationMessage || requestError?.message || 'Unable to submit your review. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  if (isLoading) {
+    return <div className="find-butcher-page customer-reviews-page"><CustomerNavigation /><main className="customer-reviews-main"><p role="status">Loading booking...</p></main></div>;
+  }
+
+  if (!booking || booking.status !== 'Completed') {
+    return <ReviewNotFound message={loadError || 'Only completed bookings can be reviewed.'} onRetry={loadError ? () => setRetryKey((current) => current + 1) : null} />;
+  }
 
   return (
     <div className="find-butcher-page customer-reviews-page">
       <CustomerNavigation />
       <main className="customer-reviews-main">
         <Link className="details-back-link" to={`/customer/bookings/${encodeURIComponent(booking.id)}`}>← Booking details</Link>
-        <header className="customer-reviews-heading"><p className="finder-eyebrow">Customer feedback</p><h1>{savedReview && !isEditing ? 'Review Submitted' : 'Leave a Review'}</h1></header>
+        <header className="customer-reviews-heading"><p className="finder-eyebrow">Customer feedback</p><h1>{savedReview ? 'Review Submitted' : 'Leave a Review'}</h1></header>
         <ReviewContext booking={booking} />
-        {savedReview && !isEditing ? <ReviewSuccess booking={booking} review={savedReview} onEdit={() => setIsEditing(true)} /> : <ReviewForm booking={booking} onSubmit={submitReview} form={form} setForm={setForm} error={error} />}
+        {savedReview ? <ReviewSuccess booking={booking} review={savedReview} /> : <ReviewForm booking={booking} onSubmit={submitReview} form={form} setForm={setForm} error={error} isSubmitting={isSubmitting} />}
       </main>
     </div>
   );
 }
 
 export function MyReviewsPage() {
-  const reviews = getCustomerReviews();
+  const [reviews, setReviews] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [retryKey, setRetryKey] = useState(0);
+
+  useEffect(() => {
+    let isCurrentRequest = true;
+    setIsLoading(true);
+    setError('');
+    api.customerReviews({ per_page: 100 })
+      .then((response) => {
+        if (isCurrentRequest) setReviews((response.data || []).map((review) => mapApiReview(review)));
+      })
+      .catch((requestError) => {
+        if (!isCurrentRequest) return;
+        setReviews([]);
+        setError(requestError?.message || 'Unable to load your reviews.');
+      })
+      .finally(() => {
+        if (isCurrentRequest) setIsLoading(false);
+      });
+    return () => {
+      isCurrentRequest = false;
+    };
+  }, [retryKey]);
+
   return (
     <div className="find-butcher-page customer-reviews-page">
       <CustomerNavigation />
       <main className="customer-reviews-main">
         <Link className="details-back-link" to="/dashboard/customer">← Customer home</Link>
         <header className="customer-reviews-heading"><p className="finder-eyebrow">Customer account</p><h1>My Reviews</h1><p>{reviews.length} review{reviews.length === 1 ? '' : 's'}</p></header>
-        {reviews.length ? (
+        {isLoading ? <p role="status">Loading reviews...</p> : null}
+        {!isLoading && error ? <section className="customer-my-reviews-empty" role="alert"><p>{error}</p><button className="booking-secondary-button" type="button" onClick={() => setRetryKey((current) => current + 1)}>Try again</button></section> : null}
+        {!isLoading && !error && reviews.length ? (
           <section className="customer-my-reviews-list">
             {reviews.map((review) => (
               <article className="customer-my-review" key={review.id}>
@@ -189,14 +264,15 @@ export function MyReviewsPage() {
               </article>
             ))}
           </section>
-        ) : (
+        ) : null}
+        {!isLoading && !error && !reviews.length ? (
           <section className="customer-my-reviews-empty"><h2>No reviews yet</h2><p>After a completed booking, you can leave a review from its booking details.</p><Link className="booking-primary-button" to="/customer/bookings">Go to Booking History</Link></section>
-        )}
+        ) : null}
       </main>
     </div>
   );
 }
 
-function ReviewNotFound() {
-  return <div className="find-butcher-page customer-reviews-page"><CustomerNavigation /><main className="customer-reviews-main"><section className="customer-my-reviews-empty"><h1>Review unavailable</h1><p>Only completed bookings can be reviewed.</p><Link className="booking-primary-button" to="/customer/bookings">Go to Booking History</Link></section></main></div>;
+function ReviewNotFound({ message, onRetry }) {
+  return <div className="find-butcher-page customer-reviews-page"><CustomerNavigation /><main className="customer-reviews-main"><section className="customer-my-reviews-empty"><h1>Review unavailable</h1><p>{message}</p>{onRetry ? <button className="booking-secondary-button" type="button" onClick={onRetry}>Try again</button> : null}<Link className="booking-primary-button" to="/customer/bookings">Go to Booking History</Link></section></main></div>;
 }

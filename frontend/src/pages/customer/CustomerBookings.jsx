@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api } from '../../api';
-import { getCustomerBooking } from '../../components/customer/customerBookings';
 import { mapApiBooking } from '../../utils/apiBookings';
 import { CustomerNavigation, VerifiedMark } from './FindButchers';
 import './CustomerBookings.css';
@@ -211,8 +210,8 @@ function LoadingBooking() {
   return <div className="find-butcher-page customer-bookings-page"><CustomerNavigation /><main className="customer-bookings-main"><p className="customer-booking-empty" role="status">Loading booking...</p></main></div>;
 }
 
-function NotFound({ error }) {
-  return <div className="find-butcher-page customer-bookings-page"><CustomerNavigation /><main className="customer-bookings-main"><section className="customer-booking-not-found"><h1>Booking not found</h1><p>{error || 'This booking is not available.'}</p><Link className="booking-primary-button" to="/customer/bookings">Go to Booking History</Link></section></main></div>;
+function NotFound({ error, onRetry }) {
+  return <div className="find-butcher-page customer-bookings-page"><CustomerNavigation /><main className="customer-bookings-main"><section className="customer-booking-not-found"><h1>Booking not found</h1><p>{error || 'This booking is not available.'}</p>{onRetry ? <button className="booking-secondary-button" type="button" onClick={onRetry}>Try again</button> : null}<Link className="booking-primary-button" to="/customer/bookings">Go to Booking History</Link></section></main></div>;
 }
 
 export function BookingConfirmation() {
@@ -244,12 +243,6 @@ export function BookingConfirmation() {
       </main>
     </div>
   );
-}
-
-export function ReviewPlaceholder() {
-  const { id } = useParams();
-  const booking = getCustomerBooking(id);
-  return <div className="find-butcher-page customer-bookings-page"><CustomerNavigation /><main className="customer-bookings-main"><section className="customer-booking-not-found"><p className="finder-eyebrow">Customer feedback</p><h1>Reviews are coming soon</h1><p>{booking ? `Your completed booking with ${booking.butcherName} is ready for a review.` : 'This booking is not available.'}</p><Link className="booking-primary-button" to={booking ? `/customer/bookings/${encodeURIComponent(booking.id)}` : '/customer/bookings'}>Back to Booking</Link></section></main></div>;
 }
 
 export { BookingDetails, BookingHistory };
