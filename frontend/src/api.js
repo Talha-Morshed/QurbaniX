@@ -71,7 +71,9 @@ export const api = {
   updateButcherBookingStatus: (id, status) => request(`/butcher/bookings/${encodeURIComponent(id)}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
   butcherReviews: () => request('/butcher/reviews'),
   createPayment: (bookingId, data) => request(`/customer/bookings/${encodeURIComponent(bookingId)}/payments`, { method: 'POST', body: JSON.stringify(data) }),
-  confirmPayment: (id) => request(`/butcher/payments/${encodeURIComponent(id)}/confirm`, { method: 'POST' }),
+  customerConfirmPayment: (id) => request(`/customer/payments/${encodeURIComponent(id)}/confirm`, { method: 'POST' }),
+  butcherConfirmPayment: (id) => request(`/butcher/payments/${encodeURIComponent(id)}/confirm`, { method: 'POST' }),
+  confirmPayment: (id, role = 'customer') => request(`/${encodeURIComponent(role)}/payments/${encodeURIComponent(id)}/confirm`, { method: 'POST' }),
 };
 
 export function setToken(token) {
