@@ -156,6 +156,7 @@ class ButcherController extends Controller
             'description' => ['nullable', 'string', 'max:2000'],
             'price' => ['required', 'integer', 'min:1', 'max:10000000'],
             'duration' => ['nullable', 'string', 'max:80'],
+            'additional' => ['sometimes', 'nullable', 'string', 'max:120'],
             'is_available' => ['sometimes', 'boolean'],
         ]);
 
@@ -176,6 +177,7 @@ class ButcherController extends Controller
             'description' => ['sometimes', 'nullable', 'string', 'max:2000'],
             'price' => ['sometimes', 'required', 'integer', 'min:1', 'max:10000000'],
             'duration' => ['sometimes', 'nullable', 'string', 'max:80'],
+            'additional' => ['sometimes', 'nullable', 'string', 'max:120'],
             'is_available' => ['sometimes', 'boolean'],
         ]);
         $service->update($validated);

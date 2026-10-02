@@ -17,6 +17,7 @@ class ButcherService extends Model
         'description',
         'price',
         'duration',
+        'additional',
         'is_available',
     ];
 

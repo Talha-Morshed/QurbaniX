@@ -1,9 +1,39 @@
-export const initialServices = [
-  { id: 1, name: 'Cow Qurbani', animal: 'Cow', description: 'Complete cow Qurbani service with clean cutting and packaging.', price: '8500', duration: '2–3 hours', available: true, additional: '৳500 delivery estimate' },
-  { id: 2, name: 'Goat Qurbani', animal: 'Goat', description: 'Careful goat slaughter, cutting, and doorstep-ready packaging.', price: '4800', duration: '1–2 hours', available: true, additional: '৳300 delivery estimate' },
-  { id: 3, name: 'Sheep Qurbani', animal: 'Sheep', description: 'A complete sheep service prepared to your preferred cut.', price: '5200', duration: '1–2 hours', available: true, additional: '৳300 delivery estimate' },
-  { id: 4, name: 'Shared Cow Qurbani', animal: 'Shared Cow', description: 'Convenient cow share processing and organized distribution.', price: '2500', duration: '2–3 hours', available: false, additional: '৳200 delivery estimate' },
-  { id: 5, name: 'Camel Qurbani', animal: 'Camel', description: 'Specialist camel Qurbani service for larger family groups.', price: '14500', duration: '3–4 hours', available: true, additional: '৳800 delivery estimate' },
-];
+const defaultAdditional = '৳0 delivery estimate';
 
-export const emptyService = { name: '', animal: 'Cow', description: '', price: '', duration: '1–2 hours', available: true, additional: '৳0 delivery estimate' };
+export function serviceFromApi(service) {
+  return {
+    id: service.id,
+    name: service.name,
+    animal: service.animal,
+    category: service.category,
+    description: service.description || '',
+    price: String(service.price),
+    duration: service.duration || '1–2 hours',
+    available: Boolean(service.is_available),
+    additional: service.additional || defaultAdditional,
+  };
+}
+
+export function serviceToApi(service) {
+  return {
+    name: service.name.trim(),
+    animal: service.animal,
+    category: service.category || 'Slaughter & cutting',
+    description: service.description.trim(),
+    price: Number(service.price),
+    duration: service.duration,
+    is_available: service.available,
+    additional: service.additional.trim() || defaultAdditional,
+  };
+}
+
+export const emptyService = {
+  name: '',
+  animal: 'Cow',
+  category: 'Slaughter & cutting',
+  description: '',
+  price: '',
+  duration: '1–2 hours',
+  available: true,
+  additional: defaultAdditional,
+};
