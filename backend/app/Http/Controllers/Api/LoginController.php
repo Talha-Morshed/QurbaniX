@@ -31,7 +31,7 @@ class LoginController extends Controller
     {
         $request->validate([
             'phone' => ['required', 'string', 'regex:/^01\d{9}$/'],
-            'role' => ['nullable', 'string', 'in:customer,butcher,admin'],
+            'role' => ['nullable', 'string', 'in:customer,butcher'],
         ]);
 
         $user = User::where('phone', $request->phone)->first();
@@ -40,6 +40,12 @@ class LoginController extends Controller
             return response()->json([
                 'message' => 'No account found with this phone number.',
             ], 404);
+        }
+
+        if ($request->filled('role') && $user->role !== $request->role) {
+            return response()->json([
+                'message' => 'This account cannot be used with the selected login role.',
+            ], 403);
         }
 
         $pin = (string) random_int(
@@ -75,6 +81,7 @@ class LoginController extends Controller
         $request->validate([
             'phone' => ['required', 'string', 'regex:/^01\d{9}$/'],
             'pin' => ['required', 'string', 'size:4'],
+            'role' => ['nullable', 'string', 'in:customer,butcher'],
         ]);
 
         $user = User::where('phone', $request->phone)->first();
@@ -83,6 +90,12 @@ class LoginController extends Controller
             return response()->json([
                 'message' => 'No account found with this phone number.',
             ], 404);
+        }
+
+        if ($request->filled('role') && $user->role !== $request->role) {
+            return response()->json([
+                'message' => 'This account cannot be used with the selected login role.',
+            ], 403);
         }
 
         if (! $user->pin_hash || ! $user->pin_expires_at) {

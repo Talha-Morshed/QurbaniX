@@ -57,7 +57,7 @@ function RoleLogin({ role }) {
     setIsSubmitting(true);
 
     try {
-      const data = await api.loginVerify(form.phone.trim(), pinInput.trim());
+      const data = await api.loginVerify(form.phone.trim(), pinInput.trim(), role.toLowerCase());
       const dashboardPaths = {
         customer: '/dashboard/customer',
         butcher: '/dashboard/butcher',
