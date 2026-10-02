@@ -88,7 +88,10 @@ class BookingController extends Controller
             }
 
             if ($startTime && $endTime) {
-                abort_unless($validated['service_time'] >= $startTime && $validated['service_time'] < $endTime, 422, 'The selected time is outside the butcher’s working hours.');
+                $serviceTime = substr($validated['service_time'], 0, 5);
+                $startTime = substr((string) $startTime, 0, 5);
+                $endTime = substr((string) $endTime, 0, 5);
+                abort_unless($serviceTime >= $startTime && $serviceTime < $endTime, 422, 'The selected time is outside the butcher’s working hours.');
             }
 
             // Adnan: Count active reservations before accepting another booking for the same date.

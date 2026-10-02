@@ -208,6 +208,49 @@ class MarketplaceApiTest extends TestCase
         $this->assertDatabaseCount('user_notifications', 1);
     }
 
+    public function test_booking_rejects_a_time_at_the_exclusive_schedule_end(): void
+    {
+        $customer = User::factory()->create(['role' => 'customer']);
+        $butcher = User::factory()->create(['role' => 'butcher']);
+        $butcher->butcherProfile()->create([
+            'area' => 'Dhanmondi',
+            'city' => 'Dhaka',
+            'verification_status' => 'verified',
+            'verified_at' => now(),
+        ]);
+        $service = ButcherService::create([
+            'butcher_id' => $butcher->id,
+            'name' => 'Goat Qurbani',
+            'animal' => 'Goat',
+            'category' => 'Slaughter & cutting',
+            'price' => 3500,
+            'is_available' => true,
+        ]);
+        $serviceDate = now()->addDays(10);
+        AvailabilitySchedule::create([
+            'butcher_id' => $butcher->id,
+            'weekday' => (int) $serviceDate->format('w'),
+            'is_enabled' => true,
+            'starts_at' => '09:00',
+            'ends_at' => '17:00',
+            'capacity' => 4,
+        ]);
+
+        $this->actingAs($customer)
+            ->postJson('/api/customer/bookings', [
+                'service_id' => $service->id,
+                'service_date' => $serviceDate->toDateString(),
+                'service_time' => '17:00',
+                'address' => 'House 10, Road 2',
+                'area' => 'Dhanmondi',
+                'city' => 'Dhaka',
+            ])
+            ->assertUnprocessable()
+            ->assertJsonPath('message', 'The selected time is outside the butcher’s working hours.');
+
+        $this->assertDatabaseCount('bookings', 0);
+    }
+
     public function test_customer_cash_confirmation_records_payer_confirmation_until_butcher_confirms(): void
     {
         ['customer' => $customer, 'booking' => $booking, 'payment' => $payment] = $this->createPaymentScenario();

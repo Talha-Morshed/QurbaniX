@@ -1,10 +1,12 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { getCustomerBooking, getCustomerBookings } from '../../components/customer/customerBookings';
+import { api } from '../../api';
+import { getCustomerBooking } from '../../components/customer/customerBookings';
+import { mapApiBooking } from '../../utils/apiBookings';
 import { CustomerNavigation, VerifiedMark } from './FindButchers';
 import './CustomerBookings.css';
 
-const filters = ['All', 'Pending', 'Confirmed', 'Completed', 'Cancelled'];
+const filters = ['All', 'Pending', 'Confirmed', 'In Progress', 'Completed', 'Cancelled'];
 const progressLabels = ['Booking Requested', 'Butcher Accepted', 'Service Scheduled', 'Service Completed', 'Payment Completed'];
 
 function formatDate(date) {
@@ -26,9 +28,68 @@ function statusClass(status) {
   return `customer-booking-status status-${status.toLowerCase().replaceAll(' ', '-')}`;
 }
 
+function useApiBooking(id) {
+  const [booking, setBooking] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [retryKey, setRetryKey] = useState(0);
+
+  useEffect(() => {
+    let isCurrentRequest = true;
+    setIsLoading(true);
+    setError('');
+
+    api.customerBooking(id)
+      .then((response) => {
+        if (isCurrentRequest) setBooking(mapApiBooking(response.booking));
+      })
+      .catch((requestError) => {
+        if (!isCurrentRequest) return;
+        setBooking(null);
+        setError(requestError?.message || 'This booking could not be loaded.');
+      })
+      .finally(() => {
+        if (isCurrentRequest) setIsLoading(false);
+      });
+
+    return () => {
+      isCurrentRequest = false;
+    };
+  }, [id, retryKey]);
+
+  return { booking, isLoading, error, retry: () => setRetryKey((current) => current + 1) };
+}
+
 function BookingHistory() {
   const [activeFilter, setActiveFilter] = useState('All');
-  const bookings = useMemo(() => getCustomerBookings(), []);
+  const [bookings, setBookings] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [retryKey, setRetryKey] = useState(0);
+
+  useEffect(() => {
+    let isCurrentRequest = true;
+    setIsLoading(true);
+    setError('');
+
+    api.customerBookings({ per_page: 100 })
+      .then((response) => {
+        if (isCurrentRequest) setBookings((response.data || []).map(mapApiBooking));
+      })
+      .catch((requestError) => {
+        if (!isCurrentRequest) return;
+        setBookings([]);
+        setError(requestError?.message || 'Unable to load your bookings. Please try again.');
+      })
+      .finally(() => {
+        if (isCurrentRequest) setIsLoading(false);
+      });
+
+    return () => {
+      isCurrentRequest = false;
+    };
+  }, [retryKey]);
+
   const visibleBookings = bookings
     .filter((booking) => activeFilter === 'All' || booking.status === activeFilter)
     .sort((first, second) => second.createdDate.localeCompare(first.createdDate));
@@ -47,7 +108,7 @@ function BookingHistory() {
             <button type="button" role="tab" aria-selected={activeFilter === filter} className={activeFilter === filter ? 'is-active' : ''} key={filter} onClick={() => setActiveFilter(filter)}>{filter}</button>
           ))}
         </div>
-        <section className="customer-booking-list" aria-live="polite">
+        <section className="customer-booking-list" aria-live="polite" aria-busy={isLoading}>
           {visibleBookings.map((booking) => (
             <article className="customer-booking-card" key={booking.id}>
               <div className="customer-booking-card-top">
@@ -59,13 +120,15 @@ function BookingHistory() {
                 <div><span>Animal</span><strong>{booking.animal}</strong></div>
                 <div><span>Date &amp; time</span><strong>{formatDate(booking.date)} · {formatTime(booking.time)}</strong></div>
                 <div><span>Location</span><strong>{booking.area}, {booking.city}</strong></div>
-                <div><span>Total / advance</span><strong>{money(booking.total)} / {money(booking.advancePaid)}</strong></div>
+                <div><span>Total / advance amount</span><strong>{money(booking.total)} / {money(booking.advanceAmount)}</strong></div>
                 <div><span>Remaining / payment</span><strong>{money(booking.remaining)} · {booking.paymentStatus}</strong></div>
               </div>
               <div className="customer-booking-card-footer"><span>Payment: {booking.paymentStatus}</span><Link className="booking-secondary-button" to={`/customer/bookings/${encodeURIComponent(booking.id)}`}>View Details</Link></div>
             </article>
           ))}
-          {visibleBookings.length === 0 ? <p className="customer-booking-empty">There are no {activeFilter.toLowerCase()} bookings.</p> : null}
+          {isLoading ? <p className="customer-booking-empty" role="status">Loading bookings...</p> : null}
+          {!isLoading && error ? <div className="customer-booking-empty" role="alert"><p>{error}</p><button className="booking-secondary-button" type="button" onClick={() => setRetryKey((current) => current + 1)}>Try again</button></div> : null}
+          {!isLoading && !error && visibleBookings.length === 0 ? <p className="customer-booking-empty">There are no {activeFilter.toLowerCase()} bookings.</p> : null}
         </section>
       </main>
     </div>
@@ -74,7 +137,11 @@ function BookingHistory() {
 
 function BookingProgress({ booking }) {
   if (booking.status === 'Cancelled') return <p className="customer-cancellation-note">{booking.cancellationMessage || 'This booking was cancelled.'}</p>;
-  const currentStep = booking.status === 'Pending' ? 0 : booking.status === 'Confirmed' ? 1 : booking.status === 'In Progress' ? 2 : 4;
+  const currentStep = booking.status === 'Pending' ? 0
+    : booking.status === 'Confirmed' ? 1
+      : booking.status === 'In Progress' ? 2
+        : booking.status === 'Completed' ? (booking.paymentStatus === 'Paid in full' ? 4 : 3)
+          : 0;
   return (
     <ol className="customer-booking-progress" aria-label="Booking progress">
       {progressLabels.map((label, index) => (
@@ -96,8 +163,9 @@ function DetailRow({ label, children }) {
 
 function BookingDetails() {
   const { id } = useParams();
-  const booking = getCustomerBooking(id);
-  if (!booking) return <NotFound />;
+  const { booking, isLoading, error, retry } = useApiBooking(id);
+  if (isLoading) return <LoadingBooking />;
+  if (error || !booking) return <NotFound error={error} onRetry={retry} />;
 
   return (
     <div className="find-butcher-page customer-bookings-page">
@@ -110,7 +178,7 @@ function BookingDetails() {
         </header>
         <BookingProgress booking={booking} />
         {booking.status === 'Completed' ? (
-          <section className="customer-booking-outcome is-completed"><strong>Service completed {formatDate(booking.completedDate)}</strong><span>Total {money(booking.total)} · Advance {money(booking.advancePaid)} · Remaining cash {money(booking.total - booking.advancePaid)} · Payment completed</span><Link className="booking-secondary-button" to={`/customer/reviews/${encodeURIComponent(booking.id)}`}>{booking.review ? 'Review Submitted' : 'Leave a Review'}</Link></section>
+          <section className="customer-booking-outcome is-completed"><strong>Service completed {formatDate(booking.completedDate)}</strong><span>Total {money(booking.total)} · Advance paid {money(booking.advancePaid)} · Remaining {money(booking.remaining)} · {booking.paymentStatus}</span><Link className="booking-secondary-button" to={`/customer/reviews/${encodeURIComponent(booking.id)}`}>{booking.review ? 'Review Submitted' : 'Leave a Review'}</Link></section>
         ) : null}
         <div className="customer-booking-detail-grid">
           <DetailSection title="Booking Information">
@@ -130,7 +198,7 @@ function BookingDetails() {
             <DetailRow label="Full address">{booking.address}</DetailRow><DetailRow label="Area">{booking.area}</DetailRow><DetailRow label="City">{booking.city}</DetailRow><DetailRow label="Instructions">{booking.instructions || 'None'}</DetailRow>
           </DetailSection>
           <DetailSection title="Payment Information" className="customer-booking-payment-section">
-            <DetailRow label="Total price">{money(booking.total)}</DetailRow><DetailRow label="Advance paid online">{money(booking.advancePaid)}</DetailRow><DetailRow label="Remaining amount">{money(booking.remaining)}</DetailRow><DetailRow label="Remaining payment method">{booking.remainingPaymentMethod}</DetailRow><DetailRow label="Payment status">{booking.paymentStatus}</DetailRow><DetailRow label="Transaction reference">{booking.transactionReference}</DetailRow>
+            <DetailRow label="Total price">{money(booking.total)}</DetailRow><DetailRow label="Advance amount">{money(booking.advanceAmount)}</DetailRow><DetailRow label="Advance paid">{money(booking.advancePaid)}</DetailRow><DetailRow label="Remaining amount">{money(booking.remaining)}</DetailRow><DetailRow label="Payment status">{booking.paymentStatus}</DetailRow><DetailRow label="Transaction reference">{booking.transactionReference || 'Not available'}</DetailRow>
           </DetailSection>
         </div>
         <div className="customer-booking-detail-actions"><Link className="booking-secondary-button" to="/customer/bookings">Back to Booking History</Link><Link className="booking-primary-button" to="/dashboard/customer">Customer home</Link></div>
@@ -139,21 +207,26 @@ function BookingDetails() {
   );
 }
 
-function NotFound() {
-  return <div className="find-butcher-page customer-bookings-page"><CustomerNavigation /><main className="customer-bookings-main"><section className="customer-booking-not-found"><h1>Booking not found</h1><p>This booking may have been cleared from local browser storage.</p><Link className="booking-primary-button" to="/customer/bookings">Go to Booking History</Link></section></main></div>;
+function LoadingBooking() {
+  return <div className="find-butcher-page customer-bookings-page"><CustomerNavigation /><main className="customer-bookings-main"><p className="customer-booking-empty" role="status">Loading booking...</p></main></div>;
+}
+
+function NotFound({ error }) {
+  return <div className="find-butcher-page customer-bookings-page"><CustomerNavigation /><main className="customer-bookings-main"><section className="customer-booking-not-found"><h1>Booking not found</h1><p>{error || 'This booking is not available.'}</p><Link className="booking-primary-button" to="/customer/bookings">Go to Booking History</Link></section></main></div>;
 }
 
 export function BookingConfirmation() {
   const { id } = useParams();
-  const booking = getCustomerBooking(id);
-  if (!booking) return <NotFound />;
+  const { booking, isLoading, error } = useApiBooking(id);
+  if (isLoading) return <LoadingBooking />;
+  if (error || !booking) return <NotFound error={error} />;
   return (
     <div className="find-butcher-page customer-bookings-page">
       <CustomerNavigation />
       <main className="customer-bookings-main customer-confirmation-main">
         <section className="customer-confirmation-panel">
-          <p className="finder-eyebrow">Advance payment successful</p><h1>Booking request received</h1>
-          <p className="customer-confirmation-message">Your mock advance payment is recorded. {booking.butcherName} must accept and confirm this booking before the service is scheduled.</p>
+          <p className="finder-eyebrow">Booking submitted</p><h1>Booking request received</h1>
+          <p className="customer-confirmation-message">Your booking was submitted to {booking.butcherName}. Payment status is {booking.paymentStatus}; the butcher must confirm this request before the service is scheduled.</p>
           <p className="customer-confirmation-reference">{booking.reference}</p>
           <dl className="customer-confirmation-summary">
             <div><dt>Butcher</dt><dd>{booking.butcherName} <VerifiedMark verified={booking.butcherVerified} /></dd></div>
@@ -161,9 +234,10 @@ export function BookingConfirmation() {
             <div><dt>Date &amp; time</dt><dd>{formatDate(booking.date)} · {formatTime(booking.time)}</dd></div>
             <div><dt>Location</dt><dd>{booking.address}, {booking.area}, {booking.city}</dd></div>
             <div><dt>Total service price</dt><dd>{money(booking.total)}</dd></div>
-            <div><dt>Advance paid</dt><dd>{money(booking.advancePaid)}</dd></div>
-            <div><dt>Remaining · Cash</dt><dd>{money(booking.remaining)}</dd></div>
+            <div><dt>Advance amount</dt><dd>{money(booking.advanceAmount)}</dd></div>
+            <div><dt>Remaining amount</dt><dd>{money(booking.remaining)}</dd></div>
             <div><dt>Booking status</dt><dd><span className={statusClass(booking.status)}>{booking.status}</span></dd></div>
+            <div><dt>Payment status</dt><dd>{booking.paymentStatus}</dd></div>
           </dl>
           <div className="customer-confirmation-actions"><Link className="booking-primary-button" to={`/customer/bookings/${encodeURIComponent(booking.id)}`}>View Booking</Link><Link className="booking-secondary-button" to="/customer/bookings">Go to Booking History</Link><Link className="booking-secondary-button" to="/">Back to Home</Link></div>
         </section>

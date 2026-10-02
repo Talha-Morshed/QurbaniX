@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { butchers } from '../../components/customer/butchersData';
-import { butcherProfileDetails, getButcherServices } from '../../components/customer/butcherProfileData';
-import { createCustomerBooking } from '../../components/customer/customerBookings';
-import { validatePhone } from '../../utils/validation';
+import { api } from '../../api';
+import { useAuth } from '../../auth/AuthContext';
+import { mapApiBooking } from '../../utils/apiBookings';
+import { mapButcherDetailsResponse } from '../../utils/butcherDirectory';
 import { CustomerNavigation, VerifiedMark } from './FindButchers';
 import './ButcherDetails.css';
 import './Booking.css';
@@ -28,20 +28,6 @@ function getScheduleForDate(date, schedule) {
     const dayIndex = weekdays.indexOf(dayName);
     return dayIndex >= startIndex && dayIndex <= endIndex;
   }) || null;
-}
-
-function timeToMinutes(time) {
-  const match = time.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
-  if (!match) return null;
-  const hour = Number(match[1]) % 12 + (match[3].toUpperCase() === 'PM' ? 12 : 0);
-  return hour * 60 + Number(match[2]);
-}
-
-function timeToInput(time) {
-  const match = time.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
-  if (!match) return '';
-  const hour = Number(match[1]) % 12 + (match[3].toUpperCase() === 'PM' ? 12 : 0);
-  return `${String(hour).padStart(2, '0')}:${match[2]}`;
 }
 
 function formatDate(date) {
@@ -101,12 +87,9 @@ function PriceSummary({ selectedService }) {
   );
 }
 
-function Booking({ butcher, services, profile, booking, setBooking, step, errors, setErrors, onContinue, onBack }) {
+function Booking({ butcher, services, profile, booking, setBooking, step, errors, setErrors, onContinue, onBack, isSubmitting, submitError }) {
   const selectedService = services.find((service) => service.id === booking.serviceId);
   const daySchedule = getScheduleForDate(booking.date, profile.schedule);
-  const timeRange = daySchedule?.[1].split(' - ') || [];
-  const minimumTime = timeRange[0] ? timeToInput(timeRange[0]) : '';
-  const maximumTime = timeRange[1] ? timeToInput(timeRange[1]) : '';
   const setField = (field, value) => {
     setBooking((current) => ({ ...current, [field]: value }));
     setErrors((current) => ({ ...current, [field]: '' }));
@@ -166,7 +149,7 @@ function Booking({ butcher, services, profile, booking, setBooking, step, errors
                 <div className="booking-step-heading">
                   <p className="booking-kicker">Step 2 of 4</p>
                   <h2>Choose date &amp; time</h2>
-                  <p>Available hours are based on this butcher&apos;s schedule.</p>
+                  <p>The butcher will confirm the selected date and time.</p>
                 </div>
                 <div className="booking-field-grid">
                   <label className="booking-field">
@@ -178,12 +161,6 @@ function Booking({ butcher, services, profile, booking, setBooking, step, errors
                       aria-invalid={Boolean(errors.date)}
                       onChange={(event) => {
                         const date = event.target.value;
-                        const schedule = getScheduleForDate(date, profile.schedule);
-                        if (date && !schedule) {
-                          setBooking((current) => ({ ...current, date: '', time: '' }));
-                          setErrors((current) => ({ ...current, date: 'This butcher is not scheduled for the selected day.' }));
-                          return;
-                        }
                         setBooking((current) => ({ ...current, date, time: '' }));
                         setErrors((current) => ({ ...current, date: '', time: '' }));
                       }}
@@ -194,14 +171,12 @@ function Booking({ butcher, services, profile, booking, setBooking, step, errors
                     <span>Preferred time <b>*</b></span>
                     <input
                       type="time"
-                      min={minimumTime}
-                      max={maximumTime}
                       value={booking.time}
-                      disabled={!booking.date || !daySchedule}
+                      disabled={!booking.date}
                       aria-invalid={Boolean(errors.time)}
                       onChange={(event) => setField('time', event.target.value)}
                     />
-                    <small>{daySchedule ? `Available ${daySchedule[1]}` : 'Select an available date first.'}</small>
+                    <small>{daySchedule ? `Usual hours ${daySchedule[1]}; final availability is confirmed on submission.` : 'Final availability is confirmed on submission.'}</small>
                     {errors.time ? <small className="booking-error" role="alert">{errors.time}</small> : null}
                   </label>
                 </div>
@@ -244,13 +219,11 @@ function Booking({ butcher, services, profile, booking, setBooking, step, errors
                   <div className="booking-field-grid">
                     <label className="booking-field">
                       <span>Customer name <b>*</b></span>
-                      <input autoComplete="name" value={booking.customerName} onChange={(event) => setField('customerName', event.target.value)} placeholder="Your full name" aria-invalid={Boolean(errors.customerName)} />
-                      {errors.customerName ? <small className="booking-error" role="alert">{errors.customerName}</small> : null}
+                      <input autoComplete="name" value={booking.customerName} readOnly />
                     </label>
                     <label className="booking-field">
                       <span>Phone number <b>*</b></span>
-                      <input type="tel" autoComplete="tel-national" inputMode="tel" value={booking.phone} onChange={(event) => setField('phone', event.target.value)} placeholder="01XXXXXXXXX" aria-invalid={Boolean(errors.phone)} />
-                      {errors.phone ? <small className="booking-error" role="alert">{errors.phone}</small> : null}
+                      <input type="tel" autoComplete="tel-national" value={booking.phone} readOnly />
                     </label>
                   </div>
                 </div>
@@ -284,9 +257,10 @@ function Booking({ butcher, services, profile, booking, setBooking, step, errors
               {step < 3 ? (
                 <button className="booking-primary-button" type="button" onClick={onContinue}>Continue</button>
               ) : (
-                <button className="booking-primary-button" type="button" onClick={onContinue}>Proceed to Payment <span aria-hidden="true">→</span></button>
+                <button className="booking-primary-button" type="button" onClick={onContinue} disabled={isSubmitting}>{isSubmitting ? 'Submitting...' : 'Submit Booking'} <span aria-hidden="true">→</span></button>
               )}
             </div>
+            {submitError ? <p className="booking-error" role="alert">{submitError}</p> : null}
           </section>
 
           <PriceSummary selectedService={selectedService} />
@@ -301,44 +275,90 @@ function BookingPage() {
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const butcher = butchers.find((item) => item.id === butcherId);
-  const profile = butcherProfileDetails[butcherId];
-  const services = butcher ? getButcherServices(butcher) : [];
-  const canBook = butcher?.verified && butcher.availability !== 'Unavailable';
-  const requestedServiceId = searchParams.get('service');
-  const initialService = services.find((service) => service.id === requestedServiceId);
+  const { user } = useAuth();
+  const [butcher, setButcher] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
+  const [retryKey, setRetryKey] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
   const [booking, setBooking] = useState(() => location.state?.booking || {
-    serviceId: initialService?.id || '',
+    serviceId: searchParams.get('service') || '',
     date: '',
     time: '',
     address: '',
-    area: butcher?.area.split(',')[0] || '',
-    city: butcher?.area.split(',').at(-1)?.trim() || '',
+    area: '',
+    city: '',
     instructions: '',
-    customerName: '',
-    phone: '',
+    customerName: user?.name || '',
+    phone: user?.phone || '',
   });
   const [step, setStep] = useState(location.state?.step || 0);
   const [errors, setErrors] = useState({});
 
-  if (!butcher || !profile) {
+  useEffect(() => {
+    let isCurrentRequest = true;
+    setIsLoading(true);
+    setLoadError('');
+
+    api.butcher(butcherId)
+      .then((response) => {
+        if (isCurrentRequest) setButcher(mapButcherDetailsResponse(response));
+      })
+      .catch((requestError) => {
+        if (!isCurrentRequest) return;
+        setButcher(null);
+        setLoadError(requestError?.message || 'Unable to load this butcher. Please try again.');
+      })
+      .finally(() => {
+        if (isCurrentRequest) setIsLoading(false);
+      });
+
+    return () => {
+      isCurrentRequest = false;
+    };
+  }, [butcherId, retryKey]);
+
+  const profile = butcher;
+  const services = butcher?.services || [];
+  const canBook = butcher?.verified && butcher.availability !== 'Unavailable';
+  const requestedServiceId = searchParams.get('service');
+
+  useEffect(() => {
+    if (!butcher) return;
+    setBooking((current) => ({
+      ...current,
+      serviceId: current.serviceId || requestedServiceId || '',
+      area: current.area || butcher.areaName,
+      city: current.city || butcher.city,
+      customerName: user?.name || '',
+      phone: user?.phone || '',
+    }));
+  }, [butcher, requestedServiceId, user?.name, user?.phone]);
+
+  if (isLoading || loadError || !butcher) {
     return (
       <div className="find-butcher-page booking-page">
         <CustomerNavigation />
         <main className="booking-main">
-          <section className="booking-error-panel"><h1>Booking not available</h1><p>This butcher could not be found.</p><Link className="booking-primary-button" to="/dashboard/customer/find-butcher">Back to Butchers</Link></section>
+          <section className="booking-error-panel" role={isLoading ? 'status' : 'alert'}>
+            <h1>{isLoading ? 'Loading butcher' : 'Booking unavailable'}</h1>
+            <p>{isLoading ? 'Fetching the butcher’s live services.' : loadError || 'This butcher could not be found.'}</p>
+            {!isLoading && loadError ? <button className="booking-primary-button" type="button" onClick={() => setRetryKey((current) => current + 1)}>Try again</button> : null}
+            <Link className="booking-primary-button" to="/dashboard/customer/find-butcher">Back to Butchers</Link>
+          </section>
         </main>
       </div>
     );
   }
 
-  if (!canBook) {
+  if (!canBook || services.length === 0) {
     return (
       <div className="find-butcher-page booking-page">
         <CustomerNavigation />
         <main className="booking-main">
           <Link className="details-back-link" to={`/dashboard/customer/find-butcher/${butcher.id}`}>← Back to Butcher Profile</Link>
-          <section className="booking-error-panel"><h1>Booking unavailable</h1><p>{butcher.verified ? 'This butcher is currently unavailable.' : 'This butcher is not verified yet.'}</p><Link className="booking-primary-button" to={`/dashboard/customer/find-butcher/${butcher.id}`}>Return to profile</Link></section>
+          <section className="booking-error-panel"><h1>Booking unavailable</h1><p>{!butcher.verified ? 'This butcher is not verified.' : butcher.availability === 'Unavailable' ? 'This butcher is currently unavailable.' : 'This butcher has no available services.'}</p><Link className="booking-primary-button" to={`/dashboard/customer/find-butcher/${butcher.id}`}>Return to profile</Link></section>
         </main>
       </div>
     );
@@ -351,38 +371,54 @@ function BookingPage() {
     if (step === 1) {
       if (!booking.date) nextErrors.date = 'Choose an available date.';
       else if (booking.date < getMinimumDate()) nextErrors.date = 'Choose today or a future date.';
-      else if (!getScheduleForDate(booking.date, profile.schedule)) nextErrors.date = 'This butcher is not scheduled for the selected day.';
       if (!booking.time) nextErrors.time = 'Choose a preferred time.';
-      else if (booking.date) {
-        const schedule = getScheduleForDate(booking.date, profile.schedule);
-        const bounds = schedule?.[1].split(' - ') || [];
-        const selectedMinutes = Number(booking.time.slice(0, 2)) * 60 + Number(booking.time.slice(3, 5));
-        if (!bounds.length || selectedMinutes < timeToMinutes(bounds[0]) || selectedMinutes > timeToMinutes(bounds[1])) {
-          nextErrors.time = 'Choose a time within the butcher’s working hours.';
-        }
-      }
     }
     if (step === 2) {
       if (!booking.address.trim()) nextErrors.address = 'Enter the full service address.';
       if (!booking.area.trim()) nextErrors.area = 'Enter the service area.';
       if (!booking.city.trim()) nextErrors.city = 'Enter the city.';
-      if (!booking.customerName.trim()) nextErrors.customerName = 'Enter the customer name.';
-      if (!booking.phone.trim()) nextErrors.phone = 'Enter a phone number.';
-      else if (!validatePhone(booking.phone)) nextErrors.phone = 'Enter a valid Bangladesh phone number (01XXXXXXXXX).';
     }
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
+    setSubmitError('');
     if (!validateStep()) return;
     if (step < 3) {
       setStep((current) => current + 1);
       return;
     }
-    navigate(`/dashboard/customer/payment/${butcher.id}`, {
-      state: { booking: { ...booking, butcherId: butcher.id }, step: 4 },
-    });
+
+    setIsSubmitting(true);
+    try {
+      const response = await api.createBooking({
+        service_id: Number(booking.serviceId),
+        service_date: booking.date,
+        service_time: booking.time,
+        address: booking.address.trim(),
+        area: booking.area.trim(),
+        city: booking.city.trim(),
+        instructions: booking.instructions.trim() || null,
+      });
+      const createdBooking = mapApiBooking(response.booking);
+      navigate(`/customer/booking-confirmation/${createdBooking.id}`, { state: { booking: createdBooking } });
+    } catch (requestError) {
+      const validationErrors = requestError?.errors || {};
+      setErrors((current) => ({
+        ...current,
+        date: validationErrors.service_date?.[0] || '',
+        time: validationErrors.service_time?.[0] || '',
+        address: validationErrors.address?.[0] || '',
+        area: validationErrors.area?.[0] || '',
+        city: validationErrors.city?.[0] || '',
+        instructions: validationErrors.instructions?.[0] || '',
+        serviceId: validationErrors.service_id?.[0] || '',
+      }));
+      setSubmitError(requestError?.message || 'Unable to create the booking. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -396,6 +432,8 @@ function BookingPage() {
       errors={errors}
       setErrors={setErrors}
       onContinue={handleContinue}
+      isSubmitting={isSubmitting}
+      submitError={submitError}
       onBack={() => {
         setErrors({});
         setStep((current) => Math.max(0, current - 1));
@@ -409,9 +447,6 @@ export function PaymentPlaceholder() {
   const location = useLocation();
   const navigate = useNavigate();
   const booking = location.state?.booking;
-  const butcher = butchers.find((item) => item.id === butcherId);
-  const services = butcher ? getButcherServices(butcher) : [];
-  const selectedService = services.find((service) => service.id === booking?.serviceId);
   const bookingPath = `/dashboard/customer/book/${butcherId}?service=${encodeURIComponent(booking?.serviceId || '')}`;
 
   return (
@@ -420,36 +455,27 @@ export function PaymentPlaceholder() {
       <main className="booking-main payment-placeholder-main">
         <BookingProgress step={4} />
         <section className="payment-placeholder-panel">
-          <p className="booking-kicker">Step 5 · Payment</p>
-          <h1>Pay your booking advance</h1>
-          <p>This is a mock payment preview. No real payment method or charge is involved.</p>
-          {booking && butcher && selectedService ? (
+          <p className="booking-kicker">Booking update</p>
+          <h1>Live booking confirmation</h1>
+          <p>This booking flow is handled by the QurbaniX backend. The server creates the booking and the confirmed reference is shown on the booking confirmation page.</p>
+          {booking ? (
             <div className="payment-preview-summary">
-              <div><span>Butcher</span><strong>{butcher.name}</strong></div>
-              <div><span>Service</span><strong>{selectedService.name}</strong></div>
+              <div><span>Butcher</span><strong>{booking.butcherName}</strong></div>
+              <div><span>Service</span><strong>{booking.serviceName}</strong></div>
               <div><span>Date &amp; time</span><strong>{formatDate(booking.date)} · {booking.time}</strong></div>
               <div><span>Location</span><strong>{booking.address}, {booking.area}, {booking.city}</strong></div>
-              <div><span>Customer</span><strong>{booking.customerName}</strong></div>
-              <div><span>Phone</span><strong>{booking.phone}</strong></div>
-              <div><span>Total</span><strong>৳{selectedService.price.toLocaleString('en-BD')}</strong></div>
+              <div><span>Customer</span><strong>{booking.customerName || 'Customer'}</strong></div>
+              <div><span>Phone</span><strong>{booking.phone || 'Not provided'}</strong></div>
+              <div><span>Total</span><strong>{booking.total ? `৳${Number(booking.total).toLocaleString('en-BD')}` : 'Not available'}</strong></div>
             </div>
           ) : (
             <p className="payment-preview-note">Open this step after reviewing a booking to see its summary here.</p>
           )}
-          <p className="payment-preview-note">The remaining balance is paid in cash after the service.</p>
+          <p className="payment-preview-note">Advance and remaining payment details are taken from the backend record and displayed on the real booking confirmation.</p>
           <div className="booking-step-actions">
             <Link className="booking-secondary-button" to={bookingPath} state={{ booking, step: 3 }}>Back to Review</Link>
-            {booking && butcher && selectedService ? (
-              <button
-                className="booking-primary-button"
-                type="button"
-                onClick={() => {
-                  const savedBooking = createCustomerBooking({ booking, butcher, service: selectedService });
-                  navigate(`/customer/booking-confirmation/${encodeURIComponent(savedBooking.id)}`);
-                }}
-              >
-                Mock pay advance ৳{Math.ceil(selectedService.price * 0.2).toLocaleString('en-BD')}
-              </button>
+            {booking ? (
+              <button className="booking-primary-button" type="button" onClick={() => navigate(`/customer/booking-confirmation/${encodeURIComponent(booking.id)}`)}>View confirmation</button>
             ) : (
               <Link className="booking-primary-button" to={`/dashboard/customer/find-butcher/${butcherId}`}>Return to profile</Link>
             )}

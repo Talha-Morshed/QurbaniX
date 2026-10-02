@@ -46,7 +46,7 @@ export const api = {
   butcher: (id) => request(`/butchers/${encodeURIComponent(id)}`),
   customerProfile: () => request('/customer/profile'),
   updateCustomerProfile: (data) => request('/customer/profile', { method: 'PUT', body: JSON.stringify(data) }),
-  customerBookings: () => request('/customer/bookings'),
+  customerBookings: (filters = {}) => request(`/customer/bookings?${new URLSearchParams(filters)}`),
   customerBooking: (id) => request(`/customer/bookings/${encodeURIComponent(id)}`),
   createBooking: (data) => request('/customer/bookings', { method: 'POST', body: JSON.stringify(data) }),
   updateBookingStatus: (id, status, cancellationReason) => request(`/customer/bookings/${encodeURIComponent(id)}/status`, {
