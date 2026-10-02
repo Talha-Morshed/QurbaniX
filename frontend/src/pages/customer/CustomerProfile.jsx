@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { clearToken } from '../../api';
+import { useAuth } from '../../auth/AuthContext';
 import { getCustomerBookings } from '../../components/customer/customerBookings';
 import { getCustomerReviews } from '../../components/customer/customerBookings';
 import { getCustomerAccount, saveCustomerAccount } from '../../components/customer/customerAccount';
@@ -37,6 +37,7 @@ function getProfileDraft(account) {
 
 function CustomerProfile() {
   const navigate = useNavigate();
+  const { logout: logoutFromAuth } = useAuth();
   const [account, setAccount] = useState(getCustomerAccount);
   const [profileDraft, setProfileDraft] = useState(() => getProfileDraft(getCustomerAccount()));
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -146,9 +147,9 @@ function CustomerProfile() {
     persistAccount({ ...account, notifications: { ...account.notifications, [key]: checked } });
   };
 
-  const logout = () => {
-    clearToken();
-    navigate('/login/customer');
+  const logout = async () => {
+    await logoutFromAuth();
+    navigate('/login/customer', { replace: true });
   };
 
   return (

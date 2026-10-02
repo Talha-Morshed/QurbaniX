@@ -27,6 +27,7 @@ import Earnings from './pages/butcher/Earnings.jsx';
 import Reviews from './pages/butcher/Reviews.jsx';
 import Profile from './pages/butcher/Profile.jsx';
 import TermsAndConditions from './pages/Terms/TermsAndConditions.jsx';
+import ProtectedRoute from './auth/ProtectedRoute.jsx';
 
 function App() {
   return (
@@ -44,25 +45,29 @@ function App() {
         <Route path="/forgot-password/butcher" element={<ButcherForgotPassword />} />
         <Route path="/reset-password/customer" element={<CustomerResetPassword />} />
         <Route path="/reset-password/butcher" element={<ButcherResetPassword />} />
-        <Route path="/dashboard/customer" element={<CustomerDashboard />} />
-        <Route path="/dashboard/customer/find-butcher" element={<FindButchers />} />
-        <Route path="/dashboard/customer/find-butcher/:butcherId" element={<ButcherDetails />} />
-        <Route path="/dashboard/customer/book/:butcherId" element={<Booking />} />
-        <Route path="/dashboard/customer/payment/:butcherId" element={<PaymentPlaceholder />} />
-        <Route path="/customer/bookings" element={<BookingHistory />} />
-        <Route path="/customer/bookings/:id" element={<BookingDetails />} />
-        <Route path="/customer/booking-confirmation/:id" element={<BookingConfirmation />} />
-        <Route path="/customer/reviews" element={<MyReviewsPage />} />
-        <Route path="/customer/reviews/:bookingId" element={<CustomerReviewFormPage />} />
-        <Route path="/customer/profile" element={<CustomerProfile />} />
-        <Route path="/customer/notifications" element={<CustomerNotifications />} />
-        <Route path="/dashboard/butcher" element={<ButcherDashboard />} />
-        <Route path="/dashboard/butcher/bookings" element={<Bookings />} />
-        <Route path="/dashboard/butcher/services" element={<ServicesPricing />} />
-        <Route path="/dashboard/butcher/availability" element={<Availability />} />
-        <Route path="/dashboard/butcher/earnings" element={<Earnings />} />
-        <Route path="/dashboard/butcher/reviews" element={<Reviews />} />
-        <Route path="/dashboard/butcher/profile" element={<Profile />} />
+        <Route element={<ProtectedRoute role="customer" />}>
+          <Route path="/dashboard/customer" element={<CustomerDashboard />} />
+          <Route path="/dashboard/customer/find-butcher" element={<FindButchers />} />
+          <Route path="/dashboard/customer/find-butcher/:butcherId" element={<ButcherDetails />} />
+          <Route path="/dashboard/customer/book/:butcherId" element={<Booking />} />
+          <Route path="/dashboard/customer/payment/:butcherId" element={<PaymentPlaceholder />} />
+          <Route path="/customer/bookings" element={<BookingHistory />} />
+          <Route path="/customer/bookings/:id" element={<BookingDetails />} />
+          <Route path="/customer/booking-confirmation/:id" element={<BookingConfirmation />} />
+          <Route path="/customer/reviews" element={<MyReviewsPage />} />
+          <Route path="/customer/reviews/:bookingId" element={<CustomerReviewFormPage />} />
+          <Route path="/customer/profile" element={<CustomerProfile />} />
+          <Route path="/customer/notifications" element={<CustomerNotifications />} />
+        </Route>
+        <Route element={<ProtectedRoute role="butcher" />}>
+          <Route path="/dashboard/butcher" element={<ButcherDashboard />} />
+          <Route path="/dashboard/butcher/bookings" element={<Bookings />} />
+          <Route path="/dashboard/butcher/services" element={<ServicesPricing />} />
+          <Route path="/dashboard/butcher/availability" element={<Availability />} />
+          <Route path="/dashboard/butcher/earnings" element={<Earnings />} />
+          <Route path="/dashboard/butcher/reviews" element={<Reviews />} />
+          <Route path="/dashboard/butcher/profile" element={<Profile />} />
+        </Route>
         <Route path="/terms" element={<TermsAndConditions />} />
         <Route path="*" element={<LandingPage />} />
       </Routes>

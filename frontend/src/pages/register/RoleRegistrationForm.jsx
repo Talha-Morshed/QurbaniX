@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import FormField from '../../components/form/FormField';
 import { validatePhone } from '../../utils/validation';
-import { api, setToken } from '../../api';
+import { api } from '../../api';
+import { useAuth } from '../../auth/AuthContext';
 
 const initialState = { fullName: '', phone: '', agree: false };
 
@@ -12,6 +13,7 @@ function RoleRegistrationForm({ role, loginPath, onComplete, onPinRequested, sho
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const { authenticate } = useAuth();
 
   const validate = () => {
     const nextErrors = {};
@@ -37,7 +39,7 @@ function RoleRegistrationForm({ role, loginPath, onComplete, onPinRequested, sho
         role: role.toLowerCase(),
       });
 
-      setToken(data.token);
+      authenticate(data.user, data.token);
       setSubmitted(true);
       onComplete?.();
     } catch (err) {

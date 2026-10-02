@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import LoginShell from '../../components/form/LoginShell';
 import { maskPhone, validatePhone } from '../../utils/validation';
-import { api, setToken } from '../../api';
+import { api } from '../../api';
+import { useAuth } from '../../auth/AuthContext';
 
 function RoleLogin({ role }) {
   const [form, setForm] = useState({ phone: '' });
@@ -13,6 +14,7 @@ function RoleLogin({ role }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const navigate = useNavigate();
+  const { authenticate } = useAuth();
 
   const validatePhoneOnly = () => {
     const nextErrors = {};
@@ -60,14 +62,14 @@ function RoleLogin({ role }) {
         customer: '/dashboard/customer',
         butcher: '/dashboard/butcher',
       };
-      const authenticatedDashboard = dashboardPaths[data.user.role];
+      const authenticatedDashboard = dashboardPaths[data.user?.role];
 
       if (!authenticatedDashboard) {
         setErrorMsg('This account role cannot sign in here.');
         return;
       }
 
-      setToken(data.token);
+      authenticate(data.user, data.token);
       navigate(authenticatedDashboard, { replace: true });
     } catch (err) {
       setErrorMsg(err.message || 'Incorrect PIN. Please try again.');
