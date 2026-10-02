@@ -1,15 +1,85 @@
-export const initialSchedule = [
-  { day: 'Saturday', enabled: true, start: '09:00', end: '18:00' },
-  { day: 'Sunday', enabled: true, start: '10:00', end: '17:00' },
-  { day: 'Monday', enabled: false, start: '09:00', end: '18:00' },
-  { day: 'Tuesday', enabled: true, start: '09:00', end: '18:00' },
-  { day: 'Wednesday', enabled: true, start: '10:00', end: '17:00' },
-  { day: 'Thursday', enabled: true, start: '09:00', end: '18:00' },
-  { day: 'Friday', enabled: false, start: '09:00', end: '18:00' },
+const daysByWeekday = [
+  'Sunday',
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
 ];
 
-export const initialSpecialDates = [
-  { id: 1, date: 'June 7, 2026', name: 'Qurbani Day', hours: '9:00 AM – 8:00 PM', type: 'Extra availability' },
-  { id: 2, date: 'June 8, 2026', name: 'Post-Qurbani break', hours: 'Unavailable', type: 'Fully unavailable' },
-  { id: 3, date: 'June 20, 2026', name: 'Family event', hours: '10:00 AM – 2:00 PM', type: 'Different hours' },
-];
+function dateOnly(value) {
+  return String(value || '').slice(0, 10);
+}
+
+function displayDate(value) {
+  const date = dateOnly(value);
+  if (!date) return '';
+  const [year, month, day] = date.split('-').map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
+
+function formatTime(value) {
+  return value ? String(value).slice(0, 5) : '';
+}
+
+export function availabilityFromApi(data) {
+  const configuredDays = new Map((data.schedule || []).map((item) => [
+    Number(item.weekday),
+    item,
+  ]));
+  const dailyCapacity = Number(data.daily_capacity) || 5;
+  const weekOrder = [6, 0, 1, 2, 3, 4, 5];
+  const schedule = weekOrder.map((weekday) => {
+    const item = configuredDays.get(weekday);
+    return {
+      weekday,
+      day: daysByWeekday[weekday],
+      enabled: Boolean(item?.is_enabled),
+      start: formatTime(item?.starts_at),
+      end: formatTime(item?.ends_at),
+      capacity: Number(item?.capacity) || dailyCapacity,
+    };
+  });
+  const dates = (data.exceptions || []).map((item) => ({
+    id: item.id,
+    date: displayDate(item.date),
+    name: item.is_available ? 'Schedule exception' : 'Unavailable',
+    hours: item.is_available && item.starts_at && item.ends_at
+      ? `${formatTime(item.starts_at)} – ${formatTime(item.ends_at)}`
+      : item.is_available ? 'Available' : 'Unavailable',
+    type: item.is_available ? 'Special availability' : 'Fully unavailable',
+  }));
+
+  return {
+    isAvailable: Boolean(data.is_available),
+    capacity: dailyCapacity,
+    schedule,
+    dates,
+  };
+}
+
+export function availabilityToApi({ isAvailable, capacity, schedule, exceptions }) {
+  return {
+    is_available: isAvailable,
+    daily_capacity: Number(capacity),
+    schedule: schedule.map((item) => ({
+      weekday: item.weekday,
+      is_enabled: item.enabled,
+      starts_at: item.enabled ? item.start : null,
+      ends_at: item.enabled ? item.end : null,
+      capacity: Number(capacity),
+    })),
+    exceptions: exceptions.map((item) => ({
+      date: dateOnly(item.date),
+      is_available: Boolean(item.is_available),
+      starts_at: item.starts_at ? formatTime(item.starts_at) : null,
+      ends_at: item.ends_at ? formatTime(item.ends_at) : null,
+      capacity: item.capacity ?? null,
+    })),
+  };
+}

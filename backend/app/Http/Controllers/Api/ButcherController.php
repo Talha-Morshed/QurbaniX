@@ -198,9 +198,11 @@ class ButcherController extends Controller
     /** Adnan: Return weekly working hours, date exceptions, and the butcher's overall availability. */
     public function availability(Request $request): JsonResponse
     {
+        $profile = $request->user()->butcherProfile()->first();
+
         return response()->json([
-            'is_available' => (bool) $request->user()->butcherProfile?->is_available,
-            'daily_capacity' => $request->user()->butcherProfile?->daily_capacity,
+            'is_available' => (bool) $profile?->is_available,
+            'daily_capacity' => $profile?->daily_capacity,
             'schedule' => $request->user()->availabilitySchedules()->orderBy('weekday')->get(),
             'exceptions' => $request->user()->availabilityExceptions()->orderBy('date')->get(),
         ]);
