@@ -15,7 +15,7 @@ import ButcherResetPassword from './pages/login/ButcherResetPassword.jsx';
 import CustomerDashboard from './pages/dashboard/CustomerDashboard.jsx';
 import FindButchers from './pages/customer/FindButchers.jsx';
 import SmartMatch from './pages/customer/SmartMatch.jsx';
-import ButcherDetails, { BookingPlaceholder } from './pages/customer/ButcherDetails.jsx';
+import ButcherDetails from './pages/customer/ButcherDetails.jsx';
 import Booking, { PaymentPlaceholder } from './pages/customer/Booking.jsx';
 import { BookingConfirmation, BookingDetails, BookingHistory } from './pages/customer/CustomerBookings.jsx';
 import { CustomerReviewFormPage, MyReviewsPage } from './pages/customer/CustomerReviews.jsx';

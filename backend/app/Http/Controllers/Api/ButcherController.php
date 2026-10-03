@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Review;
 use App\Models\ButcherService;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -92,11 +93,21 @@ class ButcherController extends Controller
         $butcher->loadCount(['reviews as review_count' => fn (Builder $reviews) => $reviews->where('status', 'published')]);
         $reviews = $butcher->reviews()
             ->where('status', 'published')
-            ->with('customer:id,name')
+            ->with(['customer:id,name', 'booking.service'])
             ->latest()
             ->paginate(10);
+        $ratingDistribution = Review::query()
+            ->where('butcher_id', $butcher->id)
+            ->where('status', 'published')
+            ->selectRaw('rating, COUNT(*) as count')
+            ->groupBy('rating')
+            ->pluck('count', 'rating');
 
-        return response()->json(['butcher' => $butcher, 'reviews' => $reviews]);
+        return response()->json([
+            'butcher' => $butcher,
+            'reviews' => $reviews,
+            'rating_distribution' => $ratingDistribution,
+        ]);
     }
 
     /** Adnan: Return the signed-in butcher's editable profile and account contact details. */

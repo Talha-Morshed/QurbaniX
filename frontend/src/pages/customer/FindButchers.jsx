@@ -128,9 +128,11 @@ function ButcherCard({ butcher }) {
       </div>
 
       <div className="butcher-rating-line">
-        <span className="butcher-star" aria-hidden="true">★</span>
-        <strong>{butcher.rating.toFixed(1)}</strong>
-        <span>{butcher.reviews} reviews</span>
+        {butcher.rating == null ? <strong>No rating yet</strong> : <>
+          <span className="butcher-star" aria-hidden="true">★</span>
+          <strong>{butcher.rating.toFixed(1)}</strong>
+          <span>{butcher.reviews} reviews</span>
+        </>}
         <span className="butcher-rating-separator" aria-hidden="true" />
         <span>{butcher.experience == null ? 'Experience not listed' : `${butcher.experience} years experience`}</span>
       </div>

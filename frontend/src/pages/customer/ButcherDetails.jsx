@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { api } from '../../api';
-import { butchers } from '../../components/customer/butchersData';
-import { getButcherServices } from '../../components/customer/butcherProfileData';
 import { mapButcherDetailsResponse } from '../../utils/butcherDirectory';
 import { CustomerNavigation, VerifiedMark } from './FindButchers';
 import './ButcherDetails.css';
@@ -99,9 +97,9 @@ function ButcherDetails() {
             <p className="details-profile-location">{butcher.area}</p>
           </div>
           <div className="details-profile-rating">
-            <strong>{overallRating.toFixed(1)}</strong>
-            <StarRating rating={overallRating} />
-            <span>{reviewCount} reviews</span>
+            <strong>{overallRating == null ? 'No rating yet' : overallRating.toFixed(1)}</strong>
+            {overallRating == null ? null : <StarRating rating={overallRating} />}
+            <span>{reviewCount} published reviews</span>
           </div>
           <div className="details-profile-stats">
             <div><strong>{butcher.experience ?? '—'}</strong><span>Years experience</span></div>
@@ -247,34 +245,6 @@ function ButcherDetails() {
           ) : (
             <span className="details-book-unavailable">{services.length ? bookingBlockMessage : 'This butcher has no services available to book right now.'}</span>
           )}
-        </section>
-      </main>
-    </div>
-  );
-}
-
-export function BookingPlaceholder() {
-  const { butcherId } = useParams();
-  const [searchParams] = useSearchParams();
-  const butcher = butchers.find((item) => item.id === butcherId);
-  const services = butcher ? getButcherServices(butcher) : [];
-  const selectedService = services.find((item) => item.id === searchParams.get('service'));
-
-  return (
-    <div className="find-butcher-page butcher-details-page">
-      <CustomerNavigation />
-      <main className="butcher-details-main">
-        <Link className="details-back-link" to={butcher ? `/dashboard/customer/find-butcher/${butcher.id}` : '/dashboard/customer/find-butcher'}>← Back to Butcher Profile</Link>
-        <section className="details-booking-placeholder">
-          <p className="finder-eyebrow">Booking preview</p>
-          <h1>Booking is coming next</h1>
-          {butcher && selectedService ? (
-            <p>You selected <strong>{selectedService.name}</strong> with <strong>{butcher.name}</strong> for <strong>৳{selectedService.price.toLocaleString('en-BD')}</strong>.</p>
-          ) : (
-            <p>Your selected butcher and service will appear here when booking is available.</p>
-          )}
-          <p>No booking or payment has been created.</p>
-          <Link className="finder-search-button" to={butcher ? `/dashboard/customer/find-butcher/${butcher.id}` : '/dashboard/customer/find-butcher'}>Return to profile</Link>
         </section>
       </main>
     </div>

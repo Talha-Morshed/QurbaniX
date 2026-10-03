@@ -407,8 +407,8 @@ function CustomerProfile() {
       {showDeleteConfirmation ? (
         <div className="customer-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setShowDeleteConfirmation(false); }}>
           <section className="customer-delete-modal" role="dialog" aria-modal="true" aria-labelledby="customer-delete-title">
-            <p className="finder-eyebrow">Account action</p><h2 id="customer-delete-title">Are you sure you want to delete your account?</h2><p>This is a mock confirmation only. No account or booking data will be deleted.</p>
-            <div className="customer-account-form-actions"><button className="booking-secondary-button" type="button" onClick={() => setShowDeleteConfirmation(false)}>Cancel</button><button className="customer-delete-button" type="button" onClick={() => { setShowDeleteConfirmation(false); setNotice('Mock account deletion confirmed. No account data was deleted.'); }}>Confirm Delete</button></div>
+            <p className="finder-eyebrow">Account action</p><h2 id="customer-delete-title">Account deletion is unavailable</h2><p>Account deletion is not available from this page. No account data has been deleted.</p>
+            <div className="customer-account-form-actions"><button className="booking-secondary-button" type="button" onClick={() => setShowDeleteConfirmation(false)}>Close</button></div>
           </section>
         </div>
       ) : null}

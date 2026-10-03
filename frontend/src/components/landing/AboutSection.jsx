@@ -24,12 +24,12 @@ const features = [
   {
     icon: <ShieldIcon />,
     title: 'Verified Professionals',
-    desc: 'Every butcher on QurbaniX passes identity, skill, and hygiene checks before they can take a single booking.',
+    desc: 'Only verified butcher accounts are listed for customer bookings.',
   },
   {
     icon: <TagIcon />,
     title: 'Transparent Pricing',
-    desc: 'Clear, upfront rates with zero hidden charges. Compare butchers side by side and choose with confidence.',
+    desc: 'Review each listed service price and any service-specific charge details before requesting a booking.',
     highlight: true,
   },
   {
@@ -71,11 +71,10 @@ export default function AboutSection() {
 
         <div className="mt-12 bg-emerald-900 px-8 py-8 lg:px-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <p className="text-lg lg:text-xl font-medium text-emerald-50 max-w-3xl">
-            “From booking to completion, QurbaniX handled everything—professional, clean, and respectful.”
+            Compare verified butcher profiles, listed services, and published customer reviews before choosing a booking.
           </p>
           <div className="flex items-center gap-3 shrink-0">
-            <span className="text-3xl font-extrabold text-[#D4A72C]">15k+</span>
-            <span className="text-sm text-emerald-100 leading-tight">families served<br />across the country</span>
+            <span className="text-sm font-semibold text-[#D4A72C] uppercase tracking-wider">Verified listings</span>
           </div>
         </div>
       </div>

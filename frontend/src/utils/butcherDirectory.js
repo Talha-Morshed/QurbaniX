@@ -24,6 +24,7 @@ export function mapDirectoryButcher(record) {
   const services = record.services || [];
   const prices = services.map((service) => Number(service.price)).filter(Number.isFinite);
   const area = [profile.area, profile.city].filter(Boolean).join(', ');
+  const averageRating = record.average_rating == null ? null : Number(record.average_rating);
 
   return {
     id: String(record.id),
@@ -33,7 +34,7 @@ export function mapDirectoryButcher(record) {
     area: area || 'Location not provided',
     areaName: profile.area || '',
     city: profile.city || '',
-    rating: Number(record.average_rating) || 0,
+    rating: averageRating,
     reviews: Number(record.review_count) || 0,
     experience: profile.experience == null ? null : Number(profile.experience),
     animals: [...new Set(services.map((service) => service.animal).filter(Boolean))],
@@ -73,12 +74,13 @@ export function mapButcherDetailsResponse(response) {
   const record = response.butcher;
   const profile = record.butcher_profile || {};
   const reviewPage = response.reviews || {};
+  const ratingCounts = response.rating_distribution || {};
   const reviews = (reviewPage.data || []).map((review) => ({
     id: review.id,
     customer: review.customer?.name || 'Customer',
     rating: Number(review.rating) || 0,
     date: formatReviewDate(review.created_at),
-    service: 'Qurbani service',
+    service: review.booking?.service?.name || 'Qurbani service',
     text: review.comment || '',
     serviceRating: review.service_rating,
     professionalismRating: review.professionalism_rating,
@@ -87,8 +89,8 @@ export function mapButcherDetailsResponse(response) {
   }));
   const ratingDistribution = [5, 4, 3, 2, 1].map((stars) => ({
     stars,
-    percent: reviews.length
-      ? Math.round(reviews.filter((review) => review.rating === stars).length / reviews.length * 100)
+    percent: Number(record.review_count)
+      ? Math.round((Number(ratingCounts[stars]) || 0) / Number(record.review_count) * 100)
       : 0,
   }));
   const schedule = (record.availability_schedules || []).map((item) => {
@@ -113,6 +115,7 @@ export function mapButcherDetailsResponse(response) {
       description: service.description || service.category || 'Service details not provided.',
       price: Number(service.price) || 0,
       duration: service.duration || 'Not specified',
+      additional: service.additional || '',
       availability: service.is_available ? 'Available' : 'Unavailable',
     })),
     reviews,

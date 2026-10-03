@@ -80,7 +80,7 @@ function PriceSummary({ selectedService }) {
       <p className="booking-kicker">Price summary</p>
       <h2>Booking total</h2>
       <div><span>Service price</span><strong>৳{servicePrice.toLocaleString('en-BD')}</strong></div>
-      <div><span>Additional charges</span><strong>৳0</strong></div>
+      <div><span>Additional charge details</span><strong>{selectedService?.additional || 'Not specified'}</strong></div>
       <div className="booking-price-total"><span>Total</span><strong>৳{servicePrice.toLocaleString('en-BD')}</strong></div>
       <p>No payment is taken in this preview.</p>
     </aside>
@@ -243,7 +243,7 @@ function Booking({ butcher, services, profile, booking, setBooking, step, errors
                   <section><h3>Schedule</h3><strong>{formatDate(booking.date)}</strong><span>{booking.time}</span></section>
                   <section><h3>Location</h3><strong>{booking.address}</strong><span>{booking.area}, {booking.city}</span>{booking.instructions ? <span>{booking.instructions}</span> : null}</section>
                   <section><h3>Customer</h3><strong>{booking.customerName}</strong><span>{booking.phone}</span></section>
-                  <section className="booking-review-total"><h3>Total</h3><strong>৳{selectedService?.price.toLocaleString('en-BD')}</strong><span>Additional charges: ৳0</span></section>
+                  <section className="booking-review-total"><h3>Total</h3><strong>৳{selectedService?.price.toLocaleString('en-BD')}</strong><span>Additional charge details: {selectedService?.additional || 'Not specified'}</span></section>
                 </div>
               </div>
             ) : null}
