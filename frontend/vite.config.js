@@ -3,7 +3,12 @@ import react from '@vitejs/plugin-react';
 import tailwind from '@tailwindcss/vite';
 
 export default defineConfig({
+  base: '/app/',
   plugins: [react(), tailwind()],
+  build: {
+    outDir: '../backend/public/app',
+    emptyOutDir: true,
+  },
   server: {
     proxy: {
       '/api': {

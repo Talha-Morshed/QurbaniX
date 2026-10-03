@@ -1,0 +1,82 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  DEPLOY_USER: s20230204002
+  DEPLOY_HOST: 187.52.122.100
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+
+      - name: Install PHP packages
+        working-directory: backend
+        run: composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build the React app
+        working-directory: frontend
+        run: |
+          set -e
+          npm ci
+          npm run build
+          if [ ! -f ../backend/public/app/index.html ]; then
+            echo "Build output backend/public/app/index.html is missing."
+            exit 1
+          fi
+
+      - name: Pack the release
+        working-directory: backend
+        run: |
+          set -e
+          tar -czf "$RUNNER_TEMP/release.tar.gz" \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            --exclude='.env' \
+            --exclude='.env.*' \
+            .
+
+      - name: Load the deploy key
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          set -e
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+
+      - name: Copy release to VPS
+        run: scp -i ~/.ssh/deploy_key -o IdentitiesOnly=yes "$RUNNER_TEMP/release.tar.gz" "$DEPLOY_USER@$DEPLOY_HOST:~/release.tar.gz"
+
+      - name: Deploy release on VPS
+        run: |
+          ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes "$DEPLOY_USER@$DEPLOY_HOST" 'bash -se' <<'REMOTE'
+          set -e
+          cd ~/laravel
+          tar -xzf ~/release.tar.gz -C ~/laravel --exclude='.env'
+          mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache
+          chmod -R u+rwX storage bootstrap/cache
+          php artisan migrate --force
+          php artisan optimize
+          rm -f ~/release.tar.gz
+          REMOTE
