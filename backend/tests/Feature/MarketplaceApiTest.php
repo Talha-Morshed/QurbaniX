@@ -674,6 +674,178 @@ class MarketplaceApiTest extends TestCase
         $this->assertDatabaseCount('user_notifications', 0);
     }
 
+    public function test_butcher_confirmation_completes_cash_payment_after_customer_confirmation(): void
+    {
+        ['butcher' => $butcher, 'booking' => $booking, 'payment' => $payment] = $this->createPaymentScenario(
+            paymentAttributes: ['payer_confirmed_at' => now()],
+        );
+
+        $this->actingAs($butcher)
+            ->postJson("/api/butcher/payments/{$payment->id}/confirm")
+            ->assertOk()
+            ->assertJsonPath('payment.status', 'paid')
+            ->assertJsonPath('booking.payment_status', 'Advance paid');
+
+        $this->assertNotNull($payment->fresh()->receiver_confirmed_at);
+        $this->assertNotNull($payment->fresh()->confirmed_at);
+        $this->assertSame($butcher->id, $payment->fresh()->confirmed_by);
+        $this->assertSame('Advance paid', $booking->fresh()->payment_status);
+    }
+
+    public function test_butcher_confirmation_waits_for_customer_confirmation(): void
+    {
+        ['butcher' => $butcher, 'booking' => $booking, 'payment' => $payment] = $this->createPaymentScenario();
+
+        $this->actingAs($butcher)
+            ->postJson("/api/butcher/payments/{$payment->id}/confirm")
+            ->assertOk()
+            ->assertJsonPath('payment.status', 'pending')
+            ->assertJsonPath('booking.payment_status', 'Payment pending');
+
+        $this->assertNotNull($payment->fresh()->receiver_confirmed_at);
+        $this->assertNull($payment->fresh()->confirmed_at);
+        $this->assertSame('Payment pending', $booking->fresh()->payment_status);
+    }
+
+    public function test_unauthenticated_user_cannot_confirm_butcher_payment(): void
+    {
+        ['payment' => $payment] = $this->createPaymentScenario();
+
+        $this->postJson("/api/butcher/payments/{$payment->id}/confirm")
+            ->assertUnauthorized();
+
+        $this->assertNull($payment->fresh()->receiver_confirmed_at);
+    }
+
+    public function test_customer_cannot_use_butcher_payment_confirmation_endpoint(): void
+    {
+        ['customer' => $customer, 'payment' => $payment] = $this->createPaymentScenario();
+
+        $this->actingAs($customer)
+            ->postJson("/api/butcher/payments/{$payment->id}/confirm")
+            ->assertForbidden();
+
+        $this->assertNull($payment->fresh()->receiver_confirmed_at);
+    }
+
+    public function test_butcher_cannot_confirm_another_butchers_payment(): void
+    {
+        ['payment' => $payment] = $this->createPaymentScenario();
+        $anotherButcher = User::factory()->create(['role' => 'butcher']);
+
+        $this->actingAs($anotherButcher)
+            ->postJson("/api/butcher/payments/{$payment->id}/confirm")
+            ->assertNotFound();
+
+        $this->assertNull($payment->fresh()->receiver_confirmed_at);
+    }
+
+    public function test_butcher_booking_endpoint_returns_only_owned_bookings_with_payment_records(): void
+    {
+        ['butcher' => $butcher, 'booking' => $booking, 'payment' => $payment] = $this->createPaymentScenario();
+        $this->createPaymentScenario();
+
+        $this->actingAs($butcher)
+            ->getJson('/api/butcher/bookings?per_page=100')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', $booking->id)
+            ->assertJsonPath('data.0.payments.0.id', $payment->id)
+            ->assertJsonPath('data.0.payments.0.status', 'pending');
+    }
+
+    public function test_butcher_cannot_confirm_a_missing_payment(): void
+    {
+        $butcher = User::factory()->create(['role' => 'butcher']);
+
+        $this->actingAs($butcher)
+            ->postJson('/api/butcher/payments/999999/confirm')
+            ->assertNotFound();
+    }
+
+    public function test_butcher_cannot_confirm_a_paid_payment_again(): void
+    {
+        ['butcher' => $butcher, 'payment' => $payment] = $this->createPaymentScenario(
+            paymentAttributes: ['status' => 'paid', 'payer_confirmed_at' => now(), 'receiver_confirmed_at' => now()],
+        );
+
+        $this->actingAs($butcher)
+            ->postJson("/api/butcher/payments/{$payment->id}/confirm")
+            ->assertStatus(409);
+    }
+
+    public function test_butcher_cannot_confirm_a_balance_payment_before_service_completion(): void
+    {
+        ['butcher' => $butcher, 'payment' => $payment] = $this->createPaymentScenario(
+            paymentAttributes: ['purpose' => 'balance', 'amount' => 8000],
+        );
+
+        $this->actingAs($butcher)
+            ->postJson("/api/butcher/payments/{$payment->id}/confirm")
+            ->assertUnprocessable()
+            ->assertJsonPath('message', 'The remaining balance is payable after service completion.');
+
+        $this->assertNull($payment->fresh()->receiver_confirmed_at);
+    }
+
+    public function test_butcher_confirmation_completes_an_eligible_balance_payment(): void
+    {
+        ['butcher' => $butcher, 'booking' => $booking, 'payment' => $payment] = $this->createPaymentScenario(
+            bookingAttributes: ['status' => 'Completed'],
+            paymentAttributes: [
+                'purpose' => 'balance',
+                'amount' => 8000,
+                'payer_confirmed_at' => now(),
+            ],
+        );
+
+        $this->actingAs($butcher)
+            ->postJson("/api/butcher/payments/{$payment->id}/confirm")
+            ->assertOk()
+            ->assertJsonPath('payment.status', 'paid')
+            ->assertJsonPath('booking.payment_status', 'Paid in full')
+            ->assertJsonPath('booking.remaining_amount', 0);
+
+        $this->assertSame(0, $booking->fresh()->remaining_amount);
+    }
+
+    public function test_butcher_cannot_confirm_a_payment_for_a_cancelled_booking(): void
+    {
+        ['butcher' => $butcher, 'payment' => $payment] = $this->createPaymentScenario(
+            bookingAttributes: ['status' => 'Cancelled'],
+        );
+
+        $this->actingAs($butcher)
+            ->postJson("/api/butcher/payments/{$payment->id}/confirm")
+            ->assertUnprocessable();
+
+        $this->assertNull($payment->fresh()->receiver_confirmed_at);
+    }
+
+    public function test_butcher_cannot_confirm_an_online_payment(): void
+    {
+        ['butcher' => $butcher, 'payment' => $payment] = $this->createPaymentScenario(
+            paymentAttributes: ['method' => 'bkash'],
+        );
+
+        $this->actingAs($butcher)
+            ->postJson("/api/butcher/payments/{$payment->id}/confirm")
+            ->assertUnprocessable();
+
+        $this->assertNull($payment->fresh()->receiver_confirmed_at);
+    }
+
+    public function test_butcher_cannot_confirm_a_payment_twice(): void
+    {
+        ['butcher' => $butcher, 'payment' => $payment] = $this->createPaymentScenario(
+            paymentAttributes: ['receiver_confirmed_at' => now()],
+        );
+
+        $this->actingAs($butcher)
+            ->postJson("/api/butcher/payments/{$payment->id}/confirm")
+            ->assertStatus(409);
+    }
+
     private function createPaymentScenario(array $bookingAttributes = [], array $paymentAttributes = []): array
     {
         $customer = User::factory()->create(['role' => 'customer']);

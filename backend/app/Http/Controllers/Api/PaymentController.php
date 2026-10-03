@@ -69,20 +69,21 @@ class PaymentController extends Controller
     /** Adnan: Complete cash payment only after both the payer and receiver confirm it. */
     public function confirm(Request $request, Payment $payment, NotificationService $notifications): JsonResponse
     {
-        $payment->load('booking');
-        $booking = $payment->booking;
-        abort_unless(in_array($request->user()->id, [$booking->customer_id, $booking->butcher_id], true), 404);
-        abort_unless($payment->method === 'cash', 422, 'Online payments can only be confirmed by a configured provider callback.');
-        abort_if($payment->status !== 'pending', 409, 'This payment is no longer pending.');
+        [$payment, $booking] = DB::transaction(function () use ($request, $payment, $notifications): array {
+            $payment = Payment::query()->whereKey($payment->id)->lockForUpdate()->firstOrFail();
+            $booking = Booking::query()->whereKey($payment->booking_id)->lockForUpdate()->firstOrFail();
 
-        DB::transaction(function () use ($request, $payment, $booking, $notifications): void {
-            if ($request->user()->id === $payment->payer_id) {
-                $payment->payer_confirmed_at ??= now();
-            } else {
-                $payment->receiver_confirmed_at ??= now();
-            }
+            abort_unless($request->user()->id === $booking->butcher_id, 404);
+            abort_unless($payment->payer_id === $booking->customer_id, 404);
+            abort_unless($payment->method === 'cash', 422, 'Online payments can only be confirmed by a configured provider callback.');
+            abort_if($booking->status === 'Cancelled', 422, 'Cancelled bookings cannot be paid.');
+            abort_if($payment->purpose === 'balance' && $booking->status !== 'Completed', 422, 'The remaining balance is payable after service completion.');
+            abort_if($payment->status !== 'pending', 409, 'This payment is no longer pending.');
+            abort_if($payment->receiver_confirmed_at !== null, 409, 'You have already confirmed this payment.');
 
-            if ($payment->payer_confirmed_at && $payment->receiver_confirmed_at) {
+            $payment->receiver_confirmed_at = now();
+
+            if ($payment->payer_confirmed_at) {
                 $payment->status = 'paid';
                 $payment->confirmed_by = $request->user()->id;
                 $payment->confirmed_at = now();
@@ -93,9 +94,8 @@ class PaymentController extends Controller
                     $booking->remaining_amount = 0;
                 }
                 $booking->save();
-                $recipientId = $request->user()->id === $booking->customer_id ? $booking->butcher_id : $booking->customer_id;
                 $notifications->send(
-                    $booking->customer_id === $recipientId ? $booking->customer : $booking->butcher,
+                    $booking->customer,
                     'payment',
                     'Cash payment confirmed',
                     "The {$payment->purpose} payment for booking {$booking->reference} was confirmed by both parties.",
@@ -104,14 +104,16 @@ class PaymentController extends Controller
             }
 
             $payment->save();
+
+            return [$payment->fresh(), $booking->fresh()];
         });
 
         return response()->json([
-            'message' => $payment->fresh()->status === 'paid'
+            'message' => $payment->status === 'paid'
                 ? 'Payment confirmed by both parties.'
                 : 'Your confirmation is recorded. The other party must confirm receipt.',
-            'payment' => $payment->fresh(),
-            'booking' => $booking->fresh(),
+            'payment' => $payment,
+            'booking' => $booking,
         ]);
     }
 
