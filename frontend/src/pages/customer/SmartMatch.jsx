@@ -1,7 +1,6 @@
 import { useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { api } from '../../api';
-import { butcherServices } from '../../components/customer/butchersData';
 import { CustomerNavigation, VerifiedMark } from './FindButchers';
 import './FindButchers.css';
 import './SmartMatch.css';
@@ -59,7 +58,8 @@ function MatchCard({ match }) {
         </div>
         <div className="butcher-price smart-match-score">
           <span>Match score</span>
-          <strong>{match.match_score}</strong>
+          <strong>{match.match_score} pts</strong>
+          <small>Based on your preferences</small>
         </div>
       </div>
 
@@ -102,23 +102,45 @@ function MatchCard({ match }) {
 }
 
 function SmartMatch() {
-  const [preferences, setPreferences] = useState(initialPreferences);
-  const [matches, setMatches] = useState(null);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const savedMatch = location.state?.smartMatch;
+  const [preferences, setPreferences] = useState(() => ({
+    ...initialPreferences,
+    ...(savedMatch?.preferences || {}),
+  }));
+  const [matches, setMatches] = useState(() => (
+    Array.isArray(savedMatch?.matches) ? savedMatch.matches : null
+  ));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [hasSubmitted, setHasSubmitted] = useState(() => Boolean(savedMatch));
   const formRef = useRef(null);
   const animalRef = useRef(null);
 
   const updatePreference = (event) => {
     const { name, value } = event.target;
-    setPreferences((current) => ({ ...current, [name]: value }));
+    const updatedPreferences = { ...preferences, [name]: value };
+    setPreferences(updatedPreferences);
+    setMatches(null);
+    setHasSubmitted(false);
     setError('');
+    if (location.state?.smartMatch) {
+      navigate(location.pathname, {
+        replace: true,
+        state: {
+          ...location.state,
+          smartMatch: { preferences: updatedPreferences, matches: null },
+        },
+      });
+    }
   };
 
   const submitPreferences = async (event) => {
     event.preventDefault();
     setError('');
     setMatches(null);
+    setHasSubmitted(true);
     setIsSubmitting(true);
 
     const payload = {
@@ -138,6 +160,13 @@ function SmartMatch() {
         throw new Error('The matching service returned an unexpected response. Please try again.');
       }
       setMatches(response.data);
+      navigate(location.pathname, {
+        replace: true,
+        state: {
+          ...location.state,
+          smartMatch: { preferences, matches: response.data },
+        },
+      });
     } catch (requestError) {
       setError(getErrorMessage(requestError));
     } finally {
@@ -204,10 +233,7 @@ function SmartMatch() {
             </label>
             <label className="finder-field">
               <span>Service category <small>(optional)</small></span>
-              <select name="service_category" value={preferences.service_category} onChange={updatePreference}>
-                <option value="">Any category</option>
-                {butcherServices.map((category) => <option key={category} value={category}>{category}</option>)}
-              </select>
+              <input name="service_category" type="text" maxLength="120" value={preferences.service_category} onChange={updatePreference} placeholder="Enter a service category" />
             </label>
           </div>
 
@@ -228,8 +254,8 @@ function SmartMatch() {
 
         {!isSubmitting && matches === null && !error ? (
           <section className="finder-empty-state smart-match-state">
-            <h2>Ready when you are</h2>
-            <p>Share your preferences above to see verified butchers ranked for your request.</p>
+            <h2>{hasSubmitted ? 'Ready to update your matches' : 'Ready when you are'}</h2>
+            <p>{hasSubmitted ? 'Your preferences have changed. Search again to see results for your updated requirements.' : 'Share your preferences above to see verified butchers ranked for your request.'}</p>
           </section>
         ) : null}
 
@@ -249,7 +275,10 @@ function SmartMatch() {
                 <p className="finder-eyebrow">Ranked for your preferences</p>
                 <h2 id="smart-match-results-heading">{matches.length} {matches.length === 1 ? 'match' : 'matches'} found</h2>
               </div>
-              <span className="smart-match-score-note">Scores reflect your submitted criteria</span>
+              <div className="smart-match-result-actions">
+                <span className="smart-match-score-note">Scores reflect your submitted criteria</span>
+                <button type="button" className="finder-clear" onClick={adjustPreferences}>Adjust preferences</button>
+              </div>
             </div>
             <div className="butcher-results-grid">
               {matches.map((match) => <MatchCard key={match.butcher.id} match={match} />)}

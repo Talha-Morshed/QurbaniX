@@ -94,10 +94,24 @@
   font-size: 11px;
 }
 
+.smart-match-result-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
 .smart-match-score strong {
+  color: var(--finder-green);
   padding: 5px 8px;
   background: var(--finder-sage);
   font-size: 17px;
+}
+
+.smart-match-score small {
+  max-width: 120px;
+  color: var(--finder-muted);
+  font-size: 9px;
+  text-align: right;
 }
 
 .smart-match-service {
@@ -119,6 +133,7 @@
   min-width: 0;
   color: #536258;
   font-size: 11px;
+  overflow-wrap: anywhere;
 }
 
 .smart-match-service strong {
@@ -170,6 +185,7 @@
   color: #47574d;
   font-size: 10px;
   line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 900px) {
@@ -201,6 +217,12 @@
 
   .smart-match-results .finder-results-heading {
     align-items: flex-start;
+  }
+
+  .smart-match-result-actions {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 5px;
   }
 
   .smart-match-availability > span:last-child {
