@@ -76,7 +76,10 @@ function CustomerNotifications() {
     setError('');
     api.customerNotifications({ per_page: 100 })
       .then((response) => {
-        if (isCurrentRequest) setNotifications((response.data || []).map(mapApiNotification));
+        if (isCurrentRequest) {
+          setNotifications((response.data || []).map(mapApiNotification));
+          window.dispatchEvent(new Event('customer-notifications-updated'));
+        }
       })
       .catch((requestError) => {
         if (!isCurrentRequest) return;
@@ -106,6 +109,7 @@ function CustomerNotifications() {
       const response = await api.markNotificationRead(id);
       const updated = mapApiNotification(response.notification);
       setNotifications((current) => current.map((notification) => notification.id === id ? updated : notification));
+      window.dispatchEvent(new Event('customer-notifications-updated'));
     } catch (requestError) {
       setError(requestError?.message || 'Unable to mark this notification as read.');
     } finally {
@@ -121,6 +125,7 @@ function CustomerNotifications() {
       await api.markAllNotificationsRead();
       setNotifications((current) => current.map((notification) => ({ ...notification, read: true })));
       setNotice('All notifications marked as read.');
+      window.dispatchEvent(new Event('customer-notifications-updated'));
     } catch (requestError) {
       setError(requestError?.message || 'Unable to mark notifications as read.');
     } finally {
