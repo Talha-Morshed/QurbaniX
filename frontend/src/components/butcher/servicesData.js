@@ -1,5 +1,3 @@
-const defaultAdditional = '৳0 delivery estimate';
-
 export function serviceFromApi(service) {
   return {
     id: service.id,
@@ -8,9 +6,9 @@ export function serviceFromApi(service) {
     category: service.category,
     description: service.description || '',
     price: String(service.price),
-    duration: service.duration || '1–2 hours',
+    duration: service.duration || '',
     available: Boolean(service.is_available),
-    additional: service.additional || defaultAdditional,
+    additional: service.additional || '',
   };
 }
 
@@ -23,7 +21,7 @@ export function serviceToApi(service) {
     price: Number(service.price),
     duration: service.duration,
     is_available: service.available,
-    additional: service.additional.trim() || defaultAdditional,
+    additional: service.additional.trim(),
   };
 }
 
@@ -33,7 +31,7 @@ export const emptyService = {
   category: 'Slaughter & cutting',
   description: '',
   price: '',
-  duration: '1–2 hours',
+  duration: '',
   available: true,
-  additional: defaultAdditional,
+  additional: '',
 };

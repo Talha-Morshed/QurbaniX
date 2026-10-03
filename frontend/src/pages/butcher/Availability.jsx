@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../api';
 import { useAuth } from '../../auth/AuthContext';
-import { Icon } from '../../components/butcher/ButcherSidebar';
 import ButcherSidebar from '../../components/butcher/ButcherSidebar';
 import BookingCapacity from '../../components/butcher/BookingCapacity';
 import SpecialDates from '../../components/butcher/SpecialDates';
@@ -96,7 +95,7 @@ function Availability() {
     <div className="butcher-dashboard availability-page">
       <ButcherSidebar />
       <main className="butcher-main">
-        <header className="butcher-topbar availability-topbar"><div><p className="eyebrow">Butcher workspace</p><h1>Availability</h1><p>Manage your working days and hours so customers know when you are available.</p></div><div className="butcher-user"><button type="button" className="butcher-notification" aria-label="View notifications"><Icon name="inbox" size={18} /><span className="notification-dot" /></button><span className="butcher-avatar">{initials}</span><div className="butcher-user-copy"><strong>{user?.name}</strong><span>Butcher</span></div></div></header>
+        <header className="butcher-topbar availability-topbar"><div><p className="eyebrow">Butcher workspace</p><h1>Availability</h1><p>Manage your working days and hours so customers know when you are available.</p></div><div className="butcher-user"><span className="butcher-avatar">{initials}</span><div className="butcher-user-copy"><strong>{user?.name || 'Butcher account'}</strong><span>Butcher</span></div></div></header>
         <div className="availability-toolbar"><div><p className="eyebrow">Schedule management</p><h2>Working hours</h2></div><Link to="/dashboard/butcher" className="availability-dashboard-link">← Dashboard</Link></div>
         {isLoading ? <p className="availability-message" role="status">Loading your availability…</p> : error && schedule.length === 0 ? <p className="availability-error" role="alert">{error} <button type="button" onClick={loadAvailability}>Retry</button></p> : <>
           <section className={`butcher-panel availability-status-panel ${isAvailable ? 'is-available' : 'is-unavailable'}`}><div className="availability-status-copy"><span className="availability-status-icon"><i /></span><div><p className="eyebrow">Overall status</p><h2>{isAvailable ? 'Currently Available' : 'Currently Unavailable'}</h2><p>{isAvailable ? 'Customers can request bookings during your scheduled hours.' : 'New booking requests will not be accepted until you become available.'}</p></div></div><button type="button" className={`availability-main-toggle ${isAvailable ? 'is-on' : ''}`} onClick={() => setIsAvailable((current) => !current)} aria-pressed={isAvailable} disabled={isSaving}><span>{isAvailable ? 'Available' : 'Unavailable'}</span><i /></button></section>

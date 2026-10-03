@@ -101,4 +101,26 @@ class ButcherServicesApiTest extends TestCase
             'name' => 'Cow Qurbani',
         ]);
     }
+
+    public function test_an_unspecified_additional_charge_is_not_filled_with_a_placeholder(): void
+    {
+        $butcher = User::factory()->create(['role' => 'butcher']);
+
+        $response = $this->actingAs($butcher)
+            ->postJson('/api/butcher/services', [
+                'name' => 'Goat Qurbani',
+                'animal' => 'Goat',
+                'category' => 'Slaughter & cutting',
+                'description' => 'Careful cutting and packaging.',
+                'price' => 4800,
+                'is_available' => true,
+            ])
+            ->assertCreated()
+            ->assertJsonPath('service.additional', null);
+
+        $this->assertDatabaseHas('butcher_services', [
+            'id' => $response->json('service.id'),
+            'additional' => null,
+        ]);
+    }
 }

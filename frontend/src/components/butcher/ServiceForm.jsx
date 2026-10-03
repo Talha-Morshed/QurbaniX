@@ -13,7 +13,7 @@ function ServiceForm({ service, onChange, onSave, onCancel, isSaving, error }) {
           <label>Animal type<select value={service.animal} onChange={(event) => update('animal', event.target.value)}>{['Cow', 'Goat', 'Sheep', 'Camel', 'Shared Cow'].map((animal) => <option key={animal}>{animal}</option>)}</select></label>
           <label className="service-form-wide">Description<textarea required rows="3" value={service.description} onChange={(event) => update('description', event.target.value)} placeholder="Describe what the customer receives" /></label>
           <label>Service price<input required min="1" step="1" type="number" value={service.price} onChange={(event) => update('price', event.target.value)} placeholder="8500" /></label>
-          <label>Estimated duration<select value={service.duration} onChange={(event) => update('duration', event.target.value)}><option>1–2 hours</option><option>2–3 hours</option><option>3–4 hours</option><option>4+ hours</option></select></label>
+          <label>Estimated duration<select value={service.duration} onChange={(event) => update('duration', event.target.value)}><option value="">Not specified</option><option>1–2 hours</option><option>2–3 hours</option><option>3–4 hours</option><option>4+ hours</option></select></label>
           <label className="service-form-wide">Additional charge<input value={service.additional} onChange={(event) => update('additional', event.target.value)} placeholder="৳500 delivery estimate" /></label>
         </div>
         <label className="service-availability"><input type="checkbox" checked={service.available} onChange={(event) => update('available', event.target.checked)} /><span>Available for new customer bookings</span></label>

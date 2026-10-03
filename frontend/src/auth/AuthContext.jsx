@@ -39,10 +39,10 @@ export function AuthProvider({ children }) {
     setIsLoading(true);
     restoreUser(token)
       .then((data) => {
-        if (isMounted) setUser(data.user || null);
+        if (isMounted && getToken() === token) setUser(data.user || null);
       })
       .catch((error) => {
-        if (!isMounted) return;
+        if (!isMounted || getToken() !== token) return;
         if (error?.status === 401 || error?.status === 403) {
           clearToken();
           resetRestoreRequest();
@@ -50,11 +50,51 @@ export function AuthProvider({ children }) {
         setUser(null);
       })
       .finally(() => {
-        if (isMounted) setIsLoading(false);
+        if (isMounted && getToken() === token) setIsLoading(false);
       });
 
     return () => {
       isMounted = false;
+    }
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const syncSession = (event) => {
+      if (event.key !== 'auth_token' && event.key !== null) return;
+
+      const token = getToken();
+      resetRestoreRequest();
+      setUser(null);
+
+      if (!token) {
+        setIsLoading(false);
+        return;
+      }
+
+      setIsLoading(true);
+      restoreUser(token)
+        .then((data) => {
+          if (isMounted && getToken() === token) setUser(data.user || null);
+        })
+        .catch((error) => {
+          if (!isMounted || getToken() !== token) return;
+          if (error?.status === 401 || error?.status === 403) {
+            clearToken();
+            resetRestoreRequest();
+          }
+          setUser(null);
+        })
+        .finally(() => {
+          if (isMounted && getToken() === token) setIsLoading(false);
+        });
+    };
+
+    window.addEventListener('storage', syncSession);
+    return () => {
+      isMounted = false;
+      window.removeEventListener('storage', syncSession);
     };
   }, []);
 

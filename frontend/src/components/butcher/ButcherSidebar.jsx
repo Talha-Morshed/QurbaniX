@@ -1,4 +1,6 @@
-import { Link, useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../auth/AuthContext';
 import images from '../../assets/images';
 
 const navigation = [
@@ -9,6 +11,7 @@ const navigation = [
   ['Earnings', 'chart'],
   ['Reviews', 'star'],
   ['Profile', 'user'],
+  ['Log out', 'logout'],
 ];
 
 function Icon({ name, size = 18 }) {
@@ -23,12 +26,23 @@ function Icon({ name, size = 18 }) {
     inbox: 'M4 5h16v14H4zM4 15h4l2 2h4l2-2h4',
     scissors: 'm6 6 12 12M6 18 18 6M6 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM6 14a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z',
     close: 'M6 6l12 12M18 6 6 18',
+    logout: 'M10 17l5-5-5-5m5 5H3m9-9h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6',
   };
   return <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={paths[name]} /></svg>;
 }
 
 function ButcherSidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  async function handleLogout() {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+    await logout();
+    navigate('/login/butcher', { replace: true });
+  }
 
   return (
     <aside className="butcher-sidebar">
@@ -39,6 +53,10 @@ function ButcherSidebar() {
       <p className="butcher-nav-label">Workspace</p>
       <nav aria-label="Butcher dashboard navigation">
         {navigation.map(([label, icon]) => {
+          if (label === 'Log out') {
+            return <button key={label} type="button" className="butcher-nav-item butcher-logout" onClick={handleLogout} disabled={isLoggingOut}><Icon name={icon} /><span>{isLoggingOut ? 'Logging out…' : label}</span></button>;
+          }
+
           const path = label === 'Dashboard' ? '/dashboard/butcher' : label === 'Bookings' ? '/dashboard/butcher/bookings' : label === 'Services & Pricing' ? '/dashboard/butcher/services' : label === 'Availability' ? '/dashboard/butcher/availability' : label === 'Earnings' ? '/dashboard/butcher/earnings' : label === 'Reviews' ? '/dashboard/butcher/reviews' : label === 'Profile' ? '/dashboard/butcher/profile' : `#${label.toLowerCase().replaceAll(' ', '-')}`;
           const isActive = location.pathname === path;
           const item = <><Icon name={icon} /><span>{label}</span></>;

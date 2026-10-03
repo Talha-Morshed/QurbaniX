@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../api';
 import { useAuth } from '../../auth/AuthContext';
-import { Icon } from '../../components/butcher/ButcherSidebar';
 import ButcherSidebar from '../../components/butcher/ButcherSidebar';
 import ProfileForm from '../../components/butcher/ProfileForm';
 import ProfileOverview from '../../components/butcher/ProfileOverview';
@@ -111,10 +110,6 @@ function Profile() {
             <p>Manage your personal and professional information.</p>
           </div>
           <div className="butcher-user">
-            <button type="button" className="butcher-notification" aria-label="View notifications">
-              <Icon name="inbox" size={18} />
-              <span className="notification-dot" />
-            </button>
             <span className="butcher-avatar">{initials}</span>
             <div className="butcher-user-copy">
               <strong>{profile?.name || user?.name}</strong>

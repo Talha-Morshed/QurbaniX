@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../api';
-import { Icon } from '../../components/butcher/ButcherSidebar';
+import { useAuth } from '../../auth/AuthContext';
 import ButcherSidebar from '../../components/butcher/ButcherSidebar';
 import RatingHighlights from '../../components/butcher/RatingHighlights';
 import RatingOverview from '../../components/butcher/RatingOverview';
@@ -71,12 +71,15 @@ function summarizeReviews(reviews) {
 }
 
 function Reviews() {
+  const { user } = useAuth();
   const [reviews, setReviews] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeFilter, setActiveFilter] = useState('All Reviews');
   const [sort, setSort] = useState('Newest');
   const [selectedReview, setSelectedReview] = useState(null);
+  const name = user?.name || '';
+  const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join('').toUpperCase();
 
   const loadReviews = useCallback(async () => {
     setIsLoading(true);
@@ -116,7 +119,7 @@ function Reviews() {
       });
   }, [activeFilter, reviews, sort]);
 
-  return <div className="butcher-dashboard reviews-page"><ButcherSidebar /><main className="butcher-main"><header className="butcher-topbar reviews-topbar"><div><p className="eyebrow">Butcher workspace</p><h1>Reviews</h1><p>See what customers are saying about your Qurbani services.</p></div><div className="butcher-user"><button type="button" className="butcher-notification" aria-label="View notifications"><Icon name="inbox" size={18} /><span className="notification-dot" /></button><span className="butcher-avatar">KA</span><div className="butcher-user-copy"><strong>Karim Ahmed</strong><span>Verified Butcher</span></div></div></header><div className="reviews-toolbar"><div><p className="eyebrow">Customer feedback</p><h2>Your reputation</h2></div><Link to="/dashboard/butcher" className="reviews-dashboard-link">← Dashboard</Link></div><div className="reviews-top-grid"><RatingOverview average={summary.average} count={summary.total} distribution={summary.distribution} /><RatingHighlights highlights={summary.highlights} /></div><ReviewFilters activeFilter={activeFilter} onFilterChange={setActiveFilter} sort={sort} onSortChange={setSort} /><ReviewList reviews={visibleReviews} onView={setSelectedReview} isLoading={isLoading} error={error} onRetry={loadReviews} /></main><ReviewDetails review={selectedReview} onClose={() => setSelectedReview(null)} /></div>;
+  return <div className="butcher-dashboard reviews-page"><ButcherSidebar /><main className="butcher-main"><header className="butcher-topbar reviews-topbar"><div><p className="eyebrow">Butcher workspace</p><h1>Reviews</h1><p>See what customers are saying about your Qurbani services.</p></div><div className="butcher-user"><span className="butcher-avatar">{initials}</span><div className="butcher-user-copy"><strong>{name || 'Butcher account'}</strong><span>Butcher</span></div></div></header><div className="reviews-toolbar"><div><p className="eyebrow">Customer feedback</p><h2>Your reputation</h2></div><Link to="/dashboard/butcher" className="reviews-dashboard-link">← Dashboard</Link></div><div className="reviews-top-grid"><RatingOverview average={summary.average} count={summary.total} distribution={summary.distribution} /><RatingHighlights highlights={summary.highlights} /></div><ReviewFilters activeFilter={activeFilter} onFilterChange={setActiveFilter} sort={sort} onSortChange={setSort} /><ReviewList reviews={visibleReviews} onView={setSelectedReview} isLoading={isLoading} error={error} onRetry={loadReviews} /></main><ReviewDetails review={selectedReview} onClose={() => setSelectedReview(null)} /></div>;
 }
 
 export default Reviews;

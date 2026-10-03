@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../api';
-import { Icon } from '../../components/butcher/ButcherSidebar';
+import { useAuth } from '../../auth/AuthContext';
 import ButcherSidebar from '../../components/butcher/ButcherSidebar';
 import ServiceForm, { emptyService } from '../../components/butcher/ServiceForm';
 import ServiceList from '../../components/butcher/ServiceList';
@@ -15,6 +15,7 @@ function errorMessage(error) {
 }
 
 function ServicesPricing() {
+  const { user } = useAuth();
   const [services, setServices] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [formService, setFormService] = useState(null);
@@ -24,6 +25,8 @@ function ServicesPricing() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [busyServiceIds, setBusyServiceIds] = useState(() => new Set());
   const [removeTarget, setRemoveTarget] = useState(null);
+  const name = user?.name || '';
+  const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join('').toUpperCase();
 
   async function loadServices() {
     setIsLoading(true);
@@ -101,7 +104,7 @@ function ServicesPricing() {
     <div className="butcher-dashboard services-page">
       <ButcherSidebar />
       <main className="butcher-main">
-        <header className="butcher-topbar services-topbar"><div><p className="eyebrow">Butcher workspace</p><h1>Services &amp; Pricing</h1><p>Manage the services you offer and set transparent pricing for your customers.</p></div><div className="butcher-user"><button type="button" className="butcher-notification" aria-label="View notifications"><Icon name="inbox" size={18} /><span className="notification-dot" /></button><span className="butcher-avatar">KA</span><div className="butcher-user-copy"><strong>Karim Ahmed</strong><span>Verified Butcher</span></div></div></header>
+        <header className="butcher-topbar services-topbar"><div><p className="eyebrow">Butcher workspace</p><h1>Services &amp; Pricing</h1><p>Manage the services you offer and set transparent pricing for your customers.</p></div><div className="butcher-user"><span className="butcher-avatar">{initials}</span><div className="butcher-user-copy"><strong>{name || 'Butcher account'}</strong><span>Butcher</span></div></div></header>
         <div className="services-toolbar"><div><p className="eyebrow">Service management</p><h2>Offerings and pricing</h2></div><div className="services-toolbar-actions"><Link to="/dashboard/butcher" className="services-dashboard-link">← Dashboard</Link><button type="button" className="services-add" onClick={() => { setFormError(''); setFormService({ ...emptyService }); }}>+ Add Service</button></div></div>
         <div className="pricing-note"><div className="pricing-note-mark">৳</div><div><strong>Keep pricing clear and current</strong><p>Customers see your service price before requesting a booking. Additional charges are shown as an estimate.</p></div></div>
         {pageError && <div className="services-error" role="alert">{pageError} <button type="button" onClick={loadServices}>Retry</button></div>}
