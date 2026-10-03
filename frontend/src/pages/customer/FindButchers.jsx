@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import images from '../../assets/images';
 import { api } from '../../api';
-import { getCustomerNotifications } from '../../components/customer/customerAccount';
 import { getButcherFilterOptions, mapDirectoryButcher } from '../../utils/butcherDirectory';
 import './FindButchers.css';
 
@@ -10,12 +9,37 @@ const initialSort = 'recommended';
 
 export function CustomerNavigation() {
   const { pathname } = useLocation();
-  const [unreadCount, setUnreadCount] = useState(() => getCustomerNotifications().filter((item) => !item.read).length);
+  const [unreadCount, setUnreadCount] = useState(null);
+  const [notificationCountError, setNotificationCountError] = useState(false);
 
   useEffect(() => {
-    const refreshUnreadCount = () => setUnreadCount(getCustomerNotifications().filter((item) => !item.read).length);
-    window.addEventListener('customer-notifications-change', refreshUnreadCount);
-    return () => window.removeEventListener('customer-notifications-change', refreshUnreadCount);
+    let isCurrentRequest = true;
+    const loadUnreadCount = async () => {
+      try {
+        let page = 1;
+        let lastPage = 1;
+        let count = 0;
+        do {
+          const response = await api.customerNotifications({ per_page: 100, page });
+          count += (response.data || []).filter((notification) => !notification.read_at).length;
+          lastPage = response.last_page || 1;
+          page += 1;
+        } while (page <= lastPage);
+        if (isCurrentRequest) {
+          setUnreadCount(count);
+          setNotificationCountError(false);
+        }
+      } catch {
+        if (isCurrentRequest) {
+          setUnreadCount(null);
+          setNotificationCountError(true);
+        }
+      }
+    };
+    loadUnreadCount();
+    return () => {
+      isCurrentRequest = false;
+    };
   }, []);
 
   return (
@@ -33,7 +57,7 @@ export function CustomerNavigation() {
             <Link to="/customer/reviews" aria-current={pathname === '/customer/reviews' ? 'page' : undefined}>Reviews</Link>
             <Link to="/customer/profile" aria-current={pathname === '/customer/profile' ? 'page' : undefined}>Profile</Link>
           </nav>
-          <Link className="finder-notification-link" to="/customer/notifications" aria-label={`Notifications${unreadCount ? `, ${unreadCount} unread` : ''}`} aria-current={pathname === '/customer/notifications' ? 'page' : undefined}>
+          <Link className="finder-notification-link" to="/customer/notifications" aria-label={`Notifications${notificationCountError ? ', unread count unavailable' : unreadCount ? `, ${unreadCount} unread` : ''}`} aria-current={pathname === '/customer/notifications' ? 'page' : undefined}>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" /></svg>
             {unreadCount ? <span className="finder-notification-count">{unreadCount > 9 ? '9+' : unreadCount}</span> : null}
           </Link>

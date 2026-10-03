@@ -1,21 +1,55 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getCustomerAccount, getCustomerNotifications } from '../../components/customer/customerAccount';
-import { getCustomerBookings, getCustomerReviews } from '../../components/customer/customerBookings';
-import { butchers } from '../../components/customer/butchersData';
-import { getButcherServices } from '../../components/customer/butcherProfileData';
+import { api } from '../../api';
+import { useAuth } from '../../auth/AuthContext';
+import { mapApiBooking, mapApiReview } from '../../utils/apiBookings';
+import { mapDirectoryButcher } from '../../utils/butcherDirectory';
 import { CustomerNavigation, VerifiedMark } from '../customer/FindButchers';
 import './CustomerDashboard.css';
 
 const money = (amount) => `৳${Number(amount || 0).toLocaleString('en-BD')}`;
 
 const plannerAnimals = {
-  Goat: { sharesPerAnimal: 1, basePrice: 3200, descriptor: 'best for small and medium family plans' },
-  Sheep: { sharesPerAnimal: 1, basePrice: 3000, descriptor: 'balanced budget option for shared or family use' },
-  Cow: { sharesPerAnimal: 7, basePrice: 52000, descriptor: 'fits larger family or shared sacrifice plans' },
-  'Shared Cow': { sharesPerAnimal: 1, basePrice: 7500, descriptor: 'ideal for cost-sharing with family or friends' },
-  Camel: { sharesPerAnimal: 7, basePrice: 70000, descriptor: 'premium choice for large gatherings and celebrations' },
+  Goat: { sharesPerAnimal: 1, basePrice: 3200 },
+  Sheep: { sharesPerAnimal: 1, basePrice: 3000 },
+  Cow: { sharesPerAnimal: 7, basePrice: 52000 },
+  'Shared Cow': { sharesPerAnimal: 1, basePrice: 7500 },
+  Camel: { sharesPerAnimal: 7, basePrice: 70000 },
 };
+
+async function loadAllPages(fetchPage) {
+  const items = [];
+  let page = 1;
+  let lastPage = 1;
+  do {
+    const response = await fetchPage(page);
+    items.push(...(response.data || []));
+    lastPage = response.last_page || 1;
+    page += 1;
+  } while (page <= lastPage);
+  return items;
+}
+
+function mapApiNotification(record) {
+  const type = ['booking', 'payment', 'service', 'review', 'account'].includes(record.type) ? record.type : 'account';
+  return {
+    id: String(record.id),
+    type,
+    title: record.title,
+    message: record.message,
+    date: record.created_at,
+    read: Boolean(record.read_at),
+  };
+}
+
+function DashboardLoadState({ message, error, onRetry }) {
+  return (
+    <div className="customer-dashboard-empty" role={error ? 'alert' : 'status'}>
+      <p>{error || message}</p>
+      {error && onRetry ? <button className="booking-secondary-button" type="button" onClick={onRetry}>Try again</button> : null}
+    </div>
+  );
+}
 
 function formatDate(date) {
   if (!date) return 'Date not set';
@@ -47,14 +81,172 @@ function NotificationTypeIcon({ type }) {
 }
 
 function CustomerDashboard() {
-  const account = getCustomerAccount();
-  const bookings = getCustomerBookings();
-  const reviews = getCustomerReviews();
-  const notifications = [...getCustomerNotifications()].sort((first, second) => second.date.localeCompare(first.date));
+  const { user: authenticatedUser } = useAuth();
+  const [account, setAccount] = useState(null);
+  const [bookings, setBookings] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [notifications, setNotifications] = useState([]);
+  const [verifiedButchers, setVerifiedButchers] = useState([]);
+  const [plannerMatches, setPlannerMatches] = useState([]);
+  const [profileLoading, setProfileLoading] = useState(true);
+  const [bookingsLoading, setBookingsLoading] = useState(true);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
+  const [notificationsLoading, setNotificationsLoading] = useState(true);
+  const [butchersLoading, setButchersLoading] = useState(true);
+  const [plannerMatchesLoading, setPlannerMatchesLoading] = useState(true);
+  const [profileError, setProfileError] = useState('');
+  const [bookingsError, setBookingsError] = useState('');
+  const [reviewsError, setReviewsError] = useState('');
+  const [notificationsError, setNotificationsError] = useState('');
+  const [butchersError, setButchersError] = useState('');
+  const [plannerMatchesError, setPlannerMatchesError] = useState('');
+  const [profileRetry, setProfileRetry] = useState(0);
+  const [bookingsRetry, setBookingsRetry] = useState(0);
+  const [reviewsRetry, setReviewsRetry] = useState(0);
+  const [notificationsRetry, setNotificationsRetry] = useState(0);
+  const [butchersRetry, setButchersRetry] = useState(0);
   const [plannerHouseholdSize, setPlannerHouseholdSize] = useState(4);
   const [plannerAnimal, setPlannerAnimal] = useState('Goat');
   const [plannerBudget, setPlannerBudget] = useState(15000);
   const [plannerLocation, setPlannerLocation] = useState('Dhanmondi, Dhaka');
+
+  useEffect(() => {
+    let isCurrentRequest = true;
+    setProfileLoading(true);
+    setProfileError('');
+    api.customerProfile()
+      .then((response) => {
+        if (isCurrentRequest) setAccount(response.user);
+      })
+      .catch((error) => {
+        if (!isCurrentRequest) return;
+        setAccount(null);
+        setProfileError(error?.message || 'Unable to load your profile.');
+      })
+      .finally(() => {
+        if (isCurrentRequest) setProfileLoading(false);
+      });
+    return () => {
+      isCurrentRequest = false;
+    };
+  }, [profileRetry]);
+
+  useEffect(() => {
+    let isCurrentRequest = true;
+    setBookingsLoading(true);
+    setBookingsError('');
+    loadAllPages((page) => api.customerBookings({ per_page: 100, page }))
+      .then((records) => {
+        if (isCurrentRequest) setBookings(records.map(mapApiBooking));
+      })
+      .catch((error) => {
+        if (!isCurrentRequest) return;
+        setBookings([]);
+        setBookingsError(error?.message || 'Unable to load your bookings.');
+      })
+      .finally(() => {
+        if (isCurrentRequest) setBookingsLoading(false);
+      });
+    return () => {
+      isCurrentRequest = false;
+    };
+  }, [bookingsRetry]);
+
+  useEffect(() => {
+    let isCurrentRequest = true;
+    setReviewsLoading(true);
+    setReviewsError('');
+    loadAllPages((page) => api.customerReviews({ per_page: 100, page }))
+      .then((records) => {
+        if (isCurrentRequest) setReviews(records.map((review) => mapApiReview(review)));
+      })
+      .catch((error) => {
+        if (!isCurrentRequest) return;
+        setReviews([]);
+        setReviewsError(error?.message || 'Unable to load your reviews.');
+      })
+      .finally(() => {
+        if (isCurrentRequest) setReviewsLoading(false);
+      });
+    return () => {
+      isCurrentRequest = false;
+    };
+  }, [reviewsRetry]);
+
+  useEffect(() => {
+    let isCurrentRequest = true;
+    setNotificationsLoading(true);
+    setNotificationsError('');
+    loadAllPages((page) => api.customerNotifications({ per_page: 100, page }))
+      .then((records) => {
+        if (isCurrentRequest) {
+          setNotifications(records.map(mapApiNotification).sort((first, second) => second.date.localeCompare(first.date)));
+        }
+      })
+      .catch((error) => {
+        if (!isCurrentRequest) return;
+        setNotifications([]);
+        setNotificationsError(error?.message || 'Unable to load your notifications.');
+      })
+      .finally(() => {
+        if (isCurrentRequest) setNotificationsLoading(false);
+      });
+    return () => {
+      isCurrentRequest = false;
+    };
+  }, [notificationsRetry]);
+
+  useEffect(() => {
+    let isCurrentRequest = true;
+    setButchersLoading(true);
+    setButchersError('');
+    api.butchers({ per_page: 3, sort: 'rating' })
+      .then((response) => {
+        if (isCurrentRequest) setVerifiedButchers((response.data || []).map(mapDirectoryButcher));
+      })
+      .catch((error) => {
+        if (!isCurrentRequest) return;
+        setVerifiedButchers([]);
+        setButchersError(error?.message || 'Unable to load verified butchers.');
+      })
+      .finally(() => {
+        if (isCurrentRequest) setButchersLoading(false);
+      });
+    return () => {
+      isCurrentRequest = false;
+    };
+  }, [butchersRetry]);
+
+  useEffect(() => {
+    let isCurrentRequest = true;
+    setPlannerMatchesLoading(true);
+    setPlannerMatchesError('');
+    const locationParts = plannerLocation.split(',').map((part) => part.trim()).filter(Boolean);
+    const filters = {
+      animal: plannerAnimal,
+      available: true,
+      per_page: 2,
+      sort: 'rating',
+      ...(locationParts.length > 1
+        ? { area: locationParts[0], city: locationParts[1] }
+        : { city: locationParts[0] || '' }),
+    };
+    api.butchers(filters)
+      .then((response) => {
+        if (isCurrentRequest) setPlannerMatches((response.data || []).map(mapDirectoryButcher));
+      })
+      .catch((error) => {
+        if (!isCurrentRequest) return;
+        setPlannerMatches([]);
+        setPlannerMatchesError(error?.message || 'Unable to load matching butchers.');
+      })
+      .finally(() => {
+        if (isCurrentRequest) setPlannerMatchesLoading(false);
+      });
+    return () => {
+      isCurrentRequest = false;
+    };
+  }, [plannerAnimal, plannerLocation]);
 
   const plannerInsight = useMemo(() => {
     const householdSize = Math.max(1, Number(plannerHouseholdSize) || 1);
@@ -65,11 +257,6 @@ function CustomerDashboard() {
     const estimatedMaximum = estimatedMinimum + (animalProfile.basePrice * 0.22);
     const budgetValue = Number(plannerBudget) || 0;
     const budgetGap = estimatedMaximum - budgetValue;
-    const matchedButchers = butchers.filter((butcher) => {
-      const matchesAnimal = butcher.animals.includes(plannerAnimal) || (plannerAnimal === 'Shared Cow' && butcher.animals.includes('Shared Cow'));
-      return butcher.verified && matchesAnimal && (!plannerLocation || butcher.area === plannerLocation);
-    }).slice(0, 2);
-
     return {
       householdSize,
       sharesNeeded,
@@ -77,10 +264,9 @@ function CustomerDashboard() {
       estimatedMinimum,
       estimatedMaximum,
       budgetGap,
-      matchedButchers,
       budgetStatus: budgetValue >= estimatedMaximum ? 'within-budget' : 'needs-more',
     };
-  }, [plannerAnimal, plannerBudget, plannerHouseholdSize, plannerLocation]);
+  }, [plannerAnimal, plannerBudget, plannerHouseholdSize]);
 
   const today = new Date().toISOString().slice(0, 10);
   const eligibleUpcomingBookings = bookings
@@ -91,7 +277,6 @@ function CustomerDashboard() {
   const nextReviewBooking = bookings.find((booking) => booking.status === 'Completed' && !booking.review);
   const writeReviewPath = nextReviewBooking ? `/customer/reviews/${encodeURIComponent(nextReviewBooking.id)}` : '/customer/reviews';
   const latestReview = [...reviews].sort((first, second) => second.date.localeCompare(first.date))[0];
-  const verifiedButchers = butchers.filter((butcher) => butcher.verified).slice(0, 3);
   const pendingBookings = bookings.filter((booking) => booking.status === 'Pending').length;
   const completedBookings = bookings.filter((booking) => booking.status === 'Completed').length;
 
@@ -100,22 +285,28 @@ function CustomerDashboard() {
       <CustomerNavigation />
       <main className="customer-dashboard-main">
         <header className="customer-dashboard-welcome">
-          <div><p className="finder-eyebrow">Customer dashboard</p><h1>Welcome back, {account.profile.name}</h1><p>Manage your Qurbani services, bookings, and payments from one place.</p></div>
+          <div>
+            <p className="finder-eyebrow">Customer dashboard</p>
+            <h1>Welcome back, {account?.name || authenticatedUser?.name || 'Customer'}</h1>
+            <p>Manage your Qurbani services, bookings, and payments from one place.</p>
+            {profileLoading ? <small role="status">Loading profile...</small> : null}
+            {profileError ? <p className="customer-dashboard-error" role="alert">{profileError} <button type="button" onClick={() => setProfileRetry((current) => current + 1)}>Try again</button></p> : null}
+          </div>
           <Link className="booking-primary-button" to="/dashboard/customer/find-butcher">Find a Verified Butcher <span aria-hidden="true">→</span></Link>
         </header>
 
         <section className="customer-dashboard-stats" aria-label="Booking summary">
-          <Link to="/customer/bookings"><strong>{bookings.length}</strong><span>Total bookings</span><small>All your service requests</small></Link>
-          <Link to="/customer/bookings"><strong>{pendingBookings}</strong><span>Pending bookings</span><small>Awaiting butcher confirmation</small></Link>
-          <Link to="/customer/bookings"><strong>{completedBookings}</strong><span>Completed bookings</span><small>Finished services</small></Link>
-          <Link to="/customer/reviews"><strong>{reviews.length}</strong><span>Reviews written</span><small>Your shared experiences</small></Link>
+          <Link to="/customer/bookings"><strong>{bookingsLoading ? '…' : bookingsError ? '—' : bookings.length}</strong><span>Total bookings</span><small>All your service requests</small></Link>
+          <Link to="/customer/bookings"><strong>{bookingsLoading ? '…' : bookingsError ? '—' : pendingBookings}</strong><span>Pending bookings</span><small>Awaiting butcher confirmation</small></Link>
+          <Link to="/customer/bookings"><strong>{bookingsLoading ? '…' : bookingsError ? '—' : completedBookings}</strong><span>Completed bookings</span><small>Finished services</small></Link>
+          <Link to="/customer/reviews"><strong>{reviewsLoading ? '…' : reviewsError ? '—' : reviews.length}</strong><span>Reviews written</span><small>Your shared experiences</small></Link>
         </section>
 
         <div className="customer-dashboard-content">
           <div className="customer-dashboard-primary">
             <section className="customer-dashboard-panel customer-upcoming-panel">
               <DashboardSectionHeading eyebrow="Next on your calendar" title="Upcoming Booking" />
-              {upcomingBooking ? (
+              {bookingsLoading ? <DashboardLoadState message="Loading your bookings..." /> : bookingsError ? <DashboardLoadState error={bookingsError} onRetry={() => setBookingsRetry((current) => current + 1)} /> : upcomingBooking ? (
                 <div className="customer-upcoming-details">
                   <div className="customer-upcoming-title"><div><h3>{upcomingBooking.butcherName}</h3><VerifiedMark verified={upcomingBooking.butcherVerified} /></div><span className={statusClass(upcomingBooking.status)}>{upcomingBooking.status}</span></div>
                   <dl><div><dt>Service</dt><dd>{upcomingBooking.serviceName} · {upcomingBooking.animal}</dd></div><div><dt>Date &amp; time</dt><dd>{formatDate(upcomingBooking.date)} · {formatTime(upcomingBooking.time)}</dd></div><div><dt>Location</dt><dd>{upcomingBooking.area}, {upcomingBooking.city}</dd></div><div><dt>Remaining</dt><dd>{money(upcomingBooking.remaining)}</dd></div></dl>
@@ -183,8 +374,10 @@ function CustomerDashboard() {
                   <strong>Best local matches</strong>
                   <span>{plannerLocation}</span>
                 </div>
-                {plannerInsight.matchedButchers.length ? (
-                  plannerInsight.matchedButchers.map((butcher) => (
+                {plannerMatchesLoading ? <p role="status">Loading matching verified butchers...</p> : plannerMatchesError ? (
+                  <div className="planner-empty-state" role="alert">{plannerMatchesError}</div>
+                ) : plannerMatches.length ? (
+                  plannerMatches.map((butcher) => (
                     <div key={butcher.id} className="planner-match-item">
                       <div>
                         <strong>{butcher.name}</strong>
@@ -192,7 +385,7 @@ function CustomerDashboard() {
                       </div>
                       <div>
                         <span>★ {butcher.rating.toFixed(1)}</span>
-                        <strong>{money(butcher.startingPrice)}</strong>
+                        <strong>{butcher.startingPrice == null ? 'Price not listed' : money(butcher.startingPrice)}</strong>
                       </div>
                     </div>
                   ))
@@ -204,7 +397,7 @@ function CustomerDashboard() {
 
             <section className="customer-dashboard-panel">
               <DashboardSectionHeading eyebrow="Your activity" title="Recent Bookings" to="/customer/bookings" action="View All Bookings" />
-              {recentBookings.length ? (
+              {bookingsLoading ? <DashboardLoadState message="Loading your bookings..." /> : bookingsError ? <DashboardLoadState error={bookingsError} onRetry={() => setBookingsRetry((current) => current + 1)} /> : recentBookings.length ? (
                 <div className="customer-recent-bookings">
                   {recentBookings.map((booking) => (
                     <article className="customer-recent-booking" key={booking.id}>
@@ -222,7 +415,7 @@ function CustomerDashboard() {
           <aside className="customer-dashboard-secondary">
             <section className="customer-dashboard-panel">
               <DashboardSectionHeading eyebrow="Latest updates" title="Notifications" to="/customer/notifications" action="View All Notifications" />
-              {notifications.length ? (
+              {notificationsLoading ? <DashboardLoadState message="Loading your notifications..." /> : notificationsError ? <DashboardLoadState error={notificationsError} onRetry={() => setNotificationsRetry((current) => current + 1)} /> : notifications.length ? (
                 <div className="customer-dashboard-notifications">
                   {notifications.slice(0, 4).map((notification) => (
                     <Link className={`customer-dashboard-notification ${notification.read ? '' : 'is-unread'}`} key={notification.id} to="/customer/notifications">
@@ -237,7 +430,7 @@ function CustomerDashboard() {
 
             <section className="customer-dashboard-panel">
               <DashboardSectionHeading eyebrow="Customer feedback" title="Your Reviews" to="/customer/reviews" action="View All Reviews" />
-              {latestReview ? (
+              {reviewsLoading ? <DashboardLoadState message="Loading your reviews..." /> : reviewsError ? <DashboardLoadState error={reviewsError} onRetry={() => setReviewsRetry((current) => current + 1)} /> : latestReview ? (
                 <article className="customer-dashboard-review">
                   <div><strong>{latestReview.butcherName}</strong><span>{'★'.repeat(latestReview.rating)} · {latestReview.rating}.0 / 5</span></div>
                   <p>{latestReview.comment}</p>
@@ -264,16 +457,16 @@ function CustomerDashboard() {
         <section className="customer-dashboard-panel customer-verified-section">
           <DashboardSectionHeading eyebrow="Local professionals" title="Verified Butchers" to="/dashboard/customer/find-butcher" action="Find More Butchers" />
           <div className="customer-dashboard-butcher-grid">
-            {verifiedButchers.map((butcher) => {
-              const mainService = butcher.services[0] || getButcherServices(butcher)[0]?.name;
+            {butchersLoading ? <DashboardLoadState message="Loading verified butchers..." /> : butchersError ? <DashboardLoadState error={butchersError} onRetry={() => setButchersRetry((current) => current + 1)} /> : verifiedButchers.length ? verifiedButchers.map((butcher) => {
+              const mainService = butcher.services[0] || 'Service details unavailable';
               return (
                 <article className="customer-dashboard-butcher" key={butcher.id}>
                   <div className="customer-dashboard-butcher-person">{butcher.image ? <img src={butcher.image} alt={butcher.name} /> : <span>{butcher.initials}</span>}<div><h3>{butcher.name}</h3><VerifiedMark verified={butcher.verified} /><p>★ {butcher.rating.toFixed(1)} · {butcher.area}</p></div></div>
-                  <div className="customer-dashboard-butcher-service"><span>{mainService}</span><strong>From {money(butcher.startingPrice)}</strong></div>
+                  <div className="customer-dashboard-butcher-service"><span>{mainService}</span><strong>{butcher.startingPrice == null ? 'Price not listed' : `From ${money(butcher.startingPrice)}`}</strong></div>
                   <Link to={`/dashboard/customer/find-butcher/${butcher.id}`}>View Profile <span aria-hidden="true">→</span></Link>
                 </article>
               );
-            })}
+            }) : <DashboardLoadState message="No verified butchers are available yet." />}
           </div>
         </section>
       </main>
