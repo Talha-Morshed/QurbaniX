@@ -28,9 +28,12 @@ class LoginController extends Controller
     /** Adnan: Create a hashed, expiring PIN and return it for the demo login flow. */
     public function requestPin(Request $request): JsonResponse
     {
+        $phone = $request->input('phone');
+        if (is_string($phone)) {
+            $request->merge(['phone' => trim($phone)]);
+        }
         $request->validate([
             'phone' => ['required', 'string', 'regex:/^01\d{9}$/'],
-            'role' => ['nullable', 'string', 'in:customer,butcher,admin'],
         ]);
 
         $user = User::where('phone', $request->phone)->first();
@@ -39,12 +42,6 @@ class LoginController extends Controller
             return response()->json([
                 'message' => 'No account found with this phone number.',
             ], 404);
-        }
-
-        if ($request->filled('role') && $user->role !== $request->role) {
-            return response()->json([
-                'message' => 'This account cannot be used with the selected login role.',
-            ], 403);
         }
 
         $pin = (string) random_int(
@@ -72,10 +69,13 @@ class LoginController extends Controller
     /** Adnan: Check expiry and retry limits, then issue a token only after a correct PIN. */
     public function verifyPin(Request $request): JsonResponse
     {
+        $phone = $request->input('phone');
+        if (is_string($phone)) {
+            $request->merge(['phone' => trim($phone)]);
+        }
         $request->validate([
             'phone' => ['required', 'string', 'regex:/^01\d{9}$/'],
             'pin' => ['required', 'string', 'size:4'],
-            'role' => ['nullable', 'string', 'in:customer,butcher,admin'],
         ]);
 
         $user = User::where('phone', $request->phone)->first();
@@ -84,12 +84,6 @@ class LoginController extends Controller
             return response()->json([
                 'message' => 'No account found with this phone number.',
             ], 404);
-        }
-
-        if ($request->filled('role') && $user->role !== $request->role) {
-            return response()->json([
-                'message' => 'This account cannot be used with the selected login role.',
-            ], 403);
         }
 
         if (! $user->pin_hash || ! $user->pin_expires_at) {

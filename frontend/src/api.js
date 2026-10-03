@@ -38,8 +38,8 @@ async function request(endpoint, options = {}) {
 
 export const api = {
   register: (data) => request('/register', { method: 'POST', body: JSON.stringify(data) }),
-  login: (phone, role) => request('/login', { method: 'POST', body: JSON.stringify({ phone, role }) }),
-  loginVerify: (phone, pin, role) => request('/login/verify', { method: 'POST', body: JSON.stringify({ phone, pin, role }) }),
+  login: (phone) => request('/login', { method: 'POST', body: JSON.stringify({ phone }) }),
+  loginVerify: (phone, pin) => request('/login/verify', { method: 'POST', body: JSON.stringify({ phone, pin }) }),
   adminUsers: (filters = {}) => request(`/admin/users${Object.keys(filters).length ? `?${new URLSearchParams(filters)}` : ''}`),
   verifyButcher: (id, data) => request(`/admin/butchers/${encodeURIComponent(id)}/verification`, { method: 'PATCH', body: JSON.stringify(data) }),
   me: () => request('/me'),

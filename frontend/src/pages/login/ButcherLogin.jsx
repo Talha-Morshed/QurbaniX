@@ -1,7 +1,7 @@
 import RoleLogin from './RoleLogin';
 
 function ButcherLogin() {
-  return <RoleLogin role="Butcher" />;
+  return <RoleLogin />;
 }
 
 export default ButcherLogin;

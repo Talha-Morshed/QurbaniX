@@ -5,7 +5,7 @@ import { maskPhone, validatePhone } from '../../utils/validation';
 import { api } from '../../api';
 import { useAuth } from '../../auth/AuthContext';
 
-function RoleLogin({ role }) {
+function RoleLogin() {
   const [form, setForm] = useState({ phone: '' });
   const [errors, setErrors] = useState({});
   const [stage, setStage] = useState('request');
@@ -36,7 +36,7 @@ function RoleLogin({ role }) {
     setErrorMsg('');
 
     try {
-      const data = await api.login(form.phone.trim(), role.toLowerCase());
+      const data = await api.login(form.phone.trim());
       setDevPin(data.dev_pin || '');
       setStage('verify');
     } catch (err) {
@@ -58,7 +58,7 @@ function RoleLogin({ role }) {
     setIsSubmitting(true);
 
     try {
-      const data = await api.loginVerify(form.phone.trim(), pinInput.trim(), role.toLowerCase());
+      const data = await api.loginVerify(form.phone.trim(), pinInput.trim());
       const dashboardPaths = {
         customer: '/dashboard/customer',
         butcher: '/dashboard/butcher',

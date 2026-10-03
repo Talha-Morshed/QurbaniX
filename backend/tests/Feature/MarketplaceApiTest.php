@@ -45,7 +45,7 @@ class MarketplaceApiTest extends TestCase
         $this->assertDatabaseCount('users', 1);
     }
 
-    public function test_customer_login_requires_the_customer_role_and_does_not_issue_a_token_for_butcher_verification(): void
+    public function test_client_supplied_butcher_role_cannot_override_a_registered_customer_role(): void
     {
         $this->app['env'] = 'local';
         $phone = '01712345678';
@@ -58,19 +58,26 @@ class MarketplaceApiTest extends TestCase
 
         $pinResponse = $this->postJson('/api/login', [
             'phone' => $phone,
-            'role' => 'customer',
+            'role' => 'butcher',
         ])->assertOk();
 
-        $this->postJson('/api/login/verify', [
+        $loginResponse = $this->postJson('/api/login/verify', [
             'phone' => $phone,
             'pin' => $pinResponse->json('dev_pin'),
             'role' => 'butcher',
-        ])->assertForbidden()
-            ->assertJsonPath('message', 'This account cannot be used with the selected login role.')
-            ->assertJsonMissingPath('token');
+        ])->assertOk()
+            ->assertJsonPath('user.role', 'customer')
+            ->assertJsonStructure(['token']);
+
+        $this->withToken($loginResponse->json('token'))
+            ->getJson('/api/customer/bookings')
+            ->assertOk();
+        $this->withToken($loginResponse->json('token'))
+            ->getJson('/api/butcher/bookings')
+            ->assertForbidden();
     }
 
-    public function test_butcher_login_requires_the_butcher_role_and_does_not_issue_a_token_for_customer_verification(): void
+    public function test_client_supplied_customer_role_cannot_override_a_registered_butcher_role(): void
     {
         $this->app['env'] = 'local';
         $phone = '01812345678';
@@ -83,19 +90,26 @@ class MarketplaceApiTest extends TestCase
 
         $pinResponse = $this->postJson('/api/login', [
             'phone' => $phone,
-            'role' => 'butcher',
+            'role' => 'customer',
         ])->assertOk();
 
-        $this->postJson('/api/login/verify', [
+        $loginResponse = $this->postJson('/api/login/verify', [
             'phone' => $phone,
             'pin' => $pinResponse->json('dev_pin'),
             'role' => 'customer',
-        ])->assertForbidden()
-            ->assertJsonPath('message', 'This account cannot be used with the selected login role.')
-            ->assertJsonMissingPath('token');
+        ])->assertOk()
+            ->assertJsonPath('user.role', 'butcher')
+            ->assertJsonStructure(['token']);
+
+        $this->withToken($loginResponse->json('token'))
+            ->getJson('/api/butcher/bookings')
+            ->assertOk();
+        $this->withToken($loginResponse->json('token'))
+            ->getJson('/api/customer/bookings')
+            ->assertForbidden();
     }
 
-    public function test_customer_can_request_and_verify_pin_with_the_customer_role(): void
+    public function test_customer_can_request_and_verify_pin_using_only_their_phone_number(): void
     {
         $this->app['env'] = 'local';
         $phone = '01712345679';
@@ -106,22 +120,18 @@ class MarketplaceApiTest extends TestCase
             'role' => 'customer',
         ])->assertCreated();
 
-        $pinResponse = $this->postJson('/api/login', [
-            'phone' => $phone,
-            'role' => 'customer',
-        ])->assertOk();
+        $pinResponse = $this->postJson('/api/login', ['phone' => "  {$phone}  "])->assertOk();
 
         $this->postJson('/api/login/verify', [
             'phone' => $phone,
             'pin' => $pinResponse->json('dev_pin'),
-            'role' => 'customer',
         ])->assertOk()
             ->assertJsonPath('user.phone', $phone)
             ->assertJsonPath('user.role', 'customer')
             ->assertJsonStructure(['token']);
     }
 
-    public function test_butcher_can_request_and_verify_pin_with_the_butcher_role(): void
+    public function test_butcher_can_request_and_verify_pin_using_only_their_phone_number(): void
     {
         $this->app['env'] = 'local';
         $phone = '01812345679';
@@ -130,17 +140,15 @@ class MarketplaceApiTest extends TestCase
             'name' => 'Butcher Login User',
             'phone' => $phone,
             'role' => 'butcher',
-        ])->assertCreated();
+        ])->assertCreated()
+            ->assertJsonPath('user.role', 'butcher');
+        $this->assertDatabaseHas('users', ['phone' => $phone, 'role' => 'butcher']);
 
-        $pinResponse = $this->postJson('/api/login', [
-            'phone' => $phone,
-            'role' => 'butcher',
-        ])->assertOk();
+        $pinResponse = $this->postJson('/api/login', ['phone' => $phone])->assertOk();
 
         $this->postJson('/api/login/verify', [
             'phone' => $phone,
             'pin' => $pinResponse->json('dev_pin'),
-            'role' => 'butcher',
         ])->assertOk()
             ->assertJsonPath('user.phone', $phone)
             ->assertJsonPath('user.role', 'butcher')
@@ -152,28 +160,23 @@ class MarketplaceApiTest extends TestCase
         $this->app['env'] = 'production';
         $user = User::factory()->create(['phone' => '01712345680', 'role' => 'customer']);
 
-        $this->postJson('/api/login', [
-            'phone' => $user->phone,
-            'role' => 'customer',
-        ])->assertOk()
+        $this->postJson('/api/login', ['phone' => $user->phone])->assertOk()
             ->assertJsonPath('message', 'PIN sent successfully.')
             ->assertJsonStructure(['dev_pin']);
     }
 
-    public function test_admin_can_request_and_verify_pin_with_the_admin_role(): void
+    public function test_admin_can_request_and_verify_pin_using_only_the_registered_phone_number(): void
     {
         $this->app['env'] = 'local';
         $admin = User::factory()->create(['phone' => '01912345678', 'role' => 'admin']);
 
         $pinResponse = $this->postJson('/api/login', [
             'phone' => $admin->phone,
-            'role' => 'admin',
         ])->assertOk();
 
         $this->postJson('/api/login/verify', [
             'phone' => $admin->phone,
             'pin' => $pinResponse->json('dev_pin'),
-            'role' => 'admin',
         ])->assertOk()
             ->assertJsonPath('user.phone', $admin->phone)
             ->assertJsonPath('user.role', 'admin')
