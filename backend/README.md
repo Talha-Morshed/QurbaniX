@@ -41,7 +41,7 @@ Registration and login use phone numbers and Sanctum bearer tokens:
 - `POST /api/login/verify` — verify the PIN and receive a bearer token
 - `GET /api/me` and `POST /api/logout`
 
-The current PIN delivery is development-only: the PIN is returned in the JSON response only in local/development environments. Configure an SMS provider before enabling production phone verification. Admin accounts cannot self-register; create them through a trusted operator process.
+The current PIN delivery is development-only: the PIN is returned in the JSON response only in local/development environments. Configure an SMS provider before enabling production phone verification. Admin accounts cannot self-register. The deployment workflow seeds one administrator using `ADMIN_PHONE`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD` from the backend environment; if unset, the seeder's documented default phone is `01000000000`. It creates a missing account only, does not reset an existing administrator's password, and stops deployment if that phone already belongs to a non-admin account. Set a unique phone and a strong password through a trusted operator before deploying to production.
 
 Send the token on protected requests as `Authorization: Bearer <token>`.
 
@@ -65,4 +65,4 @@ Payment records are persistent and remain pending until confirmed. Cash payments
 
 ## Data model
 
-Migrations create butcher profiles and services, customer addresses, weekly schedules and date exceptions, bookings, payment records, reviews, and notifications. `php artisan migrate` applies the schema; `php artisan db:seed` does not add demo records.
+Migrations create butcher profiles and services, customer addresses, weekly schedules and date exceptions, bookings, payment records, reviews, and notifications. `php artisan migrate` applies the schema; `php artisan db:seed` creates only the configured administrator account and no demo marketplace records.

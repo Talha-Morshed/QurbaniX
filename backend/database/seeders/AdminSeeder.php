@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use RuntimeException;
 
 class AdminSeeder extends Seeder
 {
@@ -14,14 +15,22 @@ class AdminSeeder extends Seeder
         $email = env('ADMIN_EMAIL', 'admin@qurbanix.test');
         $password = env('ADMIN_PASSWORD', 'Admin@123');
 
-        User::query()->updateOrCreate(
-            ['phone' => $phone],
-            [
-                'name' => 'System Administrator',
-                'email' => $email,
-                'role' => 'admin',
-                'password' => Hash::make($password),
-            ]
-        );
+        $existingUser = User::query()->where('phone', $phone)->first();
+
+        if ($existingUser) {
+            if ($existingUser->role !== 'admin') {
+                throw new RuntimeException('The configured admin phone number belongs to a non-admin account.');
+            }
+
+            return;
+        }
+
+        User::query()->create([
+            'name' => 'System Administrator',
+            'phone' => $phone,
+            'email' => $email,
+            'role' => 'admin',
+            'password' => Hash::make($password),
+        ]);
     }
 }
