@@ -29,6 +29,7 @@ function RoleLogin({ role }) {
 
   const sendPin = async (event) => {
     event.preventDefault();
+    if (isSubmitting) return;
     if (!validatePhoneOnly()) return;
 
     setIsSubmitting(true);
@@ -108,6 +109,7 @@ function RoleLogin({ role }) {
               onChange={(event) => setForm({ phone: event.target.value })}
               placeholder="01XXXXXXXXX"
               aria-invalid={!!errors.phone}
+              disabled={isSubmitting}
             />
             {errors.phone && <p className="text-xs text-rose-600">{errors.phone}</p>}
           </label>
@@ -147,6 +149,7 @@ function RoleLogin({ role }) {
                 value={pinInput}
                 onChange={(event) => setPinInput(event.target.value)}
                 placeholder="1234"
+                disabled={isSubmitting}
               />
             </label>
 
@@ -154,7 +157,7 @@ function RoleLogin({ role }) {
               <button type="submit" disabled={isSubmitting} className="premium-action inline-flex items-center justify-center rounded-3xl bg-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-slate-300">
                 {isSubmitting ? 'Verifying...' : 'Verify'}
               </button>
-              <button type="button" onClick={sendPin} className="premium-action inline-flex min-w-28 items-center justify-center px-3 py-2 text-sm font-semibold text-primary">Resend PIN</button>
+              <button type="button" disabled={isSubmitting} onClick={sendPin} className="premium-action inline-flex min-w-28 items-center justify-center px-3 py-2 text-sm font-semibold text-primary disabled:cursor-not-allowed disabled:opacity-60">{isSubmitting ? 'Sending...' : 'Resend PIN'}</button>
             </div>
           </div>
         </form>

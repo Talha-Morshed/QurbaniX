@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../api';
 import { CustomerNavigation } from './FindButchers';
@@ -69,6 +69,8 @@ function CustomerNotifications() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [updatingId, setUpdatingId] = useState(null);
   const [retryKey, setRetryKey] = useState(0);
+  const updatingIds = useRef(new Set());
+  const markingAll = useRef(false);
 
   useEffect(() => {
     let isCurrentRequest = true;
@@ -102,7 +104,8 @@ function CustomerNotifications() {
 
   const markRead = async (id) => {
     const selected = notifications.find((notification) => notification.id === id);
-    if (!selected || selected.read) return;
+    if (!selected || selected.read || updatingIds.current.size || markingAll.current) return;
+    updatingIds.current.add(id);
     setUpdatingId(id);
     setError('');
     try {
@@ -113,12 +116,14 @@ function CustomerNotifications() {
     } catch (requestError) {
       setError(requestError?.message || 'Unable to mark this notification as read.');
     } finally {
+      updatingIds.current.delete(id);
       setUpdatingId(null);
     }
   };
 
   const markAllRead = async () => {
-    if (!unreadCount) return;
+    if (!unreadCount || updatingIds.current.size || markingAll.current) return;
+    markingAll.current = true;
     setIsUpdating(true);
     setError('');
     try {
@@ -129,6 +134,7 @@ function CustomerNotifications() {
     } catch (requestError) {
       setError(requestError?.message || 'Unable to mark notifications as read.');
     } finally {
+      markingAll.current = false;
       setIsUpdating(false);
     }
   };
@@ -162,7 +168,7 @@ function CustomerNotifications() {
               );
               return (
                 <article className={`customer-notification-item ${notification.read ? '' : 'is-unread'}`} key={notification.id}>
-                  {target ? <Link className="customer-notification-content" to={target} onClick={() => markRead(notification.id)}>{content}</Link> : <button className="customer-notification-content" type="button" onClick={() => markRead(notification.id)}>{content}</button>}
+                  {target ? <Link className="customer-notification-content" to={target} onClick={(event) => { if (updatingIds.current.has(notification.id)) event.preventDefault(); else void markRead(notification.id); }}>{content}</Link> : <button className="customer-notification-content" type="button" disabled={updatingId === notification.id} onClick={() => markRead(notification.id)}>{content}</button>}
                   <div className="customer-notification-tools">
                     {!notification.read ? <span className="customer-unread-label"><span />Unread</span> : null}
                     {updatingId === notification.id ? <span role="status">Updating...</span> : null}

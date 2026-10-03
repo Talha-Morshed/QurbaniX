@@ -116,7 +116,7 @@ function Bookings() {
         <div className="bookings-toolbar"><div><p className="eyebrow">Booking management</p><h2>All service requests <span>{visibleBookings.length}</span></h2></div><Link to="/dashboard/butcher" className="bookings-back">← Dashboard</Link></div>
         <BookingFilters activeStatus={activeStatus} onStatusChange={setActiveStatus} search={search} onSearchChange={setSearch} date={date} onDateChange={setDate} />
         {statusError && <p className="booking-action-error" role="alert">{statusError}</p>}
-        <section className="butcher-panel bookings-list-panel"><BookingsTable bookings={visibleBookings} onView={setSelectedBooking} onStatusChange={updateStatus} updatingBookingId={updatingBookingId} isLoading={isLoading} error={loadError} onRetry={loadBookings} /></section>
+        <section className="butcher-panel bookings-list-panel"><BookingsTable bookings={visibleBookings} hasBookings={bookings.length > 0} onView={setSelectedBooking} onStatusChange={updateStatus} updatingBookingId={updatingBookingId} isLoading={isLoading} error={loadError} onRetry={loadBookings} /></section>
       </main>
       <BookingDetails booking={selectedBooking} onClose={() => setSelectedBooking(null)} onStatusChange={updateStatus} updatingBookingId={updatingBookingId} error={statusError} />
     </div>

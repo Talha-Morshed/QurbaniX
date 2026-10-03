@@ -135,7 +135,7 @@ function ButcherDetails() {
                 <span className="details-currency-note">Prices in BDT</span>
               </div>
               <div className="details-service-list">
-                {services.map((service) => (
+                {services.length ? services.map((service) => (
                   <article className="details-service-row" key={service.id}>
                     <div className="details-service-copy">
                       <span className="details-service-animal">{service.animal}</span>
@@ -155,7 +155,7 @@ function ButcherDetails() {
                         <button className="details-service-book" type="button" disabled>{bookingBlockMessage}</button>
                       )}
                   </article>
-                ))}
+                )) : <p className="details-empty-state">No services are currently listed for this butcher.</p>}
               </div>
             </section>
 
@@ -184,7 +184,7 @@ function ButcherDetails() {
                 </div>
               </div>
               <div className="details-review-list">
-                    {butcher.reviews.map((review) => (
+                    {butcher.reviews.length ? butcher.reviews.map((review) => (
                   <article className="details-review" key={review.id}>
                     <div className="details-review-topline">
                       <div>
@@ -197,7 +197,7 @@ function ButcherDetails() {
                     <p className="details-review-text">“{review.text}”</p>
                     {review.serviceRating ? <p className="details-review-categories">Service {review.serviceRating}/5 · Professionalism {review.professionalismRating}/5 · Punctuality {review.punctualityRating}/5 · Cleanliness {review.cleanlinessRating}/5</p> : null}
                   </article>
-                ))}
+                )) : <p className="details-empty-state">No customer reviews yet.</p>}
               </div>
             </section>
           </div>
@@ -210,9 +210,9 @@ function ButcherDetails() {
                 <span aria-hidden="true" />{butcher.availability === 'Unavailable' ? 'Currently unavailable' : 'Available for bookings'}
               </p>
               <div className="details-schedule">
-                {butcher.schedule.map(([day, hours]) => (
+                {butcher.schedule.length ? butcher.schedule.map(([day, hours]) => (
                   <div key={day}><strong>{day}</strong><span>{hours}</span></div>
-                ))}
+                )) : <p className="details-empty-state">No schedule has been provided.</p>}
               </div>
             </section>
 
@@ -221,7 +221,7 @@ function ButcherDetails() {
               <h2 id="details-areas-heading">Service Areas</h2>
               <p className="details-area-lead">Serving {butcher.area}</p>
               <ul className="details-area-list">
-                {butcher.serviceAreas.map((area) => <li key={area}>{area}</li>)}
+                {butcher.serviceAreas.length ? butcher.serviceAreas.map((area) => <li key={area}>{area}</li>) : <li>No service areas listed.</li>}
               </ul>
             </section>
 
@@ -242,10 +242,10 @@ function ButcherDetails() {
             <h2 id="details-booking-heading">Ready to book this butcher?</h2>
             <p>Choose a service and continue to the booking preview.</p>
           </div>
-          {canBook ? (
+          {canBook && services.length ? (
             <Link className="details-book-now" to={bookingPath(services[0]?.id || '')}>Choose a Service <span aria-hidden="true">→</span></Link>
           ) : (
-            <span className="details-book-unavailable">{bookingBlockMessage}</span>
+            <span className="details-book-unavailable">{services.length ? bookingBlockMessage : 'This butcher has no services available to book right now.'}</span>
           )}
         </section>
       </main>

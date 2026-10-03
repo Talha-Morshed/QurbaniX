@@ -82,6 +82,8 @@ function CustomerProfile() {
   const [profileDraft, setProfileDraft] = useState(() => getProfileDraft(emptyAccount));
   const [bookings, setBookings] = useState([]);
   const [reviews, setReviews] = useState([]);
+  const [bookingsError, setBookingsError] = useState('');
+  const [reviewsError, setReviewsError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [editingAddressId, setEditingAddressId] = useState(null);
@@ -100,6 +102,8 @@ function CustomerProfile() {
     let isCurrentRequest = true;
     setIsLoading(true);
     setProfileError('');
+    setBookingsError('');
+    setReviewsError('');
     Promise.allSettled([
       api.customerProfile(),
       api.customerBookings({ per_page: 100 }),
@@ -113,8 +117,16 @@ function CustomerProfile() {
       } else {
         setProfileError(profileResult.reason?.message || 'Unable to load your profile.');
       }
-      if (bookingsResult.status === 'fulfilled') setBookings(bookingsResult.value.data || []);
-      if (reviewsResult.status === 'fulfilled') setReviews(reviewsResult.value.data || []);
+      if (bookingsResult.status === 'fulfilled') {
+        setBookings(bookingsResult.value.data || []);
+      } else {
+        setBookingsError(bookingsResult.reason?.message || 'Unable to load your booking summary.');
+      }
+      if (reviewsResult.status === 'fulfilled') {
+        setReviews(reviewsResult.value.data || []);
+      } else {
+        setReviewsError(reviewsResult.reason?.message || 'Unable to load your review summary.');
+      }
     }).finally(() => {
       if (isCurrentRequest) setIsLoading(false);
     });
@@ -311,11 +323,13 @@ function CustomerProfile() {
             <label className="customer-photo-upload">Change photo<input type="file" accept="image/*" onChange={changePhoto} /></label>
           </div>
           <div className="customer-profile-summary" aria-label="Account summary">
-            <div><strong>{bookings.length}</strong><span>Total bookings</span></div>
-            <div><strong>{completedBookings}</strong><span>Completed</span></div>
-            <div><strong>{pendingBookings}</strong><span>Pending</span></div>
-            <div><strong>{reviews.length}</strong><span>Reviews written</span></div>
+            <div><strong>{bookingsError ? '—' : bookings.length}</strong><span>Total bookings</span></div>
+            <div><strong>{bookingsError ? '—' : completedBookings}</strong><span>Completed</span></div>
+            <div><strong>{bookingsError ? '—' : pendingBookings}</strong><span>Pending</span></div>
+            <div><strong>{reviewsError ? '—' : reviews.length}</strong><span>Reviews written</span></div>
           </div>
+          {bookingsError ? <p className="customer-account-error" role="alert">{bookingsError} <button type="button" onClick={() => setRetryKey((current) => current + 1)}>Retry</button></p> : null}
+          {reviewsError ? <p className="customer-account-error" role="alert">{reviewsError} <button type="button" onClick={() => setRetryKey((current) => current + 1)}>Retry</button></p> : null}
         </section>
 
         <div className="customer-account-grid">

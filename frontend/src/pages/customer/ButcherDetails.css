@@ -53,6 +53,7 @@
 .details-rating-track { height: 7px; background: #edf1ed; }
 .details-rating-track > span { display: block; height: 100%; background: var(--finder-gold); }
 .details-review-list { margin-top: 14px; border-top: 1px solid var(--finder-line); }
+.details-empty-state { margin: 0; padding: 13px; color: #68756c; font-size: 10px; line-height: 1.5; }
 .details-review { padding: 14px 0; border-bottom: 1px solid var(--finder-line); }
 .details-review-topline { display: flex; align-items: start; justify-content: space-between; gap: 14px; }
 .details-review-topline h3 { margin: 0 0 4px; color: #26392d; font-size: 12px; }

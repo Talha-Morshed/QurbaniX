@@ -2,7 +2,7 @@ function statusClass(status) {
   return `booking-status booking-status-${status.toLowerCase().replace(/\s+/g, '-')}`;
 }
 
-function BookingsTable({ bookings, onView, onStatusChange, updatingBookingId, isLoading, error, onRetry }) {
+function BookingsTable({ bookings, hasBookings, onView, onStatusChange, updatingBookingId, isLoading, error, onRetry }) {
   return (
     <div className="booking-list-wrap">
       <table className="bookings-list">
@@ -20,7 +20,7 @@ function BookingsTable({ bookings, onView, onStatusChange, updatingBookingId, is
       </table>
       {isLoading && <div className="booking-empty" role="status"><strong>Loading bookings...</strong></div>}
       {!isLoading && error && <div className="booking-empty" role="alert"><strong>Unable to load bookings</strong><span>{error}</span><button type="button" className="booking-retry" onClick={onRetry}>Try again</button></div>}
-      {!isLoading && !error && !bookings.length && <div className="booking-empty"><strong>No bookings found</strong><span>Try a different status or search term.</span></div>}
+      {!isLoading && !error && !bookings.length && <div className="booking-empty"><strong>{hasBookings ? 'No bookings match these filters' : 'No bookings yet'}</strong><span>{hasBookings ? 'Try a different status, search term, or date.' : 'New customer booking requests will appear here.'}</span></div>}
     </div>
   );
 }
