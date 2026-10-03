@@ -73,7 +73,7 @@ export const api = {
   updateButcherAvailability: (data) => request('/butcher/availability', { method: 'PUT', body: JSON.stringify(data) }),
   butcherBookings: (filters = {}) => request(`/butcher/bookings${Object.keys(filters).length ? `?${new URLSearchParams(filters)}` : ''}`),
   updateButcherBookingStatus: (id, status) => request(`/butcher/bookings/${encodeURIComponent(id)}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
-  butcherReviews: () => request('/butcher/reviews'),
+  butcherReviews: (filters = {}) => request(`/butcher/reviews${Object.keys(filters).length ? `?${new URLSearchParams(filters)}` : ''}`),
   createPayment: (bookingId, data) => request(`/customer/bookings/${encodeURIComponent(bookingId)}/payments`, { method: 'POST', body: JSON.stringify(data) }),
   customerConfirmPayment: (id) => request(`/customer/payments/${encodeURIComponent(id)}/confirm`, { method: 'POST' }),
   butcherConfirmPayment: (id) => request(`/butcher/payments/${encodeURIComponent(id)}/confirm`, { method: 'POST' }),

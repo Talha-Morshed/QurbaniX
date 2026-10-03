@@ -373,7 +373,7 @@ class MarketplaceApiTest extends TestCase
 
     public function test_customer_reviews_require_ownership_completion_and_valid_fields_and_cannot_be_duplicated(): void
     {
-        ['customer' => $customer, 'booking' => $completedBooking] = $this->createPaymentScenario(
+        ['customer' => $customer, 'butcher' => $butcher, 'booking' => $completedBooking] = $this->createPaymentScenario(
             bookingAttributes: ['status' => 'Completed', 'completed_at' => now()],
         );
         ['booking' => $pendingBooking] = $this->createPaymentScenario(
@@ -420,6 +420,60 @@ class MarketplaceApiTest extends TestCase
         $this->actingAs($otherCustomer)
             ->postJson("/api/customer/bookings/{$completedBooking->id}/reviews", $payload)
             ->assertNotFound();
+
+        $this->actingAs($butcher)
+            ->getJson('/api/butcher/reviews')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.booking.reference', $completedBooking->reference)
+            ->assertJsonPath('data.0.customer.name', $customer->name)
+            ->assertJsonPath('data.0.rating', 5)
+            ->assertJsonPath('data.0.service_rating', 4)
+            ->assertJsonPath('data.0.professionalism_rating', 5)
+            ->assertJsonPath('data.0.punctuality_rating', 4)
+            ->assertJsonPath('data.0.cleanliness_rating', 5)
+            ->assertJsonPath('data.0.comment', 'Excellent service from start to finish.')
+            ->assertJsonPath('data.0.recommendation', 'yes')
+            ->assertJsonPath('data.0.booking.service.name', 'Goat Qurbani');
+    }
+
+    public function test_butcher_reviews_require_butcher_authentication_and_are_scoped_to_the_authenticated_butcher(): void
+    {
+        ['butcher' => $butcher, 'booking' => $booking, 'customer' => $customer] = $this->createPaymentScenario();
+        ['butcher' => $anotherButcher, 'booking' => $anotherBooking] = $this->createPaymentScenario();
+        $review = $booking->review()->create([
+            'customer_id' => $customer->id,
+            'butcher_id' => $butcher->id,
+            'rating' => 4,
+            'service_rating' => 5,
+            'comment' => 'Excellent service and clear communication.',
+            'recommendation' => 'yes',
+            'status' => 'published',
+        ]);
+        $anotherCustomer = User::factory()->create(['role' => 'customer']);
+        $anotherBooking->review()->create([
+            'customer_id' => $anotherCustomer->id,
+            'butcher_id' => $anotherButcher->id,
+            'rating' => 2,
+            'comment' => 'Needs improvement.',
+            'status' => 'published',
+        ]);
+
+        $this->getJson('/api/butcher/reviews')->assertUnauthorized();
+
+        $customerUser = User::factory()->create(['role' => 'customer']);
+        $this->actingAs($customerUser)
+            ->getJson('/api/butcher/reviews')
+            ->assertForbidden();
+
+        $this->actingAs($butcher)
+            ->getJson('/api/butcher/reviews?butcher_id='.$anotherButcher->id)
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', $review->id)
+            ->assertJsonPath('data.0.butcher_id', $butcher->id)
+            ->assertJsonPath('data.0.booking.reference', $booking->reference)
+            ->assertJsonMissing(['rating' => 2]);
     }
 
     public function test_customer_notifications_are_scoped_and_read_actions_persist(): void
