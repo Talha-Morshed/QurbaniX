@@ -147,6 +147,19 @@ class MarketplaceApiTest extends TestCase
             ->assertJsonStructure(['token']);
     }
 
+    public function test_demo_pin_is_returned_outside_the_local_environment(): void
+    {
+        $this->app['env'] = 'production';
+        $user = User::factory()->create(['phone' => '01712345680', 'role' => 'customer']);
+
+        $this->postJson('/api/login', [
+            'phone' => $user->phone,
+            'role' => 'customer',
+        ])->assertOk()
+            ->assertJsonPath('message', 'PIN sent successfully.')
+            ->assertJsonStructure(['dev_pin']);
+    }
+
     public function test_admin_can_request_and_verify_pin_with_the_admin_role(): void
     {
         $this->app['env'] = 'local';

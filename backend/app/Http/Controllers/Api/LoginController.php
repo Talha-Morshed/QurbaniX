@@ -23,10 +23,9 @@ class LoginController extends Controller
     /**
      * Step 1: Request a login PIN.
      * Accepts a phone number, generates a 4-digit PIN, stores the hashed
-     * version in the database, and returns the plain PIN (dev only — in
-     * production this would be sent via SMS).
+     * version in the database, and returns the plain PIN for the demo flow.
      */
-    /** Adnan: Create a hashed, expiring PIN; only local development receives it in the response. */
+    /** Adnan: Create a hashed, expiring PIN and return it for the demo login flow. */
     public function requestPin(Request $request): JsonResponse
     {
         $request->validate([
@@ -59,15 +58,10 @@ class LoginController extends Controller
             'pin_attempts' => 0,
         ]);
 
-        $response = [
+        return response()->json([
             'message' => 'PIN sent successfully.',
-        ];
-
-        if (app()->environment('local', 'development')) {
-            $response['dev_pin'] = $pin;
-        }
-
-        return response()->json($response);
+            'dev_pin' => $pin,
+        ]);
     }
 
     /**
