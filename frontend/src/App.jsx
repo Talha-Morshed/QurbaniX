@@ -14,6 +14,7 @@ import CustomerResetPassword from './pages/login/CustomerResetPassword.jsx';
 import ButcherResetPassword from './pages/login/ButcherResetPassword.jsx';
 import CustomerDashboard from './pages/dashboard/CustomerDashboard.jsx';
 import FindButchers from './pages/customer/FindButchers.jsx';
+import SmartMatch from './pages/customer/SmartMatch.jsx';
 import ButcherDetails, { BookingPlaceholder } from './pages/customer/ButcherDetails.jsx';
 import Booking, { PaymentPlaceholder } from './pages/customer/Booking.jsx';
 import { BookingConfirmation, BookingDetails, BookingHistory } from './pages/customer/CustomerBookings.jsx';
@@ -51,6 +52,7 @@ function App() {
         <Route element={<ProtectedRoute role="customer" />}>
           <Route path="/dashboard/customer" element={<CustomerDashboard />} />
           <Route path="/dashboard/customer/find-butcher" element={<FindButchers />} />
+          <Route path="/dashboard/customer/smart-match" element={<SmartMatch />} />
           <Route path="/dashboard/customer/find-butcher/:butcherId" element={<ButcherDetails />} />
           <Route path="/dashboard/customer/book/:butcherId" element={<Booking />} />
           <Route path="/dashboard/customer/payment/:butcherId" element={<PaymentPlaceholder />} />

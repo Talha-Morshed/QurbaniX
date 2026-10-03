@@ -81,6 +81,7 @@ export function CustomerNavigation() {
           <nav className="finder-nav-links" aria-label="Customer navigation">
             <Link to="/dashboard/customer" aria-current={pathname === '/dashboard/customer' ? 'page' : undefined}>Dashboard</Link>
             <Link to="/dashboard/customer/find-butcher" aria-current={pathname.startsWith('/dashboard/customer/find-butcher') ? 'page' : undefined}>Find Butchers</Link>
+            <Link to="/dashboard/customer/smart-match" aria-current={pathname === '/dashboard/customer/smart-match' ? 'page' : undefined}>Smart Match</Link>
             <Link to="/customer/bookings" aria-current={pathname.startsWith('/customer/bookings') ? 'page' : undefined}>Bookings</Link>
             <Link to="/customer/reviews" aria-current={pathname === '/customer/reviews' ? 'page' : undefined}>Reviews</Link>
             <Link to="/customer/profile" aria-current={pathname === '/customer/profile' ? 'page' : undefined}>Profile</Link>

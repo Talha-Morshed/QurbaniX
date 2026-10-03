@@ -46,6 +46,10 @@ export const api = {
   logout: () => request('/logout', { method: 'POST' }),
   butchers: (filters = {}) => request(`/butchers?${new URLSearchParams(filters)}`),
   butcher: (id) => request(`/butchers/${encodeURIComponent(id)}`),
+  smartButcherMatches: (preferences) => request('/customer/butcher-matches', {
+    method: 'POST',
+    body: JSON.stringify(preferences),
+  }),
   customerProfile: () => request('/customer/profile'),
   updateCustomerProfile: (data) => request('/customer/profile', { method: 'PUT', body: JSON.stringify(data) }),
   customerBookings: (filters = {}) => request(`/customer/bookings?${new URLSearchParams(filters)}`),
