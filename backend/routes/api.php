@@ -25,6 +25,7 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('/payments', [PaymentController::class, 'index']);
 
     Route::middleware('role:customer')->prefix('customer')->group(function (): void {
+        Route::post('/butcher-matches', [CustomerController::class, 'butcherMatches']);
         Route::get('/profile', [CustomerController::class, 'profile']);
         Route::put('/profile', [CustomerController::class, 'updateProfile']);
         Route::post('/addresses', [CustomerController::class, 'createAddress']);

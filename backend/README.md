@@ -51,6 +51,7 @@ Send the token on protected requests as `Authorization: Bearer <token>`.
 | --- | --- |
 | Butcher directory | `GET /api/butchers`, `GET /api/butchers/{user}` |
 | Customer profile and addresses | `/api/customer/profile`, `/api/customer/addresses` |
+| Smart butcher matching | `POST /api/customer/butcher-matches` |
 | Customer bookings | `/api/customer/bookings` and booking status, payment, and review subroutes |
 | Customer notifications | `/api/customer/notifications` and read-state subroutes |
 | Butcher workspace | `/api/butcher/profile`, `/services`, `/availability`, `/bookings`, `/reviews` |
@@ -58,6 +59,8 @@ Send the token on protected requests as `Authorization: Bearer <token>`.
 | Admin operations | `/api/admin/users`, `/bookings`, and butcher verification |
 
 Customer and butcher endpoints are role-gated. Booking status changes are checked against the customer/butcher relationship and an explicit transition list. Booking creation checks verification, service availability, schedule, time range, and daily capacity. Review creation is limited to a customer's completed booking.
+
+Smart butcher matching is customer-authenticated and accepts a required animal type and future service date, plus optional area, city, time, budget, minimum rating, and service category. It returns verified butchers with available services, their public profile and service details, match reasons, and an additive score: animal support (30), requested category (10), requested date/time availability (25), area (15), city (10), budget (10), and minimum rating (10). Optional preferences only contribute points when supplied. Results that miss one or more preferences remain visible as closest matches with reasons that identify unmet criteria; availability is determined using the same profile, date exception or weekly schedule, time window, and active-booking capacity rules as booking creation.
 
 ## Payments
 

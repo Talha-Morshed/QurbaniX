@@ -7,6 +7,7 @@ use App\Models\Booking;
 use App\Models\CustomerAddress;
 use App\Models\Review;
 use App\Models\User;
+use App\Services\ButcherMatchingService;
 use App\Services\NotificationService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -19,6 +20,23 @@ use Illuminate\Validation\Rule;
  */
 class CustomerController extends Controller
 {
+    /** Return verified butchers ranked against the signed-in customer's preferences. */
+    public function butcherMatches(Request $request, ButcherMatchingService $matching): JsonResponse
+    {
+        $validated = $request->validate([
+            'animal_type' => ['required', 'string', Rule::in(['goat', 'cow', 'sheep', 'camel'])],
+            'area' => ['sometimes', 'nullable', 'string', 'max:120'],
+            'city' => ['sometimes', 'nullable', 'string', 'max:120'],
+            'date' => ['required', 'date', 'after_or_equal:today'],
+            'time' => ['sometimes', 'nullable', 'date_format:H:i'],
+            'max_budget' => ['sometimes', 'nullable', 'integer', 'min:0'],
+            'min_rating' => ['sometimes', 'nullable', 'numeric', 'min:1', 'max:5'],
+            'service_category' => ['sometimes', 'nullable', 'string', 'max:120'],
+        ]);
+
+        return response()->json(['data' => $matching->match($validated)]);
+    }
+
     /** Adnan: Return the signed-in customer's database profile, addresses, and notification preferences. */
     public function profile(Request $request): JsonResponse
     {
