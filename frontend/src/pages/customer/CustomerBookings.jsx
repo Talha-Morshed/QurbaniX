@@ -56,7 +56,7 @@ function useApiBooking(id) {
     };
   }, [id, retryKey]);
 
-  return { booking, isLoading, error, retry: () => setRetryKey((current) => current + 1) };
+  return { booking, isLoading, error, retry: () => setRetryKey((current) => current + 1), updateBooking: setBooking };
 }
 
 function BookingHistory() {
@@ -162,9 +162,83 @@ function DetailRow({ label, children }) {
 
 function BookingDetails() {
   const { id } = useParams();
-  const { booking, isLoading, error, retry } = useApiBooking(id);
+  const { booking, isLoading, error, retry, updateBooking } = useApiBooking(id);
+  const [paymentAction, setPaymentAction] = useState('');
+  const [paymentNotice, setPaymentNotice] = useState('');
+  const [paymentError, setPaymentError] = useState('');
+  const [isRefreshingPayment, setIsRefreshingPayment] = useState(false);
+
+  const refreshBooking = async () => {
+    const response = await api.customerBooking(id);
+    const refreshedBooking = mapApiBooking(response.booking);
+    updateBooking(refreshedBooking);
+    return refreshedBooking;
+  };
+
+  const refreshPaymentStatus = async () => {
+    setIsRefreshingPayment(true);
+    setPaymentNotice('');
+    setPaymentError('');
+    try {
+      await refreshBooking();
+      setPaymentNotice('Payment status refreshed.');
+    } catch (refreshError) {
+      setPaymentError(refreshError?.message || 'Unable to refresh payment status. Please try again.');
+    } finally {
+      setIsRefreshingPayment(false);
+    }
+  };
+
+  const createCashPayment = async (purpose) => {
+    setPaymentAction(purpose);
+    setPaymentNotice('');
+    setPaymentError('');
+    try {
+      const response = await api.createPayment(booking.id, { purpose, method: 'cash' });
+      setPaymentNotice(response.message || 'Cash payment recorded. Both parties must confirm receipt.');
+      try {
+        await refreshBooking();
+      } catch (refreshError) {
+        setPaymentError(`Payment was recorded, but the booking could not be refreshed: ${refreshError.message || 'Please retry.'}`);
+      }
+    } catch (requestError) {
+      setPaymentError(requestError?.message || 'Unable to record this payment. Please try again.');
+    } finally {
+      setPaymentAction('');
+    }
+  };
+
+  const confirmCashPayment = async (paymentId) => {
+    setPaymentAction(`confirm-${paymentId}`);
+    setPaymentNotice('');
+    setPaymentError('');
+    try {
+      const response = await api.customerConfirmPayment(paymentId);
+      setPaymentNotice(response.message || 'Your cash payment confirmation was recorded.');
+      try {
+        await refreshBooking();
+      } catch (refreshError) {
+        setPaymentError(`Your confirmation was recorded, but the booking could not be refreshed: ${refreshError.message || 'Please retry.'}`);
+      }
+    } catch (requestError) {
+      setPaymentError(requestError?.message || 'Unable to confirm this cash payment. Please try again.');
+    } finally {
+      setPaymentAction('');
+    }
+  };
+
   if (isLoading) return <LoadingBooking />;
   if (error || !booking) return <NotFound error={error} onRetry={retry} />;
+
+  const advancePayment = booking.payments.find((payment) => payment.purpose === 'advance' && ['pending', 'paid'].includes(payment.status))
+    || [...booking.payments].reverse().find((payment) => payment.purpose === 'advance');
+  const balancePayment = booking.payments.find((payment) => payment.purpose === 'balance' && ['pending', 'paid'].includes(payment.status))
+    || [...booking.payments].reverse().find((payment) => payment.purpose === 'balance');
+  const hasActiveAdvance = booking.payments.some((payment) => payment.purpose === 'advance' && ['pending', 'paid'].includes(payment.status));
+  const hasActiveBalance = booking.payments.some((payment) => payment.purpose === 'balance' && ['pending', 'paid'].includes(payment.status));
+  const isCancelled = booking.status === 'Cancelled';
+  const canCreateAdvance = !isCancelled && booking.advanceAmount > 0 && !hasActiveAdvance;
+  const canCreateBalance = !isCancelled && booking.status === 'Completed' && booking.remaining > 0 && !hasActiveBalance;
 
   return (
     <div className="find-butcher-page customer-bookings-page">
@@ -197,7 +271,83 @@ function BookingDetails() {
             <DetailRow label="Full address">{booking.address}</DetailRow><DetailRow label="Area">{booking.area}</DetailRow><DetailRow label="City">{booking.city}</DetailRow><DetailRow label="Instructions">{booking.instructions || 'None'}</DetailRow>
           </DetailSection>
           <DetailSection title="Payment Information" className="customer-booking-payment-section">
-            <DetailRow label="Total price">{money(booking.total)}</DetailRow><DetailRow label="Advance amount">{money(booking.advanceAmount)}</DetailRow><DetailRow label="Advance paid">{money(booking.advancePaid)}</DetailRow><DetailRow label="Remaining amount">{money(booking.remaining)}</DetailRow><DetailRow label="Payment status">{booking.paymentStatus}</DetailRow><DetailRow label="Transaction reference">{booking.transactionReference || 'Not available'}</DetailRow>
+            <div className="customer-payment-refresh">
+              <span>Payment updates are loaded from your booking record.</span>
+              <button className="booking-secondary-button" type="button" onClick={refreshPaymentStatus} disabled={Boolean(paymentAction) || isRefreshingPayment}>
+                {isRefreshingPayment ? 'Refreshing...' : 'Refresh payment status'}
+              </button>
+            </div>
+            <DetailRow label="Total price">{money(booking.total)}</DetailRow>
+            <DetailRow label="Advance amount">{money(booking.advanceAmount)}</DetailRow>
+            <DetailRow label="Advance payment status">
+              {advancePayment ? `${advancePayment.status} · ${advancePayment.method}` : booking.advanceAmount <= 0 ? 'Not required' : 'No payment recorded'}
+            </DetailRow>
+            <DetailRow label="Advance paid">{money(booking.advancePaid)}</DetailRow>
+            <DetailRow label="Remaining balance">{money(booking.remaining)}</DetailRow>
+            <DetailRow label="Balance payment status">
+              {balancePayment ? `${balancePayment.status} · ${balancePayment.method}` : booking.remaining <= 0 ? 'Paid in full' : 'No payment recorded'}
+            </DetailRow>
+            <DetailRow label="Booking payment status">{booking.paymentStatus}</DetailRow>
+            <DetailRow label="Transaction reference">{booking.transactionReference || 'Not available'}</DetailRow>
+
+            <div className="customer-payment-records" aria-live="polite">
+              {booking.payments.length ? booking.payments.map((payment) => (
+                <article className="customer-payment-record" key={payment.id}>
+                  <div className="customer-payment-record-heading">
+                    <strong>{payment.purpose === 'advance' ? 'Advance payment' : 'Balance payment'}</strong>
+                    <span className={`customer-payment-status status-${payment.status}`}>{payment.status}</span>
+                  </div>
+                  <p>{money(payment.amount)} · {payment.method}</p>
+                  <p>Customer confirmation: {payment.payerConfirmed ? 'Confirmed' : 'Awaiting'}</p>
+                  <p>Butcher confirmation: {payment.receiverConfirmed ? 'Confirmed' : 'Awaiting'}</p>
+                  {payment.method === 'cash' && payment.status === 'pending' && payment.receiverConfirmed && !payment.payerConfirmed && !isCancelled ? (
+                    <button
+                      className="booking-primary-button customer-payment-action"
+                      type="button"
+                      onClick={() => confirmCashPayment(payment.id)}
+                      disabled={Boolean(paymentAction) || isRefreshingPayment}
+                    >
+                      {paymentAction === `confirm-${payment.id}` ? 'Confirming...' : 'Confirm cash payment'}
+                    </button>
+                  ) : null}
+                  {payment.method === 'cash' && payment.status === 'pending' && payment.payerConfirmed && !payment.receiverConfirmed
+                    ? <p className="customer-payment-waiting" role="status">Your confirmation is recorded; waiting for the butcher to confirm.</p>
+                    : null}
+                  {payment.method !== 'cash' && payment.status === 'pending'
+                    ? <p className="customer-payment-unavailable">This online payment has not been processed. A payment gateway is not configured.</p>
+                    : null}
+                </article>
+              )) : <p className="customer-payment-empty">No payment record yet.</p>}
+            </div>
+
+            {paymentNotice ? <p className="customer-payment-notice" role="status">{paymentNotice}</p> : null}
+            {paymentError ? <p className="customer-payment-error" role="alert">{paymentError}</p> : null}
+            {isCancelled ? <p className="customer-payment-unavailable">This booking was cancelled; no further payments can be made.</p> : (
+              <div className="customer-payment-actions">
+                {canCreateAdvance ? (
+                  <button className="booking-primary-button" type="button" onClick={() => createCashPayment('advance')} disabled={Boolean(paymentAction) || isRefreshingPayment}>
+                    {paymentAction === 'advance' ? 'Recording advance...' : `Pay advance in cash · ${money(booking.advanceAmount)}`}
+                  </button>
+                ) : null}
+                {booking.status === 'Completed' && canCreateBalance ? (
+                  <button className="booking-primary-button" type="button" onClick={() => createCashPayment('balance')} disabled={Boolean(paymentAction) || isRefreshingPayment}>
+                    {paymentAction === 'balance' ? 'Recording balance...' : `Pay balance in cash · ${money(booking.remaining)}`}
+                  </button>
+                ) : null}
+                {booking.status !== 'Completed' && booking.remaining > 0
+                  ? <p className="customer-payment-waiting">The balance can be paid after the service is completed.</p>
+                  : null}
+                {!hasActiveBalance && booking.status === 'Completed' && booking.remaining <= 0
+                  ? <p className="customer-payment-waiting">The booking balance is paid in full.</p>
+                  : null}
+                <div className="customer-payment-online-options" aria-label="Online payment methods unavailable">
+                  <span>Online methods unavailable until a payment gateway is configured:</span>
+                  <button type="button" disabled>bKash</button>
+                  <button type="button" disabled>Nagad</button>
+                  <button type="button" disabled>Card</button>
+                </div>
+              </div>
+            )}
           </DetailSection>
         </div>
         <div className="customer-booking-detail-actions"><Link className="booking-secondary-button" to="/customer/bookings">Back to Booking History</Link><Link className="booking-primary-button" to="/dashboard/customer">Customer home</Link></div>

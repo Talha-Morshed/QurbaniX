@@ -677,6 +677,110 @@ class MarketplaceApiTest extends TestCase
         $this->assertDatabaseCount('user_notifications', 1);
     }
 
+    public function test_customer_can_complete_the_advance_cash_payment_flow(): void
+    {
+        ['customer' => $customer, 'butcher' => $butcher, 'booking' => $booking, 'payment' => $existingPayment] = $this->createPaymentScenario();
+        $existingPayment->delete();
+        $booking->update(['payment_status' => 'Unpaid']);
+
+        $paymentResponse = $this->actingAs($customer)
+            ->postJson("/api/customer/bookings/{$booking->id}/payments", [
+                'purpose' => 'advance',
+                'method' => 'cash',
+            ])
+            ->assertCreated()
+            ->assertJsonPath('payment.amount', 2000)
+            ->assertJsonPath('payment.purpose', 'advance')
+            ->assertJsonPath('payment.method', 'cash')
+            ->assertJsonPath('payment.status', 'pending');
+        $paymentId = $paymentResponse->json('payment.id');
+
+        $butcherConfirmation = $this->actingAs($butcher)
+            ->postJson("/api/butcher/payments/{$paymentId}/confirm")
+            ->assertOk()
+            ->assertJsonPath('payment.status', 'pending');
+        $this->assertNotNull($butcherConfirmation->json('payment.receiver_confirmed_at'));
+
+        $this->actingAs($customer)
+            ->postJson("/api/customer/payments/{$paymentId}/confirm")
+            ->assertOk()
+            ->assertJsonPath('payment.status', 'paid')
+            ->assertJsonPath('booking.payment_status', 'Advance paid');
+
+        $this->getJson("/api/customer/bookings/{$booking->id}")
+            ->assertOk()
+            ->assertJsonPath('booking.payments.0.id', $paymentId)
+            ->assertJsonPath('booking.payments.0.status', 'paid')
+            ->assertJsonPath('booking.payment_status', 'Advance paid');
+    }
+
+    public function test_customer_can_complete_the_balance_cash_payment_flow_after_service_completion(): void
+    {
+        ['customer' => $customer, 'butcher' => $butcher, 'booking' => $booking, 'payment' => $existingPayment] = $this->createPaymentScenario(
+            bookingAttributes: ['status' => 'Completed', 'payment_status' => 'Advance paid'],
+        );
+        $existingPayment->delete();
+
+        $paymentResponse = $this->actingAs($customer)
+            ->postJson("/api/customer/bookings/{$booking->id}/payments", [
+                'purpose' => 'balance',
+                'method' => 'cash',
+            ])
+            ->assertCreated()
+            ->assertJsonPath('payment.amount', 8000)
+            ->assertJsonPath('payment.purpose', 'balance')
+            ->assertJsonPath('payment.status', 'pending');
+        $paymentId = $paymentResponse->json('payment.id');
+
+        $this->actingAs($butcher)
+            ->postJson("/api/butcher/payments/{$paymentId}/confirm")
+            ->assertOk()
+            ->assertJsonPath('payment.status', 'pending');
+
+        $this->actingAs($customer)
+            ->postJson("/api/customer/payments/{$paymentId}/confirm")
+            ->assertOk()
+            ->assertJsonPath('payment.status', 'paid')
+            ->assertJsonPath('booking.payment_status', 'Paid in full')
+            ->assertJsonPath('booking.remaining_amount', 0);
+
+        $this->getJson("/api/customer/bookings/{$booking->id}")
+            ->assertOk()
+            ->assertJsonPath('booking.payments.0.status', 'paid')
+            ->assertJsonPath('booking.payments.0.purpose', 'balance')
+            ->assertJsonPath('booking.remaining_amount', 0);
+    }
+
+    public function test_customer_payment_creation_rejects_duplicates_cancelled_bookings_and_foreign_owners(): void
+    {
+        ['customer' => $customer, 'booking' => $booking] = $this->createPaymentScenario();
+        $paymentPayload = ['purpose' => 'advance', 'method' => 'cash'];
+
+        $this->postJson("/api/customer/bookings/{$booking->id}/payments", $paymentPayload)
+            ->assertUnauthorized();
+
+        $this->actingAs($customer)
+            ->postJson("/api/customer/bookings/{$booking->id}/payments", [
+                'purpose' => 'balance',
+                'method' => 'cash',
+            ])
+            ->assertUnprocessable();
+
+        $this->actingAs($customer)
+            ->postJson("/api/customer/bookings/{$booking->id}/payments", $paymentPayload)
+            ->assertStatus(409);
+
+        $otherCustomer = User::factory()->create(['role' => 'customer']);
+        $this->actingAs($otherCustomer)
+            ->postJson("/api/customer/bookings/{$booking->id}/payments", $paymentPayload)
+            ->assertNotFound();
+
+        $booking->update(['status' => 'Cancelled']);
+        $this->actingAs($customer)
+            ->postJson("/api/customer/bookings/{$booking->id}/payments", $paymentPayload)
+            ->assertUnprocessable();
+    }
+
     public function test_booking_rejects_a_time_at_the_exclusive_schedule_end(): void
     {
         $customer = User::factory()->create(['role' => 'customer']);
