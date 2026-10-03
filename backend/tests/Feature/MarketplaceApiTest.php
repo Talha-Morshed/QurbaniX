@@ -272,6 +272,105 @@ class MarketplaceApiTest extends TestCase
             ->assertNotFound();
     }
 
+    public function test_butcher_can_list_only_their_bookings_with_customer_service_and_payment_details(): void
+    {
+        ['butcher' => $butcher, 'booking' => $booking, 'customer' => $customer, 'payment' => $payment] = $this->createPaymentScenario();
+        $this->createPaymentScenario();
+
+        $this->actingAs($butcher)
+            ->getJson('/api/butcher/bookings')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', $booking->id)
+            ->assertJsonPath('data.0.reference', $booking->reference)
+            ->assertJsonPath('data.0.customer.id', $customer->id)
+            ->assertJsonPath('data.0.customer.name', $customer->name)
+            ->assertJsonPath('data.0.service.name', 'Goat Qurbani')
+            ->assertJsonPath('data.0.payments.0.id', $payment->id);
+    }
+
+    public function test_butcher_can_view_only_their_own_booking_details(): void
+    {
+        ['butcher' => $butcher, 'booking' => $booking] = $this->createPaymentScenario();
+        ['booking' => $anotherBooking] = $this->createPaymentScenario();
+
+        $this->actingAs($butcher)
+            ->getJson("/api/butcher/bookings/{$booking->id}")
+            ->assertOk()
+            ->assertJsonPath('booking.id', $booking->id)
+            ->assertJsonPath('booking.reference', $booking->reference)
+            ->assertJsonPath('booking.service.name', 'Goat Qurbani');
+
+        $this->getJson("/api/butcher/bookings/{$anotherBooking->id}")
+            ->assertNotFound();
+    }
+
+    public function test_butcher_booking_management_requires_authentication_and_butcher_role(): void
+    {
+        ['booking' => $booking] = $this->createPaymentScenario();
+
+        $this->getJson('/api/butcher/bookings')->assertUnauthorized();
+        $this->getJson("/api/butcher/bookings/{$booking->id}")->assertUnauthorized();
+        $this->patchJson("/api/butcher/bookings/{$booking->id}/status", ['status' => 'Confirmed'])->assertUnauthorized();
+
+        $customer = User::factory()->create(['role' => 'customer']);
+        $this->actingAs($customer)
+            ->getJson('/api/butcher/bookings')
+            ->assertForbidden();
+        $this->getJson("/api/butcher/bookings/{$booking->id}")
+            ->assertForbidden();
+        $this->patchJson("/api/butcher/bookings/{$booking->id}/status", ['status' => 'Confirmed'])
+            ->assertForbidden();
+    }
+
+    public function test_butcher_can_progress_booking_through_allowed_statuses_and_customer_sees_updates(): void
+    {
+        ['butcher' => $butcher, 'customer' => $customer, 'booking' => $booking] = $this->createPaymentScenario(
+            bookingAttributes: ['status' => 'Pending'],
+        );
+
+        $this->actingAs($butcher)
+            ->patchJson("/api/butcher/bookings/{$booking->id}/status", ['status' => 'Confirmed'])
+            ->assertOk()
+            ->assertJsonPath('booking.status', 'Confirmed');
+
+        $this->patchJson("/api/butcher/bookings/{$booking->id}/status", ['status' => 'In Progress'])
+            ->assertOk()
+            ->assertJsonPath('booking.status', 'In Progress');
+
+        $this->patchJson("/api/butcher/bookings/{$booking->id}/status", ['status' => 'Completed'])
+            ->assertOk()
+            ->assertJsonPath('booking.status', 'Completed');
+
+        $this->actingAs($customer)
+            ->getJson('/api/customer/bookings')
+            ->assertOk()
+            ->assertJsonPath('data.0.id', $booking->id)
+            ->assertJsonPath('data.0.status', 'Completed');
+    }
+
+    public function test_butcher_booking_status_rejects_invalid_transitions_and_foreign_bookings(): void
+    {
+        ['butcher' => $butcher, 'booking' => $booking] = $this->createPaymentScenario(
+            bookingAttributes: ['status' => 'Pending'],
+        );
+        ['booking' => $anotherBooking] = $this->createPaymentScenario(
+            bookingAttributes: ['status' => 'Pending'],
+        );
+
+        $this->actingAs($butcher)
+            ->patchJson("/api/butcher/bookings/{$booking->id}/status", ['status' => 'Completed'])
+            ->assertUnprocessable();
+
+        $this->assertSame('Pending', $booking->fresh()->status);
+
+        $this->patchJson("/api/butcher/bookings/{$anotherBooking->id}/status", ['status' => 'Confirmed'])
+            ->assertNotFound();
+
+        $this->patchJson('/api/butcher/bookings/999999/status', ['status' => 'Confirmed'])
+            ->assertNotFound();
+    }
+
     public function test_customer_reviews_require_ownership_completion_and_valid_fields_and_cannot_be_duplicated(): void
     {
         ['customer' => $customer, 'booking' => $completedBooking] = $this->createPaymentScenario(

@@ -1,4 +1,4 @@
-const statusFilters = ['All', 'Pending', 'Accepted', 'Completed', 'Cancelled'];
+const statusFilters = ['All', 'Pending', 'Confirmed', 'In Progress', 'Completed', 'Cancelled'];
 
 function BookingFilters({ activeStatus, onStatusChange, search, onSearchChange, date, onDateChange }) {
   return (

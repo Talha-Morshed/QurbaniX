@@ -167,6 +167,7 @@ class BookingController extends Controller
         $next = $validated['status'];
         $isButcher = $user->id === $booking->butcher_id;
         $isCustomer = $user->id === $booking->customer_id;
+        abort_unless($isButcher || $isCustomer, 404);
 
         // Adnan: Encode the booking lifecycle here so users cannot skip required steps.
         $allowed = match (true) {
